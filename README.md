@@ -14,23 +14,83 @@ vl ansible_inventory
 ansible all -m ping -i inventory
 ```
 
-## Installation
+[![demo](https://asciinema.org/a/auiusqdLi83LmnqjibmX7ihtg.svg)](https://asciinema.org/a/auiusqdLi83LmnqjibmX7ihtg?autoplay=1)
 
-### Fedora 29
+## Pre-requirements
+
+
+
+<details><summary>Debian-9</summary>
+<p>
 
 First you need to install libvirt and guestfs:
 ```shell
-sudo dnf install -y python3 libvirt libguestfs-tools python3-libvirt python3-virtualenv libvirt-devel
+sudo apt install -f gcc libguestfs-tools libvirt-daemon libvirt-daemon-system libvirt-dev python3 python3-dev python3-venv rsync
+sudo systemctl start --now libvirtd
+```
+
+The second step is to grant to your user the ability to use libvirt:
+```shell
+sudo usermod -a -G kvm,libvirt,libvirt-qemu $USER
+```
+</p>
+</details>
+
+
+<details><summary>Fedora-29</summary>
+<p>
+
+First you need to install libvirt and guestfs:
+```shell
+sudo apt install -f gcc libguestfs-tools libselinux-python libvirt libvirt-devel python3 python3-virtualenv
 sudo systemctl start --now libvirtd
 ```
 
 The second step is to grant to your user the ability to use libvirt:
 ```shell
 sudo usermod -a -G qemu,libvirt $USER
-sudo chmod g+x $HOME
+```
+</p>
+</details>
+
+
+<details><summary>Ubuntu-16.04</summary>
+<p>
+
+First you need to install libvirt and guestfs:
+```shell
+sudo apt install -f gcc libguestfs-tools libvirt-bin libvirt-daemon libvirt-dev python3 python3-dev python3-venv
+sudo systemctl start --now libvirtd
 ```
 
-Finally we can prepare a virtualenv:
+The second step is to grant to your user the ability to use libvirt:
+```shell
+sudo usermod -a -G kvm,libvirtd $USER
+```
+</p>
+</details>
+
+
+<details><summary>Ubuntu-18.04</summary>
+<p>
+
+First you need to install libvirt and guestfs:
+```shell
+sudo apt install -f gcc libguestfs-tools libvirt-bin libvirt-daemon libvirt-dev python3 python3-dev python3-venv
+sudo systemctl start --now libvirtd
+```
+
+The second step is to grant to your user the ability to use libvirt:
+```shell
+sudo usermod -a -G kvm,libvirt $USER
+```
+</p>
+</details>
+
+
+
+## Installation
+
 ```shell
 python3 -m venv venv
 source venv/bin/activate
