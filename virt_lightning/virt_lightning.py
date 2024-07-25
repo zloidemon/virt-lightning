@@ -19,6 +19,7 @@ import xml.etree.ElementTree as ET  # noqa: N817
 import libvirt
 import yaml
 
+from virt_lightning.codes import ExitCode
 from virt_lightning.symbols import get_symbols
 
 from .templates import (
@@ -66,7 +67,7 @@ class LibvirtHypervisor:
     def __init__(self, conn):
         if conn is None:
             logger.error("Failed to open connection to libvirt")
-            exit(1)
+            exit(ExitCode.FAIL.value)
 
         self.conn = conn
         self._last_free_ipv4 = None
@@ -245,7 +246,7 @@ class LibvirtHypervisor:
                     f"  sudo virsh vol-delete --pool "
                     f"{self.storage_pool_obj.name()} {name}.qcow2"
                 )
-                sys.exit(1)
+                sys.exit(ExitCode.FAIL.value)
             raise
 
     def get_openstack_network_data(self, domain):
@@ -628,7 +629,7 @@ class LibvirtHypervisor:
                     storage_dir=self.get_storage_dir(),
                 )
             )
-            exit(1)
+            exit(ExitCode.FAIL.value)
 
         if not self.storage_pool_obj.isActive():
             self.storage_pool_obj.create(0)
