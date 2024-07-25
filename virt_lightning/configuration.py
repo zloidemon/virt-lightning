@@ -50,7 +50,17 @@ class AbstractConfiguration(metaclass=ABCMeta):
 
     def __repr__(self):
         return (
-            f"Configuration(libvirt_uri={self.libvirt_uri}, username={self.username})"
+            "Configuration(" + \
+                ",".join([
+                    f"libvirt_uri={self.libvirt_uri}",
+                    f"network_name={self.network_name}",
+                    f"network_cidr={self.network_cidr}",
+                    f"network_auto_clean_up={self.network_auto_clean_up}",
+                    f"root_password={self.root_password}",
+                    f"ssh_key_file={self.ssh_key_file}",
+                    f"storage_pool={self.storage_pool}",
+                ]) + \
+            ")"
         )
 
 

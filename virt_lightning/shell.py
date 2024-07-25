@@ -155,6 +155,7 @@ Commands:
     console             Open console on a VM
     viewer              Open VM with virt-viewer
     status              Get status of running VM's
+    config              Dump configuration
     """
 
     vl_lightning_yaml_args = {
@@ -240,6 +241,10 @@ Commands:
         "status", help="List the VM currently running", parents=[parent_parser]
     )
     status_parser.add_argument("--context", **context_args)
+
+    config_parser = action_subparsers.add_parser(
+        "config", help="Dump configuration", parents=[parent_parser]
+    )
 
     action_subparsers.add_parser(
         "distro_list",
@@ -343,6 +348,18 @@ Commands:
                     **v,
                 )
             )
+    elif args.action == "config":
+        print("Libvirt")
+        print(f"    libvirt_uri:              {configuration.libvirt_uri}")
+        print("Network")
+        print(f"    network_name:             {configuration.network_name}")
+        print(f"    network_cidr:             {configuration.network_cidr}")
+        print(f"    network_auto_clean_up:    {configuration.network_auto_clean_up}")
+        print("Storage")
+        print(f"    storage_pool:             {configuration.storage_pool}")
+        print("User")
+        print(f"    ssh_key_file:             {configuration.ssh_key_file}")
+        print(f"    root_password:            {'*' * 8}")
     elif args.action == "console":
         console(configuration=configuration, name=args.name)
     elif args.action == "viewer":
