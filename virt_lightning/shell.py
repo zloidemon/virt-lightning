@@ -104,7 +104,7 @@ def progress_callback(cur, length):
     percent = (cur * 100) / length
     done = int(cur / virt_lightning.api.MB)
     full = int(length / virt_lightning.api.MB)
-    line = f"🌍 ➡️  💻 [{percent:06.2f}%]  {done:6}MB/{full}MB\r"
+    line = f"{symbols.GLOBE.value} {symbols.RIGHT_ARROW.value} {symbols.COMPUTER.value} [{percent:06.2f}%]  {done:6}MB/{full}MB\r"
     print(line, end="")  # noqa: T001
 
 
@@ -411,6 +411,6 @@ Commands:
             logger.error(f"VM {e.name} not found")
         except virt_lightning.api.ImageNotFoundLocallyError as e:
             logger.error(
-                f"ℹ️ You may be able to download the image with the `vl fetch {e.name}` command."
+                f"{symbols.EXCLAMATION.value} You may be able to download the image with the `vl fetch {e.name}` command."
             )
             exit(1)
