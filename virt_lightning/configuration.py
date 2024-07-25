@@ -50,8 +50,9 @@ class AbstractConfiguration(metaclass=ABCMeta):
 
     def __repr__(self):
         return (
-            "Configuration(" + \
-                ",".join([
+            "Configuration("
+            + ",".join(  # noqa: W503
+                [
                     f"libvirt_uri={self.libvirt_uri}",
                     f"network_name={self.network_name}",
                     f"network_cidr={self.network_cidr}",
@@ -59,8 +60,9 @@ class AbstractConfiguration(metaclass=ABCMeta):
                     f"root_password={self.root_password}",
                     f"ssh_key_file={self.ssh_key_file}",
                     f"storage_pool={self.storage_pool}",
-                ]) + \
-            ")"
+                ]
+            )
+            + ")"  # noqa: W503
         )
 
 

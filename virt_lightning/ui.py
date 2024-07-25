@@ -1,5 +1,7 @@
 import logging
 
+from virt_lightning.codes import ExitCode
+
 try:
     import urwid
 except ImportError:
@@ -28,7 +30,7 @@ class Selector:
 
         if not urwid_found:
             logging.error("Please install the urwid package.")
-            exit(1)
+            exit(ExitCode.FAIL.value)
 
         main = urwid.Padding(self.menu(), left=2, right=2)
         top = urwid.Overlay(
