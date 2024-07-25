@@ -411,6 +411,6 @@ Commands:
             logger.error(f"VM {e.name} not found")
         except virt_lightning.api.ImageNotFoundLocallyError as e:
             logger.error(
-                f"ℹ️ You may be able to download the image with the `vl fetch {e.name}` command."
+                f"{symbols.EXCLAMATION.value} You may be able to download the image with the `vl fetch {e.name}` command."
             )
             exit(1)
