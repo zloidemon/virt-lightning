@@ -12,6 +12,7 @@ import yaml
 import virt_lightning.api
 import virt_lightning.ui as ui
 import virt_lightning.virt_lightning as vl
+from virt_lightning.codes import ExitCode
 from virt_lightning.configuration import Configuration
 from virt_lightning.symbols import get_symbols
 
@@ -92,7 +93,7 @@ def viewer(configuration, name=None, **kwargs):
                 domain.name,
             )
         else:
-            sys.exit(0)
+            sys.exit(ExitCode.OK.value)
 
     if name:
         go_viewer(hv.get_domain_by_name(name))
@@ -104,7 +105,7 @@ def progress_callback(cur, length):
     percent = (cur * 100) / length
     done = int(cur / virt_lightning.api.MB)
     full = int(length / virt_lightning.api.MB)
-    line = f"{symbols.GLOBE.value} {symbols.RIGHT_ARROW.value} {symbols.COMPUTER.value} [{percent:06.2f}%]  {done:6}MB/{full}MB\r"
+    line = f"{symbols.GLOBE.value} {symbols.RIGHT_ARROW.value} {symbols.COMPUTER.value} [{percent:06.2f}%]  {done:6}MB/{full}MB\r"  # noqa: E501
     print(line, end="")  # noqa: T001
 
 
@@ -245,6 +246,7 @@ Commands:
     config_parser = action_subparsers.add_parser(
         "config", help="Dump configuration", parents=[parent_parser]
     )
+    config_parser.add_argument("--context", **context_args)
 
     action_subparsers.add_parser(
         "distro_list",
@@ -296,7 +298,7 @@ Commands:
         print(title)  # noqa: T001
         print(usage)  # noqa: T001
         print(example)  # noqa: T001
-        exit(1)
+        exit(ExitCode.FAIL.value)
 
     configuration = Configuration()
     if args.config:
@@ -349,17 +351,19 @@ Commands:
                 )
             )
     elif args.action == "config":
-        print("Libvirt")
-        print(f"    libvirt_uri:              {configuration.libvirt_uri}")
-        print("Network")
-        print(f"    network_name:             {configuration.network_name}")
-        print(f"    network_cidr:             {configuration.network_cidr}")
-        print(f"    network_auto_clean_up:    {configuration.network_auto_clean_up}")
-        print("Storage")
-        print(f"    storage_pool:             {configuration.storage_pool}")
-        print("User")
-        print(f"    ssh_key_file:             {configuration.ssh_key_file}")
-        print(f"    root_password:            {'*' * 8}")
+        print(  # noqa: T001
+            "Libvirt"
+            f"    libvirt_uri:              {configuration.libvirt_uri}"
+            "Network"
+            f"    network_name:             {configuration.network_name}"
+            f"    network_cidr:             {configuration.network_cidr}"
+            f"    network_auto_clean_up:    {configuration.network_auto_clean_up}"
+            "Storage"
+            f"    storage_pool:             {configuration.storage_pool}"
+            "User"
+            f"    ssh_key_file:             {configuration.ssh_key_file}"
+            f"    root_password:            {'*' * 8}"
+        )
     elif args.action == "console":
         console(configuration=configuration, name=args.name)
     elif args.action == "viewer":
@@ -390,19 +394,19 @@ Commands:
                 f"  Visit {virt_lightning.api.BASE_URL}/images/ or private image hub"
                 "to get an up to date list."
             )
-            exit(1)
+            exit(ExitCode.FAIL.value)
     elif args.action in ["up", "start"]:
         action_func = getattr(virt_lightning.api, args.action)
         try:
             action_func(configuration=configuration, **vars(args))
         except virt_lightning.api.ImageNotFoundLocallyError as e:
             print(f"Image not found from url: {e.name}")  # noqa: T001
-            exit(1)
+            exit(ExitCode.FAIL.value)
         except virt_lightning.api.CannotConnectToLibvirtError:
             how_to_fix_auth_error()
         except virt_lightning.api.VMNotRunningError as e:
             print(f"The following instance is not running: {e.name}")  # noqa: T001
-            exit(1)
+            exit(ExitCode.FAIL.value)
     else:
         try:
             action_func = getattr(virt_lightning.api, args.action)
@@ -411,6 +415,6 @@ Commands:
             logger.error(f"VM {e.name} not found")
         except virt_lightning.api.ImageNotFoundLocallyError as e:
             logger.error(
-                f"{symbols.EXCLAMATION.value} You may be able to download the image with the `vl fetch {e.name}` command."
+                f"{symbols.EXCLAMATION.value} You may be able to download the image with the `vl fetch {e.name}` command."  # noqa: E501
             )
-            exit(1)
+            exit(ExitCode.FAIL.value)
