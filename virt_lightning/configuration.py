@@ -1,23 +1,23 @@
-from abc import ABCMeta, abstractproperty
 import configparser
-import os
-import getpass
+from abc import ABCMeta, abstractproperty
+from pathlib import PosixPath
 
-DEFAULT_CONFIGFILE = '{home}/.config/virt-lightning/config.ini'.format(
-        home=os.environ['HOME'])
+DEFAULT_CONFIGFILE = PosixPath("~/.config/virt-lightning/config.ini")
+
 
 DEFAULT_CONFIGURATION = {
     "main": {
-        "libvirt_uri": "qemu:///system" if os.geteuid() == 0 else "qemu:///session",
-        "network": "192.168.122.0/24",
-        "gateway": "192.168.122.1/24",
-        "bridge": "virbr0",
-        "username": getpass.getuser(),
+        "libvirt_uri": "qemu:///system",
         "root_password": "root",
-        "storage_pool": "default",
+        "storage_pool": "virt-lightning",
+        "network_name": "virt-lightning",
+        "network_cidr": "192.168.123.0/24",
+        "network_auto_clean_up": True,
         "ssh_key_file": "~/.ssh/id_rsa.pub",
-    },
+        "private_hub": "",
+    }
 }
+
 
 class AbstractConfiguration(metaclass=ABCMeta):
     @abstractproperty
@@ -25,19 +25,15 @@ class AbstractConfiguration(metaclass=ABCMeta):
         pass
 
     @abstractproperty
-    def username(self):
+    def network_name(self):
         pass
 
     @abstractproperty
-    def network(self):
+    def network_cidr(self):
         pass
 
     @abstractproperty
-    def gateway(self):
-        pass
-
-    @abstractproperty
-    def bridge(self):
+    def network_auto_clean_up(self):
         pass
 
     @abstractproperty
@@ -53,95 +49,52 @@ class AbstractConfiguration(metaclass=ABCMeta):
         pass
 
     def __repr__(self):
-        return "Configuration(libvirt_uri={uri}, username={username})".format(
-                    uri=self.libvirt_uri, username=self.username,
-                )
+        return (
+            f"Configuration(libvirt_uri={self.libvirt_uri}, username={self.username})"
+        )
+
 
 class Configuration(AbstractConfiguration):
-    def __init__(self, obj):
-        self.data = obj
+    def __init__(self):
+        self.data = configparser.ConfigParser()
+        self.data["main"] = DEFAULT_CONFIGURATION["main"]
+        if DEFAULT_CONFIGFILE.expanduser().exists():
+            self.load_file(DEFAULT_CONFIGFILE.expanduser())
 
     def __get(self, key):
         return self.data.get("main", key)
 
     @property
     def libvirt_uri(self):
-        try:
-            return self.__get("libvirt_uri")
-        except:
-            pass
-
-        if os.geteuid() == 0:
-            path = "system"
-        else:
-            path = "session"
-
-        return "qemu:///{path}".format(path=path)
+        return self.__get("libvirt_uri")
 
     @property
-    def username(self):
-        try:
-            return self.__get("username")
-        except:
-            return getpass.getuser()
+    def network_name(self):
+        return self.__get("network_name")
 
     @property
-    def network(self):
-        return self.__get("network") 
+    def network_cidr(self):
+        return self.__get("network_cidr")
 
     @property
-    def gateway(self):
-        return self.__get("gateway") 
-
-    @property
-    def bridge(self):
-        return self.__get("bridge") 
+    def network_auto_clean_up(self):
+        return self.__get("network_auto_clean_up")
 
     @property
     def root_password(self):
-        try:
-            return self.__get("root_password") 
-        except:
-            return None
+        return self.__get("root_password")
 
     @property
     def ssh_key_file(self):
-        return self.__get("ssh_key_file") 
+        return self.__get("ssh_key_file")
 
     @property
     def storage_pool(self):
-        return self.__get("storage_pool") 
+        return self.__get("storage_pool")
 
-class ReadConfigShell:
-    def __init__(self, filename=None):
-        self.filename = filename
-        self.data = None
+    @property
+    def private_hub(self):
+        return [x for x in self.__get("private_hub").split(",") if x != ""]
 
-    def __readfile(self):
-        if self.filename == DEFAULT_CONFIGFILE and \
-                not os.path.isfile(DEFAULT_CONFIGFILE):
-            self.filename = None
-        else:
-            with open(self.filename, "r", encoding="utf-8") as f:
-                self.data = f.read()
-
-    def load(self):
-        parsed = configparser.ConfigParser()
-
-        self.__readfile()
-
-        if not self.filename:
-            parsed.read_dict(DEFAULT_CONFIGURATION)
-            config = Configuration(parsed)
-
-            return config
-
-        parsed.read_string(self.data)
-        config = Configuration(parsed)
-
-        return config
-    
-    def __repr__(self):
-        return "Config(filename={filename})".format(
-                    filename=self.filename,
-                )
+    def load_file(self, config_file):
+        self.data.read_string(config_file.read_text())

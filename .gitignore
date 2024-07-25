@@ -62,3 +62,16 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+# maintain by setuptools-scm
+virt_lightning/version.py
+
+virt-lightning.yaml
+
+.mypy_cache
+.pytest_cache
+
+ansible/roles/
+
+#IDE
+virt-lightning.code-workspace

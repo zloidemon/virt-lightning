@@ -1,2 +1,3 @@
 libvirt-python
 pyyaml
+urwid
