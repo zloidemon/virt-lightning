@@ -1,8 +1,7 @@
 import configparser
 
-from .consts import LoginMethod
-
-from .iconfiguration import (
+from virt_lightning.consts import LoginMethod
+from virt_lightning.iconfiguration import (
     IConfigurationBackend,
     IConfigurationBuilder,
     IConfigurationLogin,
