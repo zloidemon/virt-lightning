@@ -13,7 +13,7 @@ from concurrent.futures import ThreadPoolExecutor
 import libvirt
 
 import virt_lightning.virt_lightning as vl
-from virt_lightning.configuration import Configuration
+from virt_lightning.configuration import ProxyLegacyConfiguration as Configuration
 from virt_lightning.consts import DEFAULT_BASE_URL
 from virt_lightning.symbols import get_symbols
 from virt_lightning.util import strtobool
@@ -500,6 +500,9 @@ def fetch(configuration=None, progress_callback=None, hv=None, **kwargs):
         hv = vl.LibvirtHypervisor(conn)
         hv.init_storage_pool(configuration.storage_pool)
 
+    #
+    # FIXME: Поределать на использования только одной загружаемой конфигурации
+    #
     configuration = configuration if configuration is not None else Configuration()
     image_found = False
     for images_url in configuration.private_hub:
