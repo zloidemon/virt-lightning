@@ -4,6 +4,8 @@ from pathlib import PosixPath
 
 @unique
 class LoginMethod(Enum):
-    SSH = 'ssh'
+    SSH = "ssh"
 
+
+DEFAULT_BASE_URL = "https://virt-lightning.org"
 DEFAULT_CONFIGFILE = PosixPath("~/.config/virt-lightning/config.ini")
