@@ -32,7 +32,7 @@ class SymbolsDefault(Enum):
 
 
 def get_symbols():
-    lang, encoding = locale.getdefaultlocale()
+    lang, encoding = locale.getlocale()
 
     if encoding and encoding == "UTF-8":
         return SymbolsUTF
