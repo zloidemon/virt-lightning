@@ -1,4 +1,4 @@
-import configparser
+from configparser import ConfigParser
 
 from virt_lightning.consts import LoginMethod
 from virt_lightning.iconfiguration import (
@@ -65,7 +65,7 @@ class ConfigurationLoadFile(IConfigurationSource):
     def __init__(self, filename):
         self.__filename = filename
         self.__cached = None
-        self.__config = configparser.ConfigParser()
+        self.__config = ConfigParser()
         self.__section = "main"
         self.__config[self.__section] = DEFAULT_CONFIGURATION[self.__section]
 
