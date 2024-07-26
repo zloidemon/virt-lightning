@@ -1,8 +1,15 @@
 import configparser
-from abc import ABCMeta, abstractproperty
-from pathlib import PosixPath
 
-DEFAULT_CONFIGFILE = PosixPath("~/.config/virt-lightning/config.ini")
+from .consts import LoginMethod
+
+from .iconfiguration import (
+    IConfigurationBackend,
+    IConfigurationBuilder,
+    IConfigurationLogin,
+    IConfigurationNetworkModel,
+    IConfigurationSource,
+    IConfigurationUnixUser,
+)
 
 
 DEFAULT_CONFIGURATION = {
@@ -19,94 +26,199 @@ DEFAULT_CONFIGURATION = {
 }
 
 
-class AbstractConfiguration(metaclass=ABCMeta):
-    @abstractproperty
-    def libvirt_uri(self):
-        pass
+class ConfigurationBackend(IConfigurationBackend):
+    def __init__(self, uri, storage):
+        self.__entrypoint = uri
+        self.__storage = storage
 
-    @abstractproperty
-    def network_name(self):
-        pass
+    @property
+    def entrypoint(self):
+        return self.__entrypoint
 
-    @abstractproperty
-    def network_cidr(self):
-        pass
+    @property
+    def storage(self):
+        return self.__storage
 
-    @abstractproperty
-    def network_auto_clean_up(self):
-        pass
 
-    @abstractproperty
-    def root_password(self):
-        pass
+class ConfigurationTCPIP(IConfigurationNetworkModel):
+    def __init__(self, name, cidr, clean):
+        self.__name = name
+        self.__cidr = cidr
+        self.__clean = clean
 
-    @abstractproperty
-    def ssh_key_file(self):
-        pass
+    @property
+    def name(self):
+        return self.__name
 
-    @abstractproperty
-    def storage_pool(self):
-        pass
+    @property
+    def cidr(self):
+        return self.__cidr
+
+    @property
+    def auto_cleanup(self):
+        return self.__clean
 
     def __repr__(self):
-        return (
-            "Configuration("
-            + ",".join(  # noqa: W503
-                [
-                    f"libvirt_uri={self.libvirt_uri}",
-                    f"network_name={self.network_name}",
-                    f"network_cidr={self.network_cidr}",
-                    f"network_auto_clean_up={self.network_auto_clean_up}",
-                    f"root_password={self.root_password}",
-                    f"ssh_key_file={self.ssh_key_file}",
-                    f"storage_pool={self.storage_pool}",
-                ]
-            )
-            + ")"  # noqa: W503
+        return f"ConfigurationTCPIP({self.name},{self.cidr},{self.auto_cleanup})"
+
+
+class ConfigurationLoadFile(IConfigurationSource):
+    def __init__(self, filename):
+        self.__filename = filename
+        self.__cached = None
+        self.__config = configparser.ConfigParser()
+        self.__section = "main"
+        self.__config[self.__section] = DEFAULT_CONFIGURATION[self.__section]
+
+        self.__refresh()
+
+    def __get(self, key):
+        return self.__config.get(self.__section, key)
+
+    def __refresh(self):
+        if not self.__cached and self.__filename.expanduser().exists():
+            self.__cached = self.__filename.expanduser().read_text()
+        return self.__config.read_string(self.__cached)
+
+    @property
+    def uri(self):
+        return self.__filename
+
+    @property
+    def network(self):
+        return ConfigurationTCPIP(
+            self.__get("network_name"),
+            self.__get("network_cidr"),
+            self.__get("network_auto_clean_up"),
+        )
+
+    @property
+    def backend(self):
+        return ConfigurationBackend(
+            self.__get("libvirt_uri"),
+            self.__get("storage_pool"),
+        )
+
+    @property
+    def user(self):
+        return ConfigurationUnixUser(
+            "root",
+            self.__get("root_password"),
+            ConfigurationLoginSSH(self.__get("ssh_key_file")),
         )
 
 
-class Configuration(AbstractConfiguration):
-    def __init__(self):
-        self.data = configparser.ConfigParser()
-        self.data["main"] = DEFAULT_CONFIGURATION["main"]
-        if DEFAULT_CONFIGFILE.expanduser().exists():
-            self.load_file(DEFAULT_CONFIGFILE.expanduser())
+class ConfigurationLoginSSH(IConfigurationLogin):
+    def __init__(self, filename):
+        self.__filename = filename
 
-    def __get(self, key):
-        return self.data.get("main", key)
+    @property
+    def method(self):
+        return LoginMethod.SSH
+
+    @property
+    def key(self):
+        return self.__filename
+
+
+class ConfigurationUnixUser(IConfigurationUnixUser):
+    #
+    # NOTE: В login на самом деле стоит сделать не только SSH, а и другое
+    #       либо несколько, используя список
+    #
+    def __init__(self, username, password, login):
+        self.__username = username
+        self.__password = password
+        self.__login = login
+
+    @property
+    def username(self):
+        return self.__username
+
+    @property
+    def password(self):
+        return self.__password
+
+    @property
+    def login(self):
+        return self.__login
+
+
+class ConfigurationBuilder(IConfigurationBuilder):
+    def __init__(self):
+        self.__source = None
+
+    @classmethod
+    def create(cls):
+        return cls()
+
+    def set_source(self, source):
+        if self.__source:
+            raise Exception("source already setup")
+        else:
+            self.__source = source
+        return self
+
+    def build(self):
+        if not self.__source:
+            raise Exception("source must be defined before build")
+
+        return Configuration(
+            self.__source.backend,
+            self.__source.user,
+            self.__source.network,
+        )
+
+
+class Configuration:
+    def __init__(self, backend, user, network):
+        self.backend = backend
+        self.network = network
+        self.user = user
+
+    def __repr__(self):
+        return "Configuration()"
+
+
+class ProxyLegacyConfiguration:
+    def __init__(self, filename=None):
+        builder = ConfigurationBuilder.create().set_source(
+            ConfigurationLoadFile(filename)
+        )
+
+        self.data = builder.build()
 
     @property
     def libvirt_uri(self):
-        return self.__get("libvirt_uri")
+        return self.data.backend.entrypoint
 
     @property
     def network_name(self):
-        return self.__get("network_name")
+        return self.data.network.name
 
     @property
     def network_cidr(self):
-        return self.__get("network_cidr")
+        return self.data.network.cidr
 
     @property
     def network_auto_clean_up(self):
-        return self.__get("network_auto_clean_up")
+        return self.data.network.auto_cleanup
 
     @property
     def root_password(self):
-        return self.__get("root_password")
+        return self.data.user.password
 
     @property
     def ssh_key_file(self):
-        return self.__get("ssh_key_file")
+        return self.data.user.login.key
 
     @property
     def storage_pool(self):
-        return self.__get("storage_pool")
+        return self.data.backend.storage
 
+    #
+    # FIXME: Переделать на использование множества источников из конфигурации
+    #
     @property
     def private_hub(self):
         return [x for x in self.__get("private_hub").split(",") if x != ""]
-
-    def load_file(self, config_file):
-        self.data.read_string(config_file.read_text())

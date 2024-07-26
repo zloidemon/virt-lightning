@@ -14,7 +14,7 @@ import virt_lightning.consts as consts
 import virt_lightning.ui as ui
 import virt_lightning.virt_lightning as vl
 from virt_lightning.codes import ExitCode
-from virt_lightning.configuration import Configuration
+from virt_lightning.configuration import ProxyLegacyConfiguration as Configuration
 from virt_lightning.symbols import get_symbols
 
 symbols = get_symbols()
