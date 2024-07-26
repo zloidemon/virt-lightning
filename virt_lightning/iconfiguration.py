@@ -9,7 +9,9 @@ from abc import (
 # Общий интерфейс для сетевых моделей
 #
 class IConfigurationNetworkModel(metaclass=ABCMeta):
-    pass
+    @abstractproperty
+    def name(self):
+        pass
 
 
 #
