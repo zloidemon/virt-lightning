@@ -13,11 +13,10 @@ from concurrent.futures import ThreadPoolExecutor
 import libvirt
 
 import virt_lightning.virt_lightning as vl
-from virt_lightning.configuration import Configuration
+from virt_lightning.configuration import ProxyLegacyConfiguration as Configuration
+from virt_lightning.consts import DEFAULT_BASE_URL
 from virt_lightning.symbols import get_symbols
 from virt_lightning.util import strtobool
-
-BASE_URL = "https://virt-lightning.org"
 
 logger = logging.getLogger("virt_lightning")
 
@@ -460,7 +459,9 @@ def fetch_from_url(progress_callback=None, url=None, **kwargs):
     opener = urllib.request.build_opener(RedirectFilter)
     urllib.request.install_opener(opener)
 
-    parent_url = BASE_URL + "/images/{distro}".format(**kwargs) if url is None else url
+    parent_url = (
+        DEFAULT_BASE_URL + "/images/{distro}".format(**kwargs) if url is None else url
+    )
     try:
         r = urllib.request.urlopen(
             "{url}/{distro}.qcow2".format(url=parent_url, **kwargs)
@@ -499,6 +500,9 @@ def fetch(configuration=None, progress_callback=None, hv=None, **kwargs):
         hv = vl.LibvirtHypervisor(conn)
         hv.init_storage_pool(configuration.storage_pool)
 
+    #
+    # FIXME: Поределать на использования только одной загружаемой конфигурации
+    #
     configuration = configuration if configuration is not None else Configuration()
     image_found = False
     for images_url in configuration.private_hub:
