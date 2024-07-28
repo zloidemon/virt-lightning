@@ -12,7 +12,7 @@ classifiers = [
     "Environment :: Console",
     "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
-        "Operating System :: POSIX :: Linux",
+    "Operating System :: POSIX :: Linux",
 ]
 dynamic = ["dependencies", "version"]
 keywords = ["libvirt", "cloud", "qemu", "cloudinit"]

@@ -10,10 +10,11 @@ import libvirt
 import yaml
 
 import virt_lightning.api
+import virt_lightning.consts as consts
 import virt_lightning.ui as ui
 import virt_lightning.virt_lightning as vl
 from virt_lightning.codes import ExitCode
-from virt_lightning.configuration import Configuration
+from virt_lightning.configuration import ProxyLegacyConfiguration as Configuration
 from virt_lightning.symbols import get_symbols
 
 symbols = get_symbols()
@@ -184,6 +185,7 @@ Commands:
         help="path to configuration file",
         required=False,
         type=pathlib.PosixPath,
+        default=consts.DEFAULT_CONFIGFILE,
     )
 
     action_subparsers = main_parser.add_subparsers(title="action", dest="action")
@@ -300,9 +302,7 @@ Commands:
         print(example)  # noqa: T001
         exit(ExitCode.FAIL.value)
 
-    configuration = Configuration()
-    if args.config:
-        configuration.load_file(args.config)
+    configuration = Configuration(args.config)
 
     if args.debug:
         logger.setLevel(logging.DEBUG)
@@ -352,17 +352,17 @@ Commands:
             )
     elif args.action == "config":
         print(  # noqa: T001
-            "Libvirt"
-            f"    libvirt_uri:              {configuration.libvirt_uri}"
-            "Network"
-            f"    network_name:             {configuration.network_name}"
-            f"    network_cidr:             {configuration.network_cidr}"
-            f"    network_auto_clean_up:    {configuration.network_auto_clean_up}"
-            "Storage"
-            f"    storage_pool:             {configuration.storage_pool}"
-            "User"
-            f"    ssh_key_file:             {configuration.ssh_key_file}"
-            f"    root_password:            {'*' * 8}"
+            "Libvirt\n"
+            f"    libvirt_uri:              {configuration.libvirt_uri}\n"
+            "Network\n"
+            f"    network_name:             {configuration.network_name}\n"
+            f"    network_cidr:             {configuration.network_cidr}\n"
+            f"    network_auto_clean_up:    {configuration.network_auto_clean_up}\n"
+            "Storage\n"
+            f"    storage_pool:             {configuration.storage_pool}\n"
+            "User\n"
+            f"    ssh_key_file:             {configuration.ssh_key_file}\n"
+            f"    root_password:            {'*' * 8}\n"
         )
     elif args.action == "console":
         console(configuration=configuration, name=args.name)
