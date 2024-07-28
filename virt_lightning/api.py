@@ -8,6 +8,7 @@ import pathlib
 import re
 import sys
 import urllib.request
+from urllib.parse import urlparse
 from concurrent.futures import ThreadPoolExecutor
 
 import libvirt
@@ -73,7 +74,10 @@ _register_aio_virt_impl.__dict__["aio_virt_bindinds"] = {}
 
 def _connect_libvirt(uri):
     try:
-        return libvirt.open(uri)
+        if urlparse(uri).netloc == "":
+            return libvirt.open(uri)
+        else:
+            raise NotImplementedError("Only local access allowed")
     except libvirt.libvirtError as e:
         if e.get_error_code() == libvirt.VIR_ERR_AUTH_UNAVAILABLE:
             raise CannotConnectToLibvirtError() from None
