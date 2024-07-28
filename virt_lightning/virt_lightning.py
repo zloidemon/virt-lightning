@@ -19,7 +19,7 @@ import xml.etree.ElementTree as ET  # noqa: N817
 import libvirt
 import yaml
 
-from virt_lightning.codes import ExitCode
+from virt_lightning.consts import ExitCode
 from virt_lightning.symbols import get_symbols
 
 from .templates import (
