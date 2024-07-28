@@ -13,7 +13,6 @@ import virt_lightning.api
 import virt_lightning.consts as consts
 import virt_lightning.ui as ui
 import virt_lightning.virt_lightning as vl
-from virt_lightning.codes import ExitCode
 from virt_lightning.configuration import ProxyLegacyConfiguration as Configuration
 from virt_lightning.symbols import get_symbols
 
@@ -94,7 +93,7 @@ def viewer(configuration, name=None, **kwargs):
                 domain.name,
             )
         else:
-            sys.exit(ExitCode.OK.value)
+            sys.exit(consts.ExitCode.OK.value)
 
     if name:
         go_viewer(hv.get_domain_by_name(name))
@@ -300,7 +299,7 @@ Commands:
         print(title)  # noqa: T001
         print(usage)  # noqa: T001
         print(example)  # noqa: T001
-        exit(ExitCode.FAIL.value)
+        exit(consts.ExitCode.FAIL.value)
 
     configuration = Configuration(args.config)
 
@@ -394,19 +393,19 @@ Commands:
                 f"  Visit {virt_lightning.api.BASE_URL}/images/ or private image hub"
                 "to get an up to date list."
             )
-            exit(ExitCode.FAIL.value)
+            exit(consts.ExitCode.FAIL.value)
     elif args.action in ["up", "start"]:
         action_func = getattr(virt_lightning.api, args.action)
         try:
             action_func(configuration=configuration, **vars(args))
         except virt_lightning.api.ImageNotFoundLocallyError as e:
             print(f"Image not found from url: {e.name}")  # noqa: T001
-            exit(ExitCode.FAIL.value)
+            exit(consts.ExitCode.FAIL.value)
         except virt_lightning.api.CannotConnectToLibvirtError:
             how_to_fix_auth_error()
         except virt_lightning.api.VMNotRunningError as e:
             print(f"The following instance is not running: {e.name}")  # noqa: T001
-            exit(ExitCode.FAIL.value)
+            exit(consts.ExitCode.FAIL.value)
     else:
         try:
             action_func = getattr(virt_lightning.api, args.action)
@@ -417,4 +416,4 @@ Commands:
             logger.error(
                 f"{symbols.EXCLAMATION.value} You may be able to download the image with the `vl fetch {e.name}` command."  # noqa: E501
             )
-            exit(ExitCode.FAIL.value)
+            exit(consts.ExitCode.FAIL.value)
