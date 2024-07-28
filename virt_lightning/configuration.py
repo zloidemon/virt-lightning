@@ -73,6 +73,9 @@ class ConfigurationLoadFile(IConfigurationSource):
     def __get(self, key):
         return self.__config.get(self.__section, key)
 
+    def __get_bool(self, key):
+        return self.__config.getboolean(self.__section, key)
+
     def __refresh(self):
         if not self.__cached and self.__filename.expanduser().exists():
             self.__cached = self.__filename.expanduser().read_text()
@@ -87,7 +90,7 @@ class ConfigurationLoadFile(IConfigurationSource):
         return ConfigurationTCPIP(
             self.__get("network_name"),
             self.__get("network_cidr"),
-            self.__get("network_auto_clean_up"),
+            self.__get_bool("network_auto_clean_up"),
         )
 
     @property

@@ -16,7 +16,6 @@ import virt_lightning.virt_lightning as vl
 from virt_lightning.configuration import ProxyLegacyConfiguration as Configuration
 from virt_lightning.consts import DEFAULT_BASE_URL
 from virt_lightning.symbols import get_symbols
-from virt_lightning.util import strtobool
 
 logger = logging.getLogger("virt_lightning")
 
@@ -417,7 +416,7 @@ def down(configuration, context="default", **kwargs):
         logger.info("%s purging %s", symbols.TRASHBIN.value, domain.name)
         hv.clean_up(domain)
 
-    if strtobool(configuration.network_auto_clean_up):
+    if configuration.network_auto_clean_up:
         hv.network_obj.destroy()
 
 
