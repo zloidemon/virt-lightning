@@ -5,6 +5,7 @@ import logging
 import os
 import pathlib
 import sys
+from urllib.parse import urlparse
 
 import libvirt
 import yaml
@@ -183,8 +184,8 @@ Commands:
         "--config",
         help="path to configuration file",
         required=False,
-        type=pathlib.PosixPath,
         default=consts.DEFAULT_CONFIGFILE,
+        type=urlparse,
     )
 
     action_subparsers = main_parser.add_subparsers(title="action", dest="action")
