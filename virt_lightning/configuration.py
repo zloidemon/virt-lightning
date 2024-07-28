@@ -10,7 +10,6 @@ from virt_lightning.iconfiguration import (
     IConfigurationUnixUser,
 )
 
-
 DEFAULT_CONFIGURATION = {
     "main": {
         "libvirt_uri": "qemu:///system",
