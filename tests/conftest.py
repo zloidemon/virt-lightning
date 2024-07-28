@@ -1,6 +1,6 @@
 import pathlib
-from urllib.parse import urlparse
 from unittest.mock import Mock, patch
+from urllib.parse import urlparse
 
 import libvirt
 import pytest
