@@ -8,8 +8,8 @@ import pathlib
 import re
 import sys
 import urllib.request
-from urllib.parse import urlparse
 from concurrent.futures import ThreadPoolExecutor
+from urllib.parse import urlparse
 
 import libvirt
 
