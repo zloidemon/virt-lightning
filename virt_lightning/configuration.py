@@ -1,6 +1,7 @@
+import pathlib
 from configparser import ConfigParser
 
-from virt_lightning.consts import LoginMethod
+from virt_lightning import consts
 from virt_lightning.iconfiguration import (
     IConfigurationBackend,
     IConfigurationBuilder,
@@ -9,19 +10,6 @@ from virt_lightning.iconfiguration import (
     IConfigurationSource,
     IConfigurationUnixUser,
 )
-
-DEFAULT_CONFIGURATION = {
-    "main": {
-        "libvirt_uri": "qemu:///system",
-        "root_password": "root",
-        "storage_pool": "virt-lightning",
-        "network_name": "virt-lightning",
-        "network_cidr": "192.168.123.0/24",
-        "network_auto_clean_up": True,
-        "ssh_key_file": "~/.ssh/id_rsa.pub",
-        "private_hub": "",
-    }
-}
 
 
 class ConfigurationBackend(IConfigurationBackend):
@@ -66,7 +54,7 @@ class ConfigurationLoadFile(IConfigurationSource):
         self.__cached = None
         self.__config = ConfigParser()
         self.__section = "main"
-        self.__config[self.__section] = DEFAULT_CONFIGURATION[self.__section]
+        self.__config[self.__section] = consts.DEFAULT_CONFIGURATION[self.__section]
 
         self.__refresh()
 
@@ -103,7 +91,7 @@ class ConfigurationLoadFile(IConfigurationSource):
     @property
     def user(self):
         return ConfigurationUnixUser(
-            "root",
+            consts.DEFAULT_USER_USERNAME,
             self.__get("root_password"),
             ConfigurationLoginSSH(self.__get("ssh_key_file")),
         )
@@ -115,7 +103,7 @@ class ConfigurationLoginSSH(IConfigurationLogin):
 
     @property
     def method(self):
-        return LoginMethod.SSH
+        return consts.LoginMethod.SSH
 
     @property
     def key(self):
@@ -182,10 +170,15 @@ class Configuration:
 
 
 class ProxyLegacyConfiguration:
-    def __init__(self, filename=None):
-        builder = ConfigurationBuilder.create().set_source(
-            ConfigurationLoadFile(filename)
-        )
+    def __init__(self, source=None):
+        builder = ConfigurationBuilder.create()
+
+        #
+        # NOTE: Добавить поддержку загрузки конфигурации например по HTTP
+        #
+        if source.scheme == "" and source.netloc == "":
+            filename = pathlib.PosixPath(source.geturl())
+            builder.set_source(ConfigurationLoadFile(filename))
 
         self.data = builder.build()
 
