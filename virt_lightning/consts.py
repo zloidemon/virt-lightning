@@ -1,5 +1,4 @@
 from enum import Enum, unique
-from pathlib import PosixPath
 
 
 @unique
@@ -14,7 +13,7 @@ class ExitCode(Enum):
 
 
 DEFAULT_BASE_URL = "https://virt-lightning.org"
-DEFAULT_CONFIGFILE = PosixPath("~/.config/virt-lightning/config.ini")
+DEFAULT_CONFIGFILE = "~/.config/virt-lightning/config.ini"
 DEFAULT_USER_USERNAME = "root"
 DEFAULT_USER_PASSWORD = "root"
 DEFAULT_CONFIGURATION = {

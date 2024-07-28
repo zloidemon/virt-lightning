@@ -1,3 +1,4 @@
+import pathlib
 from configparser import ConfigParser
 
 from virt_lightning import consts
@@ -169,10 +170,15 @@ class Configuration:
 
 
 class ProxyLegacyConfiguration:
-    def __init__(self, filename=None):
-        builder = ConfigurationBuilder.create().set_source(
-            ConfigurationLoadFile(filename)
-        )
+    def __init__(self, source=None):
+        builder = ConfigurationBuilder.create()
+
+        #
+        # NOTE: Добавить поддержку загрузки конфигурации например по HTTP
+        #
+        if source.scheme == "" and source.netloc == "":
+            filename = pathlib.PosixPath(source.geturl())
+            builder.set_source(ConfigurationLoadFile(filename))
 
         self.data = builder.build()
 
