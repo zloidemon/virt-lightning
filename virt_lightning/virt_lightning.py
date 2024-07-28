@@ -19,7 +19,7 @@ import xml.etree.ElementTree as ET  # noqa: N817
 import libvirt
 import yaml
 
-from virt_lightning.consts import ExitCode
+import virt_lightning.consts as consts
 from virt_lightning.symbols import get_symbols
 
 from .templates import (
@@ -33,19 +33,6 @@ from .templates import (
     STORAGE_POOL_XML,
     STORAGE_VOLUME_XML,
     USER_CREATE_STORAGE_POOL_DIR,
-)
-
-DEFAULT_STORAGE_DIR = "/var/lib/virt-lightning/pool"
-QEMU_DIR = "/var/lib/libvirt/qemu/"
-KVM_BINARIES = (
-    "/usr/bin/qemu-system-x86_64",
-    "/usr/bin/qemu-kvm",
-    "/usr/bin/kvm",
-    "/usr/libexec/qemu-kvm",
-)
-ISO_BINARIES = (
-    "genisoimage",
-    "mkisofs",
 )
 
 logger = logging.getLogger("virt_lightning")
@@ -67,7 +54,7 @@ class LibvirtHypervisor:
     def __init__(self, conn):
         if conn is None:
             logger.error("Failed to open connection to libvirt")
-            exit(ExitCode.FAIL.value)
+            exit(consts.ExitCode.FAIL.value)
 
         self.conn = conn
         self._last_free_ipv4 = None
@@ -116,7 +103,7 @@ class LibvirtHypervisor:
             "groups": [],
             "memory": 768,
             "python_interpreter": "/usr/bin/python3",
-            "root_password": "root",
+            "root_password": consts.DEFAULT_USER_PASSWORD,
             "username": getpass.getuser(),
             "vcpus": 1,
             "default_nic_model": "virtio",
@@ -246,7 +233,7 @@ class LibvirtHypervisor:
                     f"  sudo virsh vol-delete --pool "
                     f"{self.storage_pool_obj.name()} {name}.qcow2"
                 )
-                sys.exit(ExitCode.FAIL.value)
+                sys.exit(consts.ExitCode.FAIL.value)
             raise
 
     def get_openstack_network_data(self, domain):
@@ -531,7 +518,7 @@ class LibvirtHypervisor:
 
     @property
     def kvm_binary(self):
-        paths = [pathlib.PosixPath(i) for i in KVM_BINARIES]
+        paths = [pathlib.PosixPath(i) for i in consts.KVM_BINARIES]
         for i in paths:
             if i.exists():
                 return i
@@ -541,12 +528,12 @@ class LibvirtHypervisor:
     def iso_binary(self):
         paths = [pathlib.PosixPath(i) for i in os.environ["PATH"].split(os.pathsep)]
         for i in paths:
-            for binary in ISO_BINARIES:
+            for binary in consts.ISO_BINARIES:
                 exe = i / binary
                 if exe.exists():
                     return exe
         error_msg = (
-            f"Failed to find {' or '.join(ISO_BINARIES)} in "
+            f"Failed to find {' or '.join(consts.ISO_BINARIES)} in "
             f"{', '.join([x.as_posix() for x in paths])} "
             "\nPlease install genisoimage tool"
         )
@@ -607,7 +594,7 @@ class LibvirtHypervisor:
             if e.get_error_code() != libvirt.VIR_ERR_NO_STORAGE_POOL:
                 raise (e)
 
-        storage_dir = pathlib.PosixPath(DEFAULT_STORAGE_DIR)
+        storage_dir = pathlib.PosixPath(consts.DEFAULT_STORAGE_DIR)
         if not self.storage_pool_obj:
             self.storage_pool_obj = self.create_storage_pool(
                 name=storage_pool, directory=storage_dir
@@ -620,7 +607,7 @@ class LibvirtHypervisor:
             dir_exists = False
 
         if not dir_exists:
-            qemu_dir = pathlib.PosixPath(QEMU_DIR)
+            qemu_dir = pathlib.PosixPath(consts.QEMU_DIR)
             logger.error(
                 USER_CREATE_STORAGE_POOL_DIR.format(  # noqa: G001
                     user=getpass.getuser(),
@@ -629,7 +616,7 @@ class LibvirtHypervisor:
                     storage_dir=self.get_storage_dir(),
                 )
             )
-            exit(ExitCode.FAIL.value)
+            exit(consts.ExitCode.FAIL.value)
 
         if not self.storage_pool_obj.isActive():
             self.storage_pool_obj.create(0)

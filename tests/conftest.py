@@ -6,6 +6,7 @@ import libvirt
 import pytest
 
 import virt_lightning.virt_lightning as vl
+import virt_lightning.consts as consts
 
 DEFAULT_INI = """
 [main]
@@ -48,7 +49,7 @@ def kvm_binaries(tmp_path):
     kvm_f = tmp_path / "kvm-dummy"
     with kvm_f.open(mode="wt") as fd:
         fd.write("aa")
-    vl.KVM_BINARIES = (kvm_f,)
+    consts.KVM_BINARIES = (kvm_f,)
 
 
 @pytest.fixture(autouse=True)
@@ -56,7 +57,7 @@ def qemu_dir(tmp_path):
     qemu_dir = tmp_path / "kvm-dummy"
     if not qemu_dir.exists():
         qemu_dir.mkdir()
-    vl.QEMU_DIR = str(qemu_dir)
+    consts.QEMU_DIR = str(qemu_dir)
 
 
 @pytest.fixture(autouse=True)
@@ -67,7 +68,7 @@ def storage_dir(tmp_path):
         pool_dir.mkdir()
     if not upstream_dir.exists():
         upstream_dir.mkdir()
-    vl.DEFAULT_STORAGE_DIR = str(pool_dir)
+    consts.DEFAULT_STORAGE_DIR = str(pool_dir)
 
 
 @pytest.fixture
