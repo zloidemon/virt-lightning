@@ -7,7 +7,6 @@ import pathlib
 import sys
 from urllib.parse import urlparse
 
-import libvirt
 import yaml
 
 import virt_lightning.api
@@ -52,7 +51,7 @@ def how_to_fix_auth_error():
 
 
 def console(configuration, name=None, **kwargs):
-    conn = libvirt.open(configuration.libvirt_uri)
+    conn = virt_lightning.api._connect_libvirt(configuration.libvirt_uri)
     hv = vl.LibvirtHypervisor(conn)
 
     def go_console(domain):
@@ -67,7 +66,7 @@ def console(configuration, name=None, **kwargs):
 
 
 def viewer(configuration, name=None, **kwargs):
-    conn = libvirt.open(configuration.libvirt_uri)
+    conn = virt_lightning.api._connect_libvirt(configuration.libvirt_uri)
     hv = vl.LibvirtHypervisor(conn)
 
     def virt_viewer_binary():
