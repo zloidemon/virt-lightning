@@ -7,7 +7,7 @@ RUN apk add --no-cache \
   py3-build \
   git
 
-COPY . /app 
+COPY . /app
 
 RUN python -m build
 
