@@ -1,6 +1,6 @@
 import logging
 
-from virt_lightning.codes import ExitCode
+from virt_lightning.consts import ExitCode
 
 try:
     import urwid
