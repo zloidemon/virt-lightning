@@ -1,5 +1,6 @@
 import pathlib
 from unittest.mock import Mock, patch
+from urllib.parse import urlparse
 
 import libvirt
 import pytest
@@ -75,4 +76,4 @@ def config_file(tmp_path):
     d.mkdir()
     config_file = d / "my_inifile.ini"
     config_file.write_text(DEFAULT_INI)
-    return config_file
+    return urlparse(config_file.absolute().as_posix())

@@ -5,8 +5,8 @@ import logging
 import os
 import pathlib
 import sys
+from urllib.parse import urlparse
 
-import libvirt
 import yaml
 
 import virt_lightning.api
@@ -51,7 +51,7 @@ def how_to_fix_auth_error():
 
 
 def console(configuration, name=None, **kwargs):
-    conn = libvirt.open(configuration.libvirt_uri)
+    conn = virt_lightning.api._connect_libvirt(configuration.libvirt_uri)
     hv = vl.LibvirtHypervisor(conn)
 
     def go_console(domain):
@@ -66,7 +66,7 @@ def console(configuration, name=None, **kwargs):
 
 
 def viewer(configuration, name=None, **kwargs):
-    conn = libvirt.open(configuration.libvirt_uri)
+    conn = virt_lightning.api._connect_libvirt(configuration.libvirt_uri)
     hv = vl.LibvirtHypervisor(conn)
 
     def virt_viewer_binary():
@@ -183,8 +183,8 @@ Commands:
         "--config",
         help="path to configuration file",
         required=False,
-        type=pathlib.PosixPath,
         default=consts.DEFAULT_CONFIGFILE,
+        type=urlparse,
     )
 
     action_subparsers = main_parser.add_subparsers(title="action", dest="action")
