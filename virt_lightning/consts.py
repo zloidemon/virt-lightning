@@ -28,3 +28,16 @@ DEFAULT_CONFIGURATION = {
         "private_hub": "",
     }
 }
+DEFAULT_LIBVIRT_GROUP = "libvirt"
+DEFAULT_STORAGE_DIR = "/var/lib/virt-lightning/pool"
+QEMU_DIR = "/var/lib/libvirt/qemu/"
+ISO_BINARIES = (
+    "genisoimage",
+    "mkisofs",
+)
+KVM_BINARIES = (
+    "/usr/bin/qemu-system-x86_64",
+    "/usr/bin/qemu-kvm",
+    "/usr/bin/kvm",
+    "/usr/libexec/qemu-kvm",
+)
