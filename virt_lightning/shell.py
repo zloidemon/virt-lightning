@@ -55,7 +55,12 @@ def console(configuration, name=None, **kwargs):
 
     def go_console(domain):
         os.execlp(
-            "virsh", "virsh", "-c", configuration.libvirt_uri, "console", domain.name
+            consts.EXEC_FILE_VIRSH,
+            "virsh",
+            "-c",
+            configuration.libvirt_uri,
+            "console",
+            domain.name,
         )
 
     if name:
@@ -70,7 +75,7 @@ def viewer(configuration, name=None, **kwargs):
 
     def virt_viewer_binary():
         paths = [
-            pathlib.PosixPath(i, "virt-viewer")
+            pathlib.PosixPath(i, consts.EXEC_FILE_VIRT_VIEWER)
             for i in os.environ["PATH"].split(os.pathsep)
         ]
         for exe in paths:

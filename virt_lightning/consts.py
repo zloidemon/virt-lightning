@@ -41,3 +41,5 @@ KVM_BINARIES = (
     "/usr/bin/kvm",
     "/usr/libexec/qemu-kvm",
 )
+EXEC_FILE_VIRT_VIEWER = "virt-viewer"
+EXEC_FILE_VIRSH = "virsh"
