@@ -98,7 +98,7 @@ def _start_domain(hv, host, context, configuration):
     else:
         logger.info(f"Skipping {host['name']}, already here but is not running.")
         logger.info(
-            f"You can restart it with: virsh -c qemu:///system start {host['name']}"
+            f"You can restart it with: virsh -c {configuration.libvirt_uri} start {host['name']}"
         )
         logger.info(f"You can also destroy the instance with: vl stop {host['name']}")
         raise VMNotRunningError(host["name"])
