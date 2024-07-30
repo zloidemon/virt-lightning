@@ -39,5 +39,6 @@ KVM_BINARIES = (
 )
 EXEC_FILE_GENISOIMAGE = "genisoimage"
 EXEC_FILE_MKISOFS = "mkisofs"
+EXEC_FILE_QEMU_IMG = "qemu-img"
 EXEC_FILE_VIRSH = "virsh"
 EXEC_FILE_VIRT_VIEWER = "virt-viewer"
