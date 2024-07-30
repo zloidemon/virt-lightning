@@ -31,15 +31,13 @@ DEFAULT_CONFIGURATION = {
 DEFAULT_LIBVIRT_GROUP = "libvirt"
 DEFAULT_STORAGE_DIR = "/var/lib/virt-lightning/pool"
 QEMU_DIR = "/var/lib/libvirt/qemu/"
-ISO_BINARIES = (
-    "genisoimage",
-    "mkisofs",
-)
 KVM_BINARIES = (
     "/usr/bin/qemu-system-x86_64",
     "/usr/bin/qemu-kvm",
     "/usr/bin/kvm",
     "/usr/libexec/qemu-kvm",
 )
-EXEC_FILE_VIRT_VIEWER = "virt-viewer"
+EXEC_FILE_GENISOIMAGE = "genisoimage"
+EXEC_FILE_MKISOFS = "mkisofs"
 EXEC_FILE_VIRSH = "virsh"
+EXEC_FILE_VIRT_VIEWER = "virt-viewer"
