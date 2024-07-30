@@ -9,6 +9,7 @@ import math
 import os
 import pathlib
 import re
+import shutil
 import string
 import subprocess
 import sys
@@ -526,15 +527,15 @@ class LibvirtHypervisor:
 
     @property
     def iso_binary(self):
-        paths = [pathlib.PosixPath(i) for i in os.environ["PATH"].split(os.pathsep)]
-        for i in paths:
-            for binary in consts.ISO_BINARIES:
-                exe = i / binary
-                if exe.exists():
+        iso_binaries = (consts.EXEC_FILE_MKISOFS, consts.EXEC_FILE_GENISOIMAGE)
+
+        for binary in iso_binaries:
+            exe = shutil.which(binary)
+            if exe:
+                if pathlib.PosixPath(exe).exists():
                     return exe
         error_msg = (
-            f"Failed to find {' or '.join(consts.ISO_BINARIES)} in "
-            f"{', '.join([x.as_posix() for x in paths])} "
+            f"Failed to find {' or '.join(iso_binaries)} in PATH"
             "\nPlease install genisoimage tool"
         )
         raise Exception(error_msg)
