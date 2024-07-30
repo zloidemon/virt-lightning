@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import grp
 import logging
 import os
 import pathlib
@@ -24,11 +25,9 @@ logger.addHandler(ch)
 
 
 def get_local_libvirt_group():
-    etc_group_content = pathlib.Path("/etc/group").read_text()
-    for entry in etc_group_content.split("\n"):
-        group, _, gid = entry.split(":")[0:3]
-        if group == "libvirt":
-            return (group, gid)
+    for entry in grp.getgrall():
+        if entry.gr_name == consts.DEFAULT_LIBVIRT_GROUP:
+            return (entry.gr_name, entry.gr_gid)
 
 
 def how_to_fix_auth_error():
@@ -56,7 +55,12 @@ def console(configuration, name=None, **kwargs):
 
     def go_console(domain):
         os.execlp(
-            "virsh", "virsh", "-c", configuration.libvirt_uri, "console", domain.name
+            consts.EXEC_FILE_VIRSH,
+            "virsh",
+            "-c",
+            configuration.libvirt_uri,
+            "console",
+            domain.name,
         )
 
     if name:
@@ -71,7 +75,7 @@ def viewer(configuration, name=None, **kwargs):
 
     def virt_viewer_binary():
         paths = [
-            pathlib.PosixPath(i, "virt-viewer")
+            pathlib.PosixPath(i, consts.EXEC_FILE_VIRT_VIEWER)
             for i in os.environ["PATH"].split(os.pathsep)
         ]
         for exe in paths:
