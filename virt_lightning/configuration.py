@@ -49,14 +49,19 @@ class ConfigurationTCPIP(IConfigurationNetworkModel):
 
 
 class ConfigurationLoadFile(IConfigurationSource):
-    def __init__(self, filename):
+    def __init__(self, filename=None):
         self.__filename = filename
         self.__cached = None
         self.__config = ConfigParser()
         self.__section = "main"
         self.__config[self.__section] = consts.DEFAULT_CONFIGURATION[self.__section]
 
-        self.__refresh()
+        #
+        # FIXME: Переделать на получение данных, и убрать чтение из фалов
+        #        в данном классе. Например передать в конструктор поток байт.
+        #
+        if self.__filename:
+            self.__refresh()
 
     def __get(self, key):
         return self.__config.get(self.__section, key)
@@ -67,7 +72,8 @@ class ConfigurationLoadFile(IConfigurationSource):
     def __refresh(self):
         if not self.__cached and self.__filename.expanduser().exists():
             self.__cached = self.__filename.expanduser().read_text()
-        return self.__config.read_string(self.__cached)
+
+        self.__config.read_string(self.__cached)
 
     @property
     def uri(self):
@@ -176,7 +182,9 @@ class ProxyLegacyConfiguration:
         #
         # NOTE: Добавить поддержку загрузки конфигурации например по HTTP
         #
-        if source.scheme == "" and source.netloc == "":
+        if not source:
+            builder.set_source(ConfigurationLoadFile())
+        elif source and source.scheme == "" and source.netloc == "":
             filename = pathlib.PosixPath(source.geturl())
             builder.set_source(ConfigurationLoadFile(filename))
 
