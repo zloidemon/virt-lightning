@@ -531,9 +531,8 @@ class LibvirtHypervisor:
 
         for binary in iso_binaries:
             exe = shutil.which(binary)
-            if exe:
-                if pathlib.PosixPath(exe).exists():
-                    return exe
+            if exe and pathlib.PosixPath(exe).exists():
+                return exe
         error_msg = (
             f"Failed to find {' or '.join(iso_binaries)} in PATH"
             "\nPlease install genisoimage tool"
