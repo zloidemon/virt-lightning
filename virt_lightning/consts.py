@@ -12,7 +12,7 @@ class ExitCode(Enum):
     FAIL = 1
 
 
-DEFAULT_BASE_URL = "https://virt-lightning.org"
+DEFAULT_BASE_REGISTRY_URL = "https://virt-lightning.org"
 DEFAULT_CONFIGFILE = "~/.config/virt-lightning/config.ini"
 DEFAULT_USER_USERNAME = "root"
 DEFAULT_USER_PASSWORD = "root"
@@ -25,7 +25,7 @@ DEFAULT_CONFIGURATION = {
         "network_cidr": "192.168.123.0/24",
         "network_auto_clean_up": True,
         "ssh_key_file": "~/.ssh/id_rsa.pub",
-        "private_hub": "",
+        "registry_urls": "",
     }
 }
 DEFAULT_LIBVIRT_GROUP = "libvirt"
