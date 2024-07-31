@@ -14,8 +14,6 @@ from urllib.parse import urlparse
 import libvirt
 
 import virt_lightning.virt_lightning as vl
-from virt_lightning.configuration import ProxyLegacyConfiguration as Configuration
-from virt_lightning.consts import DEFAULT_BASE_URL
 from virt_lightning.symbols import get_symbols
 
 logger = logging.getLogger("virt_lightning")
@@ -158,13 +156,13 @@ def _start_domain(hv, host, context, configuration):
     return domain
 
 
-def _ensure_image_exists(hv, hosts):
+def _ensure_image_exists(configuration, hv, hosts):
     for host in hosts:
         distro = host.get("distro")
         if distro not in hv.distro_available():
             logger.debug("distro not available: %s, will be fetched", distro)
             try:
-                fetch(hv=hv, distro=distro)
+                fetch(configuration, hv=hv, distro=distro)
             except ImageNotFoundUpstreamError:
                 raise ImageNotFoundLocallyError(distro) from None
 
@@ -185,8 +183,11 @@ def up(virt_lightning_yaml, configuration, context="default", **kwargs):
     hv.init_network(configuration.network_name, configuration.network_cidr)
     hv.init_storage_pool(configuration.storage_pool)
 
-    _ensure_image_exists(hv, virt_lightning_yaml)
+    _ensure_image_exists(configuration, hv, virt_lightning_yaml)
     conn = _connect_libvirt(configuration.libvirt_uri)
+    #
+    # FIXME: Перенести константы в конфигурацию
+    #
     conn.setKeepAlive(interval=5, count=3)
     conn.domainEventRegisterAny(
         None,
@@ -233,7 +234,7 @@ def start(
     }
     if kwargs.get("disk"):
         host.update({"disks": [{"size": x} for x in kwargs["disk"]]})
-    _ensure_image_exists(hv, [host])
+    _ensure_image_exists(configuration, hv, [host])
     domain = _start_domain(hv, host, context, configuration)
     if not domain:
         return
@@ -441,9 +442,7 @@ def storage_dir(configuration, **kwargs):
 
 
 def fetch_from_url(progress_callback=None, url=None, **kwargs):
-    """Retrieve a VM image from a given url
-    - when url is set to None, this means we are trying to fetch from the default url.
-    """
+    """Retrieve a VM image from a given url."""
     target_file = pathlib.PosixPath(
         "{storage_dir}/upstream/{distro}.qcow2".format(**kwargs)
     )
@@ -462,9 +461,7 @@ def fetch_from_url(progress_callback=None, url=None, **kwargs):
     opener = urllib.request.build_opener(RedirectFilter)
     urllib.request.install_opener(opener)
 
-    parent_url = (
-        DEFAULT_BASE_URL + "/images/{distro}".format(**kwargs) if url is None else url
-    )
+    parent_url = url.format(**kwargs)
     try:
         r = urllib.request.urlopen(
             "{url}/{distro}.qcow2".format(url=parent_url, **kwargs)
@@ -496,38 +493,25 @@ def fetch_from_url(progress_callback=None, url=None, **kwargs):
     logger.info(f"Image {kwargs['distro']} is ready!")
 
 
-def fetch(configuration=None, progress_callback=None, hv=None, **kwargs):
+def fetch(configuration, progress_callback=None, hv=None, **kwargs):
     """Retrieve a VM image from Internet."""
     if hv is None:
         conn = _connect_libvirt(configuration.libvirt_uri)
         hv = vl.LibvirtHypervisor(conn)
         hv.init_storage_pool(configuration.storage_pool)
 
-    #
-    # FIXME: Поределать на использования только одной загружаемой конфигурации
-    #
-    configuration = configuration if configuration is not None else Configuration()
-    image_found = False
-    for images_url in configuration.private_hub:
+    for registry in configuration.registry_urls:
         try:
             fetch_from_url(
                 progress_callback=progress_callback,
                 storage_dir=hv.get_storage_dir(),
-                url=images_url,
+                url=registry.entrypoint,
                 **kwargs,
             )
-            image_found = True
             break
         except ImageNotFoundUpstreamError:
             logger.info(
-                "Image: %s not found from url: %s", kwargs["distro"], images_url
+                "Image: %s not found from url: %s",
+                kwargs["distro"],
+                registry.entrypoint,
             )
-
-    if not image_found:
-        # image not found from custom url
-        # fetch from base url
-        fetch_from_url(
-            progress_callback=progress_callback,
-            storage_dir=hv.get_storage_dir(),
-            **kwargs,
-        )

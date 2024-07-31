@@ -35,6 +35,10 @@ class IConfigurationSource(metaclass=ABCMeta):
         pass
 
     @abstractproperty
+    def registry(self):
+        pass
+
+    @abstractproperty
     def uri(self):
         pass
 
@@ -100,3 +104,15 @@ class IConfigurationBackend(metaclass=ABCMeta):
     @abstractproperty
     def storage(self):
         pass
+
+
+#
+# Интерфейс источников образов
+#
+class IConfigurationRegistry(metaclass=ABCMeta):
+    @abstractproperty
+    def entrypoint(self):
+        pass
+
+    def __repr__(self):
+        return f"ConfigurationRegistry({self.entrypoint})"
