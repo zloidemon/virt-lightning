@@ -7,6 +7,7 @@ from virt_lightning.iconfiguration import (
     IConfigurationBuilder,
     IConfigurationLogin,
     IConfigurationNetworkModel,
+    IConfigurationRegistry,
     IConfigurationSource,
     IConfigurationUnixUser,
 )
@@ -102,6 +103,23 @@ class ConfigurationLoadFile(IConfigurationSource):
             ConfigurationLoginSSH(self.__get("ssh_key_file")),
         )
 
+    @property
+    def registry(self):
+        registries = []
+
+        for registry in self.__get("registry_urls").split(","):
+            if registry and registry != "":
+                registries.append(ConfigurationRegistry(registry))
+
+        #
+        # NOTE: Добавление адреса к хранилищу образов по-умолчанию в конец
+        #
+        registries.append(
+            ConfigurationRegistry(consts.DEFAULT_BASE_REGISTRY_URL + "/images/{distro}")
+        )
+
+        return registries
+
 
 class ConfigurationLoginSSH(IConfigurationLogin):
     def __init__(self, filename):
@@ -139,6 +157,15 @@ class ConfigurationUnixUser(IConfigurationUnixUser):
         return self.__login
 
 
+class ConfigurationRegistry(IConfigurationRegistry):
+    def __init__(self, entrypoint):
+        self.__entrypoint = entrypoint
+
+    @property
+    def entrypoint(self):
+        return self.__entrypoint
+
+
 class ConfigurationBuilder(IConfigurationBuilder):
     def __init__(self):
         self.__source = None
@@ -162,14 +189,16 @@ class ConfigurationBuilder(IConfigurationBuilder):
             self.__source.backend,
             self.__source.user,
             self.__source.network,
+            self.__source.registry,
         )
 
 
 class Configuration:
-    def __init__(self, backend, user, network):
+    def __init__(self, backend, user, network, registry):
         self.backend = backend
         self.network = network
         self.user = user
+        self.registry = registry
 
     def __repr__(self):
         return "Configuration()"
@@ -218,9 +247,6 @@ class ProxyLegacyConfiguration:
     def storage_pool(self):
         return self.data.backend.storage
 
-    #
-    # FIXME: Переделать на использование множества источников из конфигурации
-    #
     @property
-    def private_hub(self):
-        return [x for x in self.__get("private_hub").split(",") if x != ""]
+    def registry_urls(self):
+        return self.data.registry
