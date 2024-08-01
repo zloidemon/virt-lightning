@@ -18,7 +18,6 @@ WORKDIR /app
 RUN apk add --no-cache \
   py3-libvirt \
   py3-pip \
-  py3-urwid \
   py3-wcwidth \
   py3-yaml
 
