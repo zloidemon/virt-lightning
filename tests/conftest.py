@@ -45,14 +45,6 @@ def domain(hv, scope="function"):
 
 
 @pytest.fixture(autouse=True)
-def kvm_binaries(tmp_path):
-    kvm_f = tmp_path / "kvm-dummy"
-    with kvm_f.open(mode="wt") as fd:
-        fd.write("aa")
-    consts.KVM_BINARIES = (kvm_f,)
-
-
-@pytest.fixture(autouse=True)
 def qemu_dir(tmp_path):
     qemu_dir = tmp_path / "kvm-dummy"
     if not qemu_dir.exists():

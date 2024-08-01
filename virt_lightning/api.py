@@ -13,6 +13,7 @@ from urllib.parse import urlparse
 
 import libvirt
 
+import virt_lightning.consts as consts
 import virt_lightning.virt_lightning as vl
 from virt_lightning.symbols import get_symbols
 
@@ -84,8 +85,11 @@ def _connect_libvirt(uri):
 
 def _start_domain(hv, host, context, configuration):
     distro = host["distro"]
+    #
+    # FIXME: Переделать выделение имен на использование FQDN
+    #
     if "name" not in host:
-        host["name"] = re.sub(r"[^a-zA-Z0-9-]+", "", distro)
+        host["name"] = re.sub(consts.RE_DISTRO_HOSTNAME_PATTERN, "", distro)
 
     domain = hv.get_domain_by_name(host["name"])
     if not domain:
