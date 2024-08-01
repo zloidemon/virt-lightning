@@ -11,10 +11,6 @@ def test_domain_type(hv):
     assert hv.domain_type == "test"
 
 
-def test_kvm_binary(hv):
-    assert hv.kvm_binary.name == "kvm-dummy"
-
-
 def test_init_storage_pool(hv):
     assert hv.conn.storagePoolLookupByName("foo_bar")
 

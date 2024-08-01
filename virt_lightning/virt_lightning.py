@@ -6,10 +6,8 @@ import ipaddress
 import json
 import logging
 import math
-import os
 import pathlib
 import re
-import shutil
 import string
 import subprocess
 import sys
@@ -21,6 +19,12 @@ import libvirt
 import yaml
 
 import virt_lightning.consts as consts
+from virt_lightning.execfile_connection_tools import ExecFileSSH
+from virt_lightning.execfile_iso_tools import ExecFileISOTool
+from virt_lightning.execfile_virtualization_tools import (
+    ExecFileQemuIMG,
+    ExecFileVirtTool,
+)
 from virt_lightning.symbols import get_symbols
 
 from .templates import (
@@ -92,7 +96,7 @@ class LibvirtHypervisor:
         root.attrib["type"] = self.domain_type
         root.find("./name").text = name
         root.find("./vcpu").text = str(self.conn.getInfo()[2])
-        root.find("./devices/emulator").text = str(self.kvm_binary)
+        root.find("./devices/emulator").text = str(ExecFileVirtTool().entrypoint)
         root.find("./os/type").attrib["arch"] = self.arch
         dom = self.conn.defineXML(ET.tostring(root).decode())
         domain = LibvirtDomain(dom)
@@ -187,7 +191,7 @@ class LibvirtHypervisor:
 
     def get_qcow_virtual_size(self, qcow_path):
         qemu_img_info = run_cmd(
-            [consts.EXEC_FILE_QEMU_IMG, "info", "--output=json", str(qcow_path)]
+            [ExecFileQemuIMG().entrypoint, "info", "--output=json", str(qcow_path)]
         )
         return math.ceil(json.loads(qemu_img_info)["virtual-size"] / 1024**3)
 
@@ -332,7 +336,7 @@ class LibvirtHypervisor:
             cidata_file = temp_dir / f"{domain.name}-cidata.iso"
             run_cmd(
                 [
-                    str(self.iso_binary),
+                    str(ExecFileISOTool().entrypoint),
                     "-output",
                     cidata_file.name,
                     "-ldots",
@@ -416,7 +420,7 @@ class LibvirtHypervisor:
             cidata_file = temp_dir / f"{domain.name}-cidata.iso"
             run_cmd(
                 [
-                    str(self.iso_binary),
+                    str(ExecFileISOTool().entrypoint),
                     "-output",
                     cidata_file.name,
                     "-volid",
@@ -518,28 +522,6 @@ class LibvirtHypervisor:
                 logger.debug("Purge volume: %s", str(filepath))
                 vol = self.storage_pool_obj.storageVolLookupByName(filepath.name)
                 vol.delete()
-
-    @property
-    def kvm_binary(self):
-        paths = [pathlib.PosixPath(i) for i in consts.KVM_BINARIES]
-        for i in paths:
-            if i.exists():
-                return i
-        raise Exception("Failed to find the kvm binary in: ", paths)
-
-    @property
-    def iso_binary(self):
-        iso_binaries = (consts.EXEC_FILE_MKISOFS, consts.EXEC_FILE_GENISOIMAGE)
-
-        for binary in iso_binaries:
-            exe = shutil.which(binary)
-            if exe and pathlib.PosixPath(exe).exists():
-                return exe
-        error_msg = (
-            f"Failed to find {' or '.join(iso_binaries)} in PATH"
-            "\nPlease install genisoimage tool"
-        )
-        raise Exception(error_msg)
 
     def init_network(self, network_name, network_cidr):
         try:
@@ -741,7 +723,7 @@ class LibvirtDomain:
 
     @username.setter
     def username(self, username):
-        if not re.match("[a-z_][a-z0-9_-]{1,32}$", username):
+        if not re.match(consts.RE_USERNAME_PATTERN, username):
             raise Exception("Invalid username: ", username)
 
         self.user_data["users"] = [
@@ -770,7 +752,7 @@ class LibvirtDomain:
 
     @fqdn.setter
     def fqdn(self, value):
-        fqdn_validate = re.compile(r"^[\.a-z0-9]+$", re.IGNORECASE)
+        fqdn_validate = re.compile(consts.RE_FQDN_PATTERN, re.IGNORECASE)
         if not value or not fqdn_validate.match(value):
             logger.error(f"Invalid FQDN: {value}")
             return
@@ -978,9 +960,7 @@ class LibvirtDomain:
                 pass
 
     def exec_ssh(self):
-        os.execlp(
-            "ssh",
-            "ssh",
+        ExecFileSSH().run(
             "-o",
             "StrictHostKeyChecking=no",
             "-o",

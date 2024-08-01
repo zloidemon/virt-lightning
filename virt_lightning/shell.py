@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import curses
 import grp
 import logging
 import os
@@ -12,10 +13,14 @@ import yaml
 
 import virt_lightning.api
 import virt_lightning.consts as consts
-import virt_lightning.ui as ui
 import virt_lightning.virt_lightning as vl
 from virt_lightning.configuration import ProxyLegacyConfiguration as Configuration
+from virt_lightning.execfile_connection_tools import (
+    ExecFileVirsh,
+    ExecFileVirtViewer,
+)
 from virt_lightning.symbols import get_symbols
+from virt_lightning.tui import VirtTUI
 
 symbols = get_symbols()
 logger = logging.getLogger("virt_lightning")
@@ -54,9 +59,7 @@ def console(configuration, name=None, **kwargs):
     hv = vl.LibvirtHypervisor(conn)
 
     def go_console(domain):
-        os.execlp(
-            consts.EXEC_FILE_VIRSH,
-            "virsh",
+        ExecFileVirsh().run(
             "-c",
             configuration.libvirt_uri,
             "console",
@@ -66,31 +69,19 @@ def console(configuration, name=None, **kwargs):
     if name:
         go_console(hv.get_domain_by_name(name))
 
-    ui.Selector(sorted(hv.list_domains()), go_console)
+    curses.wrapper(VirtTUI, sorted(hv.list_domains()), go_console)
 
 
 def viewer(configuration, name=None, **kwargs):
     conn = virt_lightning.api._connect_libvirt(configuration.libvirt_uri)
     hv = vl.LibvirtHypervisor(conn)
 
-    def virt_viewer_binary():
-        paths = [
-            pathlib.PosixPath(i, consts.EXEC_FILE_VIRT_VIEWER)
-            for i in os.environ["PATH"].split(os.pathsep)
-        ]
-        for exe in paths:
-            if exe.exists():
-                return exe
-        raise Exception("Failed to find virt-viewer in: ", paths)
-
     def go_viewer(domain):
         pid = os.fork()
         if pid == 0:
             os.close(1)
             os.close(2)
-            os.execlp(
-                virt_viewer_binary(),
-                "virt-viewer",
+            ExecFileVirtViewer().run(
                 "-c",
                 configuration.libvirt_uri,
                 "--domain-name",
@@ -102,7 +93,7 @@ def viewer(configuration, name=None, **kwargs):
     if name:
         go_viewer(hv.get_domain_by_name(name))
 
-    ui.Selector(sorted(hv.list_domains()), go_viewer)
+    curses.wrapper(VirtTUI, sorted(hv.list_domains()), go_viewer)
 
 
 def progress_callback(cur, length):
@@ -378,7 +369,8 @@ Commands:
         def go_ssh(domain):
             domain.exec_ssh()
 
-        ui.Selector(
+        curses.wrapper(
+            VirtTUI,
             virt_lightning.api.list_domains(configuration=configuration, **vars(args)),
             go_ssh,
         )
