@@ -14,6 +14,9 @@ jobs:
     steps:
     - name: Install libvirt-dev
       run: sudo apt update; sudo apt install -y libvirt-dev
+    - name: Create symlinks for quick tests
+      run: |
+        sudo ln -s /usr/bin/true /usr/bin/qemu-kvm
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
