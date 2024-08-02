@@ -114,7 +114,7 @@ def list_from_yaml_file(value):
 
 
 def main():
-    title = f"Virt-Lightning"
+    title = "Virt-Lightning"
 
     usage = """
 usage: vl [--debug DEBUG] [--config CONFIG] COMMAND
