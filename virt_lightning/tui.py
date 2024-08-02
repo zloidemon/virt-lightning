@@ -59,7 +59,7 @@ class Menu:
                 else:
                     mode = curses.A_NORMAL
 
-                entry, callback = item
+                entry, _ = item
 
                 self.window.addstr(
                     self.offset_top + index,
@@ -73,7 +73,9 @@ class Menu:
                     self.__move(key)
                 case curses.KEY_ENTER | curses.KEY_NEWLINE:
                     self.__restore_shell()
-                    callback(entry)
+
+                    item, callback = self.items[self.position]
+                    callback(item)
                 case curses.KEY_Q:
                     break
                 case _:
