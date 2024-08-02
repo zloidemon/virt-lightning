@@ -25,7 +25,6 @@ from virt_lightning.execfile_virtualization_tools import (
     ExecFileQemuIMG,
     ExecFileVirtTool,
 )
-from virt_lightning.symbols import get_symbols
 
 from .templates import (
     BRIDGE_XML,
@@ -41,8 +40,6 @@ from .templates import (
 )
 
 logger = logging.getLogger("virt_lightning")
-
-symbols = get_symbols()
 
 
 def run_cmd(cmd, cwd=None):
@@ -952,9 +949,7 @@ class LibvirtDomain:
                 reader, _ = await asyncio.open_connection(str(self.ipv4.ip), 22)
                 data = await reader.read(10)
                 if data.decode().startswith("SSH"):
-                    logger.info(
-                        f"{symbols.COMPUTER.value} {self.name} found at {self.ipv4.ip}!"
-                    )
+                    logger.info(f"+ {self.name} found at {self.ipv4.ip}!")
                     return
             except OSError:
                 pass
