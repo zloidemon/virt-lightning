@@ -331,13 +331,9 @@ Commands:
                 "distro": status["distro"],
             }
 
-        output_template = (
-            "+ {name:<13}   {username}@{ipv4:>5} [{distro}]"
-        )
+        output_template = "+ {name:<13}   {username}@{ipv4:>5} [{distro}]"
         for _, v in sorted(results.items()):
-            print(  # noqa: T001
-                output_template.format(**v)
-            )
+            print(output_template.format(**v))  # noqa: T001
     elif args.action == "config":
         print(  # noqa: T001
             "Libvirt\n"
