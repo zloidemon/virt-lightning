@@ -42,7 +42,6 @@ from .templates import (
 logger = logging.getLogger("virt_lightning")
 
 
-
 def run_cmd(cmd, cwd=None):
     proc = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=cwd
