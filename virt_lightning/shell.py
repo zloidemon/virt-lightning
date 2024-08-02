@@ -19,10 +19,8 @@ from virt_lightning.execfile_connection_tools import (
     ExecFileVirsh,
     ExecFileVirtViewer,
 )
-from virt_lightning.symbols import get_symbols
 from virt_lightning.tui import VirtTUI
 
-symbols = get_symbols()
 logger = logging.getLogger("virt_lightning")
 logger.setLevel(logging.INFO)
 ch = logging.StreamHandler()
@@ -96,11 +94,11 @@ def viewer(configuration, name=None, **kwargs):
     curses.wrapper(VirtTUI, sorted(hv.list_domains()), go_viewer)
 
 
-def progress_callback(cur, length):
+def progress_callback(filename, cur, length):
     percent = (cur * 100) / length
     done = int(cur / virt_lightning.api.MB)
     full = int(length / virt_lightning.api.MB)
-    line = f"{symbols.GLOBE.value} {symbols.RIGHT_ARROW.value} {symbols.COMPUTER.value} [{percent:06.2f}%]  {done:6}MB/{full}MB\r"  # noqa: E501
+    line = f"[{percent:06.2f}%] {done:6}MB/{full}MB {filename}\r"
     print(line, end="")  # noqa: T001
 
 
@@ -116,7 +114,7 @@ def list_from_yaml_file(value):
 
 
 def main():
-    title = f"{symbols.LIGHTNING.value} Virt-Lightning {symbols.LIGHTNING.value}"
+    title = f"Virt-Lightning"
 
     usage = """
 usage: vl [--debug DEBUG] [--config CONFIG] COMMAND
@@ -150,7 +148,7 @@ Commands:
     ssh_config          Dump an SSH config
     console             Open console on a VM
     viewer              Open VM with virt-viewer
-    status              Get status of running VM's
+    ps                  Get list of running VM's
     config              Dump configuration
     """
 
@@ -234,10 +232,10 @@ Commands:
     )
     stop_parser.add_argument("name", help="Name of the VM", type=str)
 
-    status_parser = action_subparsers.add_parser(
-        "status", help="List the VM currently running", parents=[parent_parser]
+    ps_parser = action_subparsers.add_parser(
+        "ps", help="List the VM currently running", parents=[parent_parser]
     )
-    status_parser.add_argument("--context", **context_args)
+    ps_parser.add_argument("--context", **context_args)
 
     config_parser = action_subparsers.add_parser(
         "config", help="Dump configuration", parents=[parent_parser]
@@ -284,10 +282,10 @@ Commands:
     )
     viewer_parser.add_argument("name", help="Name of the host", type=str, nargs="?")
 
-    fetch_parser = action_subparsers.add_parser(
-        "fetch", help="Fetch a VM image", parents=[parent_parser]
+    pull_parser = action_subparsers.add_parser(
+        "pull", help="Pull a VM image", parents=[parent_parser]
     )
-    fetch_parser.add_argument("distro", help="Name of the VM image", type=str)
+    pull_parser.add_argument("distro", help="Name of the VM image", type=str)
 
     args = main_parser.parse_args()
     if not args.action:
@@ -320,7 +318,7 @@ Commands:
         print(  # noqa: T001
             virt_lightning.api.storage_dir(configuration=configuration, **vars(args))
         )
-    elif args.action == "status":
+    elif args.action == "ps":
         results = {}
         for status in virt_lightning.api.status(
             configuration=configuration, **vars(args)
@@ -334,15 +332,11 @@ Commands:
             }
 
         output_template = (
-            "{computer} {name:<13}   {arrow}   {username}@{ipv4:>5} [{distro}]"
+            "+ {name:<13}   {username}@{ipv4:>5} [{distro}]"
         )
         for _, v in sorted(results.items()):
             print(  # noqa: T001
-                output_template.format(
-                    computer=symbols.COMPUTER.value,
-                    arrow=symbols.RIGHT_ARROW.value,
-                    **v,
-                )
+                output_template.format(**v)
             )
     elif args.action == "config":
         print(  # noqa: T001
@@ -374,7 +368,7 @@ Commands:
             virt_lightning.api.list_domains(configuration=configuration, **vars(args)),
             go_ssh,
         )
-    elif args.action == "fetch":
+    elif args.action == "pull":
         try:
             virt_lightning.api.fetch(
                 configuration=configuration,
@@ -410,6 +404,6 @@ Commands:
             logger.error(f"VM {e.name} not found")
         except virt_lightning.api.ImageNotFoundLocallyError as e:
             logger.error(
-                f"{symbols.EXCLAMATION.value} You may be able to download the image with the `vl fetch {e.name}` command."  # noqa: E501
+                f"! You may be able to download the image with the `vl pull {e.name}` command."  # noqa: E501
             )
             exit(consts.ExitCode.FAIL.value)
