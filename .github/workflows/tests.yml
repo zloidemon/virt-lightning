@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ '3.8', '3.9', '3.10' ]
+        python-version: [ '3.10', '3.11', '3.12' ]
     steps:
       - name: Check out
         uses: actions/checkout@v2
@@ -14,7 +14,12 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install libvirt-dev
-        run: sudo apt update; sudo apt install -y libvirt-dev
+        run: |
+          sudo apt update
+          sudo apt install -y libvirt-dev
+      - name: Create symlinks for quick tests
+        run: |
+          sudo ln -s /usr/bin/true /usr/bin/qemu-kvm
       - name: install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -23,15 +28,23 @@ jobs:
         run: tox
   linters:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.10' ]
     steps:
       - name: Check out
         uses: actions/checkout@v2
-      - name: Set up Python 3.9
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
-          python-version: 3.9
+          python-version: ${{ matrix.python-version }}
       - name: Install libvirt-dev
-        run: sudo apt update; sudo apt install -y libvirt-dev
+        run: |
+          sudo apt update
+          sudo apt install -y libvirt-dev
+      - name: Create symlinks for quick tests
+        run: |
+          sudo ln -s /usr/bin/true /usr/bin/qemu-kvm
       - name: install dependencies
         run: |
           python -m pip install --upgrade pip
