@@ -15,7 +15,6 @@ import libvirt
 
 import virt_lightning.consts as consts
 import virt_lightning.virt_lightning as vl
-from virt_lightning.symbols import get_symbols
 
 logger = logging.getLogger("virt_lightning")
 
@@ -25,7 +24,6 @@ def libvirt_callback(userdata, err):
 
 
 libvirt.registerErrorHandler(f=libvirt_callback, ctx=None)
-symbols = get_symbols()
 
 MB = 1024 * 1000
 
@@ -105,7 +103,7 @@ def _start_domain(hv, host, context, configuration):
         logger.info(f"You can also destroy the instance with: vl stop {host['name']}")
         raise VMNotRunningError(host["name"])
 
-    logger.info(f"{symbols.LIGHTNING.value} {host['name']} ")
+    logger.info(f"^ {host['name']} ")
 
     user_config = {
         "groups": host.get("groups"),
@@ -176,7 +174,7 @@ def up(virt_lightning_yaml, configuration, context="default", **kwargs):
 
     def _lifecycle_callback(conn, dom, state, reason, opaque):  # noqa: N802
         if state == 1:
-            logger.info("%s %s QEMU agent found", symbols.CUSTOMS.value, dom.name())
+            logger.info("+ %s QEMU agent found", dom.name())
 
     loop = kwargs.get("loop") or asyncio.get_event_loop()
     _register_aio_virt_impl(loop)
@@ -217,12 +215,12 @@ def up(virt_lightning_yaml, configuration, context="default", **kwargs):
             domain = f.result()
             if domain:
                 domain_reachable_futures.append(domain.reachable())
-        logger.info("%s ok Waiting...", symbols.HOURGLASS.value)
+        logger.info("... ok Waiting...")
 
         await asyncio.gather(*domain_reachable_futures)
 
     loop.run_until_complete(deploy())
-    logger.info("%s You are all set", symbols.THUMBS_UP.value)
+    logger.info("+ You are all set")
 
 
 def start(
@@ -422,7 +420,7 @@ def down(configuration, context="default", **kwargs):
     for domain in hv.list_domains():
         if domain.context != context:
             continue
-        logger.info("%s purging %s", symbols.TRASHBIN.value, domain.name)
+        logger.info("x purging %s", domain.name)
         hv.clean_up(domain)
 
     if configuration.network_auto_clean_up:
@@ -485,7 +483,7 @@ def fetch_from_url(progress_callback=None, url=None, **kwargs):
             chunk = r.read(chunk_size)
             fd.write(chunk)
             if progress_callback:
-                progress_callback(fd.tell(), length)
+                progress_callback(temp_file, fd.tell(), length)
     temp_file.rename(target_file)
     try:
         r = urllib.request.urlopen(f"{parent_url}/{kwargs['distro']}.yaml")
