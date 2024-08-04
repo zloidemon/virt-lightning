@@ -94,14 +94,6 @@ def viewer(configuration, name=None, **kwargs):
     curses.wrapper(VirtTUI, sorted(hv.list_domains()), go_viewer)
 
 
-def progress_callback(filename, cur, length):
-    percent = (cur * 100) / length
-    done = int(cur / virt_lightning.api.MB)
-    full = int(length / virt_lightning.api.MB)
-    line = f"[{percent:06.2f}%] {done:6}MB/{full}MB {filename}\r"
-    print(line, end="")  # noqa: T001
-
-
 def list_from_yaml_file(value):
     file_path = pathlib.PosixPath(value)
     if not file_path.exists():
@@ -366,9 +358,8 @@ Commands:
         )
     elif args.action == "pull":
         try:
-            virt_lightning.api.fetch(
+            virt_lightning.api.pull(
                 configuration=configuration,
-                progress_callback=progress_callback,
                 **vars(args),
             )
         except virt_lightning.api.CannotConnectToLibvirtError:
