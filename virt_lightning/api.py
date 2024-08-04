@@ -4,10 +4,8 @@ import asyncio
 import collections
 import ipaddress
 import logging
-import pathlib
 import re
 import sys
-import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urlparse
 
@@ -15,6 +13,8 @@ import libvirt
 
 import virt_lightning.consts as consts
 import virt_lightning.virt_lightning as vl
+from virt_lightning.downloader_native import DownloaderNative
+from virt_lightning.exceptions import ImageNotFoundUpstreamError
 
 logger = logging.getLogger("virt_lightning")
 
@@ -25,8 +25,6 @@ def libvirt_callback(userdata, err):
 
 libvirt.registerErrorHandler(f=libvirt_callback, ctx=None)
 
-MB = 1024 * 1000
-
 
 class VMNotFoundError(Exception):
     def __init__(self, name):
@@ -34,11 +32,6 @@ class VMNotFoundError(Exception):
 
 
 class VMNotRunningError(Exception):
-    def __init__(self, name):
-        self.name = name
-
-
-class ImageNotFoundUpstreamError(Exception):
     def __init__(self, name):
         self.name = name
 
@@ -164,9 +157,25 @@ def _ensure_image_exists(configuration, hv, hosts):
         if distro not in hv.distro_available():
             logger.debug("distro not available: %s, will be fetched", distro)
             try:
-                fetch(configuration, hv=hv, distro=distro)
+                downloader = DownloaderNative(
+                    configuration,
+                    hv.get_storage_dir(),
+                )
+                downloader.pull(distro=distro)
             except ImageNotFoundUpstreamError:
                 raise ImageNotFoundLocallyError(distro) from None
+
+
+def pull(configuration, **kwargs):
+    conn = _connect_libvirt(configuration.libvirt_uri)
+    hv = vl.LibvirtHypervisor(conn)
+    hv.init_storage_pool(configuration.storage_pool)
+
+    downloader = DownloaderNative(
+        configuration,
+        hv.get_storage_dir(),
+    )
+    downloader.pull(**kwargs)
 
 
 def up(virt_lightning_yaml, configuration, context="default", **kwargs):
@@ -441,79 +450,3 @@ def storage_dir(configuration, **kwargs):
     hv = vl.LibvirtHypervisor(conn)
     hv.init_storage_pool(configuration.storage_pool)
     return hv.get_storage_dir()
-
-
-def fetch_from_url(progress_callback=None, url=None, **kwargs):
-    """Retrieve a VM image from a given url."""
-    target_file = pathlib.PosixPath(
-        "{storage_dir}/upstream/{distro}.qcow2".format(**kwargs)
-    )
-    temp_file = target_file.with_suffix(".temp")
-    if target_file.exists():
-        logger.info("File already exists: %s", target_file)
-        return
-
-    class RedirectFilter(urllib.request.HTTPRedirectHandler):
-        def redirect_request(self, req, fp, code, msg, hdrs, newurl):
-            logger.info("downloading image from: %s", newurl)
-            return urllib.request.HTTPRedirectHandler.redirect_request(
-                self, req, fp, code, msg, hdrs, newurl
-            )
-
-    opener = urllib.request.build_opener(RedirectFilter)
-    urllib.request.install_opener(opener)
-
-    parent_url = url.format(**kwargs)
-    try:
-        r = urllib.request.urlopen(
-            "{url}/{distro}.qcow2".format(url=parent_url, **kwargs)
-        )
-    except urllib.error.HTTPError as e:
-        if e.code == 404:
-            raise ImageNotFoundUpstreamError(kwargs["distro"]) from None
-        raise
-    last_modified = r.headers["Last-Modified"]
-    logger.debug("Date: %s", last_modified)
-    size = r.headers["Content-Length"]
-    logger.debug("Size: %s", size)
-    length = int(size)
-    chunk_size = MB * 1
-    with temp_file.open("wb") as fd:
-        while fd.tell() < length:
-            chunk = r.read(chunk_size)
-            fd.write(chunk)
-            if progress_callback:
-                progress_callback(temp_file, fd.tell(), length)
-    temp_file.rename(target_file)
-    try:
-        r = urllib.request.urlopen(f"{parent_url}/{kwargs['distro']}.yaml")
-    except urllib.error.HTTPError as e:
-        if e.code == 404:
-            pass
-    with target_file.with_suffix(".yaml").open("wb") as fd:
-        fd.write(r.read())
-    logger.info(f"Image {kwargs['distro']} is ready!")
-
-
-def fetch(configuration, progress_callback=None, hv=None, **kwargs):
-    """Retrieve a VM image from Internet."""
-    if hv is None:
-        conn = _connect_libvirt(configuration.libvirt_uri)
-        hv = vl.LibvirtHypervisor(conn)
-        hv.init_storage_pool(configuration.storage_pool)
-
-    for registry in configuration.registry_urls:
-        try:
-            fetch_from_url(
-                progress_callback=progress_callback,
-                storage_dir=hv.get_storage_dir(),
-                url=registry.entrypoint,
-                **kwargs,
-            )
-            break
-        except ImageNotFoundUpstreamError:
-            logger.info(
-                "Image: %s not found from url: %s",
-                kwargs["distro"],
-                registry.entrypoint,
-            )
