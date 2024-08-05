@@ -162,11 +162,11 @@ class LibvirtHypervisor:
 
     def start(self, domain, metadata_format):
         if metadata_format.get("provider", "") == "nocloud":  # noqa: SIM114
-            cloud_init_iso = AuxiliaryCloudInitDisk(self.conn).init(domain)
+            cloud_init_iso = AuxiliaryCloudInitDisk(self.conn, self.storage).init(domain)
         elif domain.distro.startswith("rhel-6") or domain.distro.startswith("centos-6"):
-            cloud_init_iso = AuxiliaryCloudInitDisk(self.conn).init(domain)
+            cloud_init_iso = AuxiliaryCloudInitDisk(self.conn, self.storage).init(domain)
         else:  # OpenStack format is the default
-            cloud_init_iso = AuxiliaryOpenstackInitDisk(self.conn).init(domain)
+            cloud_init_iso = AuxiliaryOpenstackInitDisk(self.conn, self.storage).init(domain)
 
         media_type = domain.meta_data_media_type
         domain.attach_disk(cloud_init_iso, device=media_type, disk_type="raw")

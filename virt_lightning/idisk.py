@@ -23,7 +23,7 @@ logger = logging.getLogger("virt_lightning")
 #
 class IDisk(metaclass=ABCMeta):
     @abstractmethod
-    def __init__(self, conn):
+    def __init__(self, conn, storage):
         pass
 
     @abstractmethod
@@ -41,10 +41,10 @@ class IDisk(metaclass=ABCMeta):
         min_size = 0
         if backing_on:
             backing_file = pathlib.PosixPath(
-                f"{self.storage_dir}/upstream/{backing_on}.qcow2"
+                f"{self.storage.storage_dir}/upstream/{backing_on}.qcow2"
             )
             min_size = self.__get_qcow_virtual_size(backing_file)
-        disk_path = pathlib.PosixPath(f"{self.storage_dir}/{name}.qcow2")
+        disk_path = pathlib.PosixPath(f"{self.storage.storage_dir}/{name}.qcow2")
 
         if "/" in name:
             raise TypeError
@@ -71,7 +71,7 @@ class IDisk(metaclass=ABCMeta):
 
         xml = ElementTree.tostring(root).decode()
         try:
-            return self.storage_pool_obj.createXML(xml)
+            return self.storage.storage_pool_obj.createXML(xml)
         except libvirt.libvirtError as e:
             if e.get_error_code() == libvirt.VIR_ERR_STORAGE_VOL_EXIST:
                 logger.error(
@@ -79,7 +79,7 @@ class IDisk(metaclass=ABCMeta):
                     f" of a new one. You can remove it with the following "
                     f"command:\n"
                     f"  sudo virsh vol-delete --pool "
-                    f"{self.storage_pool_obj.name()} {name}.qcow2"
+                    f"{self.storage.storage_pool_obj.name()} {name}.qcow2"
                 )
                 sys.exit(consts.ExitCode.FAIL.value)
             raise
