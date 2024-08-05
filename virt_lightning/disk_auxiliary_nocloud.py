@@ -9,15 +9,16 @@ from virt_lightning.templates import META_DATA_ENI
 
 
 class AuxiliaryCloudInitDisk(IDisk):
-    def __init__(self, conn, storage):
+    def __init__(self, conn, storage, network):
         self.conn = conn
         self.storage = storage
+        self.network = network
 
     def init(self, domain):
         self._network_meta = {"config": "disabled"}
         network_config = []
         for i, nic in enumerate(domain.nics):
-            gateway = self.get_network_gateway(nic["network"])
+            gateway = self.network.get_network_gateway(nic["network"])
             if nic["ipv4"]:
                 network_config.append(
                     {
@@ -79,7 +80,7 @@ class AuxiliaryCloudInitDisk(IDisk):
                 cwd=str(temp_dir),
             )
 
-            cdrom = self.create_disk(name=cidata_file.stem, size=1)
+            cdrom = self.create(name=cidata_file.stem, size=1)
             with cidata_file.open("br") as fd:
                 st = self.conn.newStream(0)
                 cdrom.upload(st, 0, 1024 * 1024)

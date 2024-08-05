@@ -122,10 +122,10 @@ def _start_domain(hv, host, context, configuration):
         if "network" not in network:
             network["network"] = configuration.network_name
         if i == 0 and not network.get("ipv4"):
-            network["ipv4"] = hv.get_free_ipv4()
+            network["ipv4"] = hv.network.get_free_ipv4(hv.list_domains())
         ipv4 = network.get("ipv4")
         if ipv4:
-            network["mac"] = hv.reuse_mac_address(
+            network["mac"] = hv.network.reuse_mac_address(
                 network["network"], host["name"], ipaddress.ip_interface(ipv4)
             )
         domain.attach_network(**network)
@@ -143,7 +143,7 @@ def _start_domain(hv, host, context, configuration):
         if "disks" not in host and "root_disk_size" in host:
             size = int(host["root_disk_size"])
 
-        volume = DiskSystem(None, hv.storage).create(
+        volume = DiskSystem(None, hv.storage, hv.network).create(
             name=f"{host['name']}-{i}", backing_on=(distro if i == 0 else ""), size=size
         )
         domain.attach_disk(volume=volume)
@@ -192,7 +192,7 @@ def up(virt_lightning_yaml, configuration, context="default", **kwargs):
     conn = _connect_libvirt(configuration.libvirt_uri)
     hv = vl.LibvirtHypervisor(conn)
 
-    hv.init_network(configuration.network_name, configuration.network_cidr)
+    hv.network.init_network(configuration.network_name, configuration.network_cidr)
     hv.storage.init_storage_pool(configuration.storage_pool)
 
     _ensure_image_exists(configuration, hv, virt_lightning_yaml)
@@ -239,7 +239,7 @@ def start(
     """Start a single VM."""
     conn = _connect_libvirt(configuration.libvirt_uri)
     hv = vl.LibvirtHypervisor(conn)
-    hv.init_network(configuration.network_name, configuration.network_cidr)
+    hv.network.init_network(configuration.network_name, configuration.network_cidr)
     hv.storage.init_storage_pool(configuration.storage_pool)
     host = {
         k: kwargs[k] for k in ["name", "distro", "memory", "vcpus"] if kwargs.get(k)
@@ -294,7 +294,7 @@ def stop(configuration, **kwargs):
     """Stop and delete a given VM."""
     conn = _connect_libvirt(configuration.libvirt_uri)
     hv = vl.LibvirtHypervisor(conn)
-    hv.init_network(configuration.network_name, configuration.network_cidr)
+    hv.network.init_network(configuration.network_name, configuration.network_cidr)
     hv.storage.init_storage_pool(configuration.storage_pool)
     domain = hv.get_domain_by_name(kwargs["name"])
     if not domain:
@@ -425,7 +425,7 @@ def down(configuration, context="default", **kwargs):
     """Stop and remove a running environment."""
     conn = _connect_libvirt(configuration.libvirt_uri)
     hv = vl.LibvirtHypervisor(conn)
-    hv.init_network(configuration.network_name, configuration.network_cidr)
+    hv.network.init_network(configuration.network_name, configuration.network_cidr)
     hv.storage.init_storage_pool(configuration.storage_pool)
     for domain in hv.list_domains():
         if domain.context != context:
@@ -434,7 +434,7 @@ def down(configuration, context="default", **kwargs):
         hv.clean_up(domain)
 
     if configuration.network_auto_clean_up:
-        hv.network_obj.destroy()
+        hv.network.network_obj.destroy()
 
 
 def distro_list(configuration, **kwargs):

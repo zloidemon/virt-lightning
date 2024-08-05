@@ -9,15 +9,16 @@ from virt_lightning.idisk import IDisk
 
 
 class AuxiliaryOpenstackInitDisk(IDisk):
-    def __init__(self, conn, storage):
+    def __init__(self, conn, storage, network):
         self.conn = conn
         self.storage = storage
+        self.network = network
 
     def __get_network_data(self, domain):
         openstack_network_data = {
             "links": [],
             "networks": [],
-            "services": [{"type": "dns", "address": str(self.dns.ip)}],
+            "services": [{"type": "dns", "address": str(self.network.dns.ip)}],
         }
 
         for i, nic in enumerate(domain.nics):
@@ -29,12 +30,14 @@ class AuxiliaryOpenstackInitDisk(IDisk):
                 }
             )
 
-            gateway = self.get_network_gateway(nic["network"])
+            gateway = self.network.get_network_gateway(nic["network"])
+
             if nic["ipv4"]:
-                if if self.dns.ip in nic["ipv4"].network:
-                    net_dns_nameservers = (str(self.dns.ip),)
+                if self.network.dns.ip in nic["ipv4"].network:
+                    net_dns_nameservers = (str(self.network.dns.ip),)
                 else:
                     net_dns_nameservers = ()
+
                 openstack_network_data["networks"].append(
                     {
                         "id": f"private-ipv4-{i}",
@@ -126,7 +129,7 @@ class AuxiliaryOpenstackInitDisk(IDisk):
                 cwd=str(temp_dir),
             )
 
-            cdrom = self.create_disk(name=cidata_file.stem, size=1)
+            cdrom = self.create(name=cidata_file.stem, size=1)
             with cidata_file.open("br") as fd:
                 st = self.conn.newStream(0)
                 cdrom.upload(st, 0, 1024 * 1024)
