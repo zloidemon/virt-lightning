@@ -9,8 +9,9 @@ from virt_lightning.idisk import IDisk
 
 
 class AuxiliaryOpenstackInitDisk(IDisk):
-    def __init__(self, conn):
+    def __init__(self, conn, storage):
         self.conn = conn
+        self.storage = storage
 
     def __get_network_data(self, domain):
         openstack_network_data = {

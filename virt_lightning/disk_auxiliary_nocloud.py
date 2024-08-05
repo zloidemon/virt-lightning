@@ -9,8 +9,9 @@ from virt_lightning.templates import META_DATA_ENI
 
 
 class AuxiliaryCloudInitDisk(IDisk):
-    def __init__(self, conn):
+    def __init__(self, conn, storage):
         self.conn = conn
+        self.storage = storage
 
     def init(self, domain):
         self._network_meta = {"config": "disabled"}
