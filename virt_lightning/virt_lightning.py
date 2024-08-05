@@ -18,6 +18,7 @@ from virt_lightning.disk_auxiliary_nocloud import AuxiliaryCloudInitDisk
 from virt_lightning.disk_auxiliary_openstack import AuxiliaryOpenstackInitDisk
 from virt_lightning.execfile_connection_tools import ExecFileSSH
 from virt_lightning.execfile_virtualization_tools import ExecFileVirtTool
+from virt_lightning.storage_system import StorageSystem
 
 from .templates import (
     BRIDGE_XML,
@@ -26,8 +27,6 @@ from .templates import (
     NETWORK_DHCP_ENTRY,
     NETWORK_HOST_ENTRY,
     NETWORK_XML,
-    STORAGE_POOL_XML,
-    USER_CREATE_STORAGE_POOL_DIR,
 )
 
 logger = logging.getLogger("virt_lightning")
@@ -41,11 +40,11 @@ class LibvirtHypervisor:
 
         self.conn = conn
         self._last_free_ipv4 = None
-        self.storage_pool_obj = None
         self.network_obj = None
         self.gateway = None
         self.dns = None
         self.network = None
+        self.storage = StorageSystem(conn)
 
     @property
     def arch(self):
@@ -161,12 +160,6 @@ class LibvirtHypervisor:
                 self._last_free_ipv4 = interface
                 return interface
 
-    def get_storage_dir(self):
-        xml = self.storage_pool_obj.XMLDesc(0)
-        root = ElementTree.fromstring(xml)
-        disk_source = root.find("./target/path")
-        return pathlib.PosixPath(disk_source.text)
-
     def start(self, domain, metadata_format):
         if metadata_format.get("provider", "") == "nocloud":  # noqa: SIM114
             cloud_init_iso = AuxiliaryCloudInitDisk(self.conn).init(domain)
@@ -241,13 +234,15 @@ class LibvirtHypervisor:
         flag |= libvirt.VIR_DOMAIN_UNDEFINE_SNAPSHOTS_METADATA
         domain.dom.undefineFlags(flag)
 
-        self.storage_pool_obj.refresh()
+        self.storage.storage_pool_obj.refresh()
         root = ElementTree.fromstring(xml)
         for disk in root.findall("./devices/disk[@type='file']/source[@file]"):
             filepath = pathlib.PosixPath(disk.attrib["file"])
             if filepath.exists():
                 logger.debug("Purge volume: %s", str(filepath))
-                vol = self.storage_pool_obj.storageVolLookupByName(filepath.name)
+                vol = self.storage.storage_pool_obj.storageVolLookupByName(
+                    filepath.name
+                )
                 vol.delete()
 
     def init_network(self, network_name, network_cidr):
@@ -297,50 +292,6 @@ class LibvirtHypervisor:
         }
         xml = ElementTree.tostring(root).decode()
         return self.conn.networkCreateXML(xml)
-
-    def init_storage_pool(self, storage_pool):
-        try:
-            self.storage_pool_obj = self.conn.storagePoolLookupByName(storage_pool)
-        except libvirt.libvirtError as e:
-            if e.get_error_code() != libvirt.VIR_ERR_NO_STORAGE_POOL:
-                raise (e)
-
-        storage_dir = pathlib.PosixPath(consts.DEFAULT_STORAGE_DIR)
-        if not self.storage_pool_obj:
-            self.storage_pool_obj = self.create_storage_pool(
-                name=storage_pool, directory=storage_dir
-            )
-
-        try:
-            full_dir = storage_dir / "upstream"
-            dir_exists = full_dir.is_dir()
-        except PermissionError:
-            dir_exists = False
-
-        if not dir_exists:
-            qemu_dir = pathlib.PosixPath(consts.QEMU_DIR)
-            logger.error(
-                USER_CREATE_STORAGE_POOL_DIR.format(  # noqa: G001
-                    user=getpass.getuser(),
-                    qemu_user=qemu_dir.owner(),
-                    qemu_group=qemu_dir.group(),
-                    storage_dir=self.get_storage_dir(),
-                )
-            )
-            exit(consts.ExitCode.FAIL.value)
-
-        if not self.storage_pool_obj.isActive():
-            self.storage_pool_obj.create(0)
-
-    def create_storage_pool(self, name, directory):
-        root = ElementTree.fromstring(STORAGE_POOL_XML)
-        root.find("./name").text = name
-        root.find("./target/path").text = str(directory)
-        xml = ElementTree.tostring(root).decode()
-        pool = self.conn.storagePoolDefineXML(xml, 0)
-        if not pool:
-            raise Exception("Failed to create pool:", name, xml)
-        return pool
 
     def distro_available(self):
         path = self.get_storage_dir() / "upstream"
