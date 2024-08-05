@@ -143,7 +143,7 @@ def _start_domain(hv, host, context, configuration):
         if "disks" not in host and "root_disk_size" in host:
             size = int(host["root_disk_size"])
 
-        volume = DiskSystem(None).create(
+        volume = DiskSystem(None, hv.storage).create(
             name=f"{host['name']}-{i}", backing_on=(distro if i == 0 else ""), size=size
         )
         domain.attach_disk(volume=volume)
