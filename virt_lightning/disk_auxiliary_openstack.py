@@ -31,9 +31,10 @@ class AuxiliaryOpenstackInitDisk(IDisk):
 
             gateway = self.get_network_gateway(nic["network"])
             if nic["ipv4"]:
-                net_dns_nameservers = (
-                    [str(self.dns.ip)] if self.dns.ip in nic["ipv4"].network else []
-                )
+                if if self.dns.ip in nic["ipv4"].network:
+                    net_dns_nameservers = (str(self.dns.ip),)
+                else:
+                    net_dns_nameservers = ()
                 openstack_network_data["networks"].append(
                     {
                         "id": f"private-ipv4-{i}",
