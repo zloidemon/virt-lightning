@@ -1,10 +1,18 @@
-import libvirt
-from xml.etree import ElementTree
-
+import logging
+import pathlib
+import sys
 from abc import (
     ABCMeta,
     abstractmethod,
 )
+from xml.etree import ElementTree
+
+import libvirt
+
+import virt_lightning.consts as consts
+from virt_lightning.templates import STORAGE_VOLUME_XML
+
+logger = logging.getLogger("virt_lightning")
 
 
 #
@@ -62,4 +70,3 @@ class IDisk(metaclass=ABCMeta):
                 )
                 sys.exit(consts.ExitCode.FAIL.value)
             raise
-
