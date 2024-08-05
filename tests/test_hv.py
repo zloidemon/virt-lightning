@@ -29,7 +29,7 @@ def test_distro_available(hv, tmpdir):
 
 
 def test_get_storage_dir(hv):
-    assert hv.storage.get_storage_dir().name == "pool"
+    assert hv.storage.storage_dir.name == "pool"
 
 #
 # FIXME: Сделать класс для тестирования класса дисков
