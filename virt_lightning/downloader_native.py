@@ -35,7 +35,7 @@ class DownloaderNative(IDownloader):
 
         class RedirectFilter(urllib.request.HTTPRedirectHandler):
             def redirect_request(self, req, fp, code, msg, hdrs, newurl):
-                logger.info("downloading image from: %s", newurl)
+                logger.info("Start downloading image from: %s", newurl)
                 return urllib.request.HTTPRedirectHandler.redirect_request(
                     self, req, fp, code, msg, hdrs, newurl
                 )
