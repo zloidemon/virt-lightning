@@ -117,7 +117,7 @@ class LibvirtHypervisor:
 
     def get_distro_configuration(self, distro) -> dict:
         distro_configuration_file = pathlib.PosixPath(
-            f"{self.get_storage_dir()}/upstream/{distro}.yaml"
+            f"{self.storage.get_storage_dir()}/upstream/{distro}.yaml"
         )
         if not distro_configuration_file.exists():
             return {}
@@ -294,7 +294,7 @@ class LibvirtHypervisor:
         return self.conn.networkCreateXML(xml)
 
     def distro_available(self):
-        path = self.get_storage_dir() / "upstream"
+        path = self.storage.get_storage_dir() / "upstream"
         return [path.stem for path in sorted(path.glob("*.qcow2"))]
 
     def set_dns_entry(self, ipv4, names=None):

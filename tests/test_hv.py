@@ -19,7 +19,7 @@ def test_create_domain(hv):
 
 
 def test_distro_available(hv, tmpdir):
-    hv.storage_pool_obj = hv.create_storage_pool("foo", tmpdir)
+    hv.storage_pool_obj = hv.storage.create_storage_pool("foo", tmpdir)
     assert hv.distro_available() == []
     upstream_d = tmpdir / "upstream"
     upstream_d.mkdir()
@@ -29,7 +29,7 @@ def test_distro_available(hv, tmpdir):
 
 
 def test_get_storage_dir(hv):
-    assert hv.get_storage_dir().name == "pool"
+    assert hv.storage.get_storage_dir().name == "pool"
 
 #
 # FIXME: Сделать класс для тестирования класса дисков
