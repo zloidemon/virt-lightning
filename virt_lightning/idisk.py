@@ -23,7 +23,7 @@ logger = logging.getLogger("virt_lightning")
 #
 class IDisk(metaclass=ABCMeta):
     @abstractmethod
-    def __init__(self, conn, storage):
+    def __init__(self, conn, storage, network):
         pass
 
     @abstractmethod

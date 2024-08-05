@@ -8,6 +8,8 @@ import pytest
 import virt_lightning.consts as consts
 import virt_lightning.virt_lightning as vl
 
+from virt_lightning.disk_system import DiskSystem
+
 DEFAULT_INI = """
 [main]
 root_password=boby
@@ -33,7 +35,7 @@ def hv(scope="function"):
         mock_exists.return_value = False
         hv.storage.init_storage_pool("foo_bar")
     hv.get_qcow_virtual_size = Mock(return_value=2)
-    hv.init_network("my_network", "1.0.0.0/24")
+    hv.network.init_network("my_network", "1.0.0.0/24")
     yield hv
     clean_up()
 
@@ -43,6 +45,11 @@ def domain(hv, scope="function"):
     yield hv.create_domain(name="a", distro="b")
     clean_up()
 
+
+@pytest.fixture
+def disk(hv):
+    yield DiskSystem(None, hv.storage, None)
+    clean_up()
 
 @pytest.fixture(autouse=True)
 def qemu_dir(tmp_path):

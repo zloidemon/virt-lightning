@@ -34,7 +34,7 @@ class IExecFile(metaclass=ABCMeta):
             *args,
         )
 
-    def run_cmd(self, *args,  cwd=None):
+    def run_cmd(self, *args, cwd=None):
         cmd = [self.entrypoint] + list(args)
 
         proc = subprocess.Popen(
