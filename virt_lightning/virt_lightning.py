@@ -19,14 +19,11 @@ from virt_lightning.disk_auxiliary_openstack import AuxiliaryOpenstackInitDisk
 from virt_lightning.execfile_connection_tools import ExecFileSSH
 from virt_lightning.execfile_virtualization_tools import ExecFileVirtTool
 from virt_lightning.storage_system import StorageSystem
-
-from .templates import (
+from virt_lightning.network_system import NetworkSystem
+from virt_lightning.templates import (
     BRIDGE_XML,
     DISK_XML,
     DOMAIN_XML,
-    NETWORK_DHCP_ENTRY,
-    NETWORK_HOST_ENTRY,
-    NETWORK_XML,
 )
 
 logger = logging.getLogger("virt_lightning")
@@ -39,11 +36,7 @@ class LibvirtHypervisor:
             exit(consts.ExitCode.FAIL.value)
 
         self.conn = conn
-        self._last_free_ipv4 = None
-        self.network_obj = None
-        self.gateway = None
-        self.dns = None
-        self.network = None
+        self.network = NetworkSystem(conn)
         self.storage = StorageSystem(conn)
 
     @property
@@ -140,92 +133,30 @@ class LibvirtHypervisor:
             else:
                 raise
 
-    def get_free_ipv4(self):
-        used_ips = [self.gateway]
-        for dom in self.list_domains():
-            ipstr = dom.get_metadata("ipv4")
-            if not ipstr:
-                continue
-            interface = ipaddress.ip_interface(ipstr)
-            used_ips.append(interface)
-
-        for ip in self.network:
-            cidr_ip = f"{ip}/24"
-            interface = ipaddress.IPv4Interface(cidr_ip)
-            if int(interface.ip.exploded.split(".")[3]) < 5:
-                continue
-            if self._last_free_ipv4 and self._last_free_ipv4 >= interface:
-                continue
-            if interface.ip not in [i.ip for i in used_ips]:
-                self._last_free_ipv4 = interface
-                return interface
-
     def start(self, domain, metadata_format):
         if metadata_format.get("provider", "") == "nocloud":  # noqa: SIM114
-            cloud_init_iso = AuxiliaryCloudInitDisk(self.conn, self.storage).init(domain)
+            init_builder = AuxiliaryCloudInitDisk
         elif domain.distro.startswith("rhel-6") or domain.distro.startswith("centos-6"):
-            cloud_init_iso = AuxiliaryCloudInitDisk(self.conn, self.storage).init(domain)
+            init_builder = AuxiliaryCloudInitDisk
         else:  # OpenStack format is the default
-            cloud_init_iso = AuxiliaryOpenstackInitDisk(self.conn, self.storage).init(domain)
+            init_builder = AuxiliaryOpenstackInitDisk
+
+        cloud_init_iso = init_builder(self.conn, self.storage, self.network).init(
+            domain
+        )
 
         media_type = domain.meta_data_media_type
         domain.attach_disk(cloud_init_iso, device=media_type, disk_type="raw")
         domain.dom.create()
-        self.remove_domain_from_network(domain)
+        self.network.remove_domain_from_network(domain)
         self.add_domain_to_network(domain)
 
     def add_domain_to_network(self, domain):
-        self.set_dns_entry(domain.ipv4, [domain.name, domain.fqdn])
-        self.set_dhcp_entry(domain.ipv4, domain.nics[0]["mac"])
-
-    def remove_domain_from_network(self, domain):
-        root = ElementTree.fromstring(self.network_obj.XMLDesc(0))
-        if not domain.ipv4:
-            return
-        for host in root.findall("./dns/host[@ip]"):
-            if host.attrib["ip"] != str(domain.ipv4.ip):
-                continue
-            xml = ElementTree.tostring(host, encoding="unicode")
-            self.network_obj.update(
-                libvirt.VIR_NETWORK_UPDATE_COMMAND_DELETE,
-                libvirt.VIR_NETWORK_SECTION_DNS_HOST,
-                0,
-                xml,
-                libvirt.VIR_NETWORK_UPDATE_AFFECT_LIVE,
-            )
-
-        root = ElementTree.fromstring(self.network_obj.XMLDesc(0))
-        for host in root.findall("./ip/dhcp/host[@ip]"):
-            if host.attrib["ip"] != str(domain.ipv4.ip):
-                continue
-            xml = ElementTree.tostring(host, encoding="unicode")
-            self.network_obj.update(
-                libvirt.VIR_NETWORK_UPDATE_COMMAND_DELETE,
-                libvirt.VIR_NETWORK_SECTION_IP_DHCP_HOST,
-                0,
-                xml,
-                libvirt.VIR_NETWORK_UPDATE_AFFECT_LIVE,
-            )
-
-        domain_root = ElementTree.fromstring(domain.dom.XMLDesc(0))
-        ifaces = domain_root.findall("./devices/interface/mac[@address]")
-        domain_macs = [iface.attrib["address"] for iface in ifaces]
-
-        root = ElementTree.fromstring(self.network_obj.XMLDesc(0))
-        for host in root.findall("./ip/dhcp/host[@mac]"):
-            if host.attrib["mac"] not in domain_macs:
-                continue
-            xml = ElementTree.tostring(host, encoding="unicode")
-            self.network_obj.update(
-                libvirt.VIR_NETWORK_UPDATE_COMMAND_DELETE,
-                libvirt.VIR_NETWORK_SECTION_IP_DHCP_HOST,
-                0,
-                xml,
-                libvirt.VIR_NETWORK_UPDATE_AFFECT_LIVE,
-            )
+        self.network.set_dns_entry(domain.ipv4, [domain.name, domain.fqdn])
+        self.network.set_dhcp_entry(domain.ipv4, domain.nics[0]["mac"])
 
     def clean_up(self, domain):
-        self.remove_domain_from_network(domain)
+        self.network.remove_domain_from_network(domain)
         xml = domain.dom.XMLDesc(0)
         state, _ = domain.dom.state()
         if state != libvirt.VIR_DOMAIN_SHUTOFF:
@@ -245,85 +176,9 @@ class LibvirtHypervisor:
                 )
                 vol.delete()
 
-    def init_network(self, network_name, network_cidr):
-        try:
-            self.network_obj = self.conn.networkLookupByName(network_name)
-        except libvirt.libvirtError as e:
-            if e.get_error_code() != libvirt.VIR_ERR_NO_NETWORK:
-                raise (e)
-
-        if not self.network_obj:
-            self.network_obj = self.create_network(network_name, network_cidr)
-
-        if not self.network_obj.isActive():
-            self.network_obj.create()
-        self.gateway = self.get_network_gateway(network_name)
-        self.dns = self.gateway
-        self.network = self.gateway.network
-
-    def get_network_by_name(self, network_name):
-        try:
-            return self.conn.networkLookupByName(network_name)
-        except libvirt.libvirtError as e:
-            if e.get_error_code() != libvirt.VIR_ERR_NO_NETWORK:
-                raise (e)
-
-    def get_network_gateway(self, network_name):
-        network_obj = self.get_network_by_name(network_name)
-        xml = network_obj.XMLDesc(0)
-        root = ElementTree.fromstring(xml)
-        ip = root.find("./ip")
-        return ipaddress.IPv4Interface("{address}/{netmask}".format(**ip.attrib))
-
-    def reuse_mac_address(self, network_name, domain_name, ipv4):
-        network_obj = self.get_network_by_name(network_name)
-        for lease in network_obj.DHCPLeases():
-            if lease["hostname"] == domain_name and lease["ipaddr"] == str(ipv4.ip):
-                return lease["mac"]
-
-    def create_network(self, network_name, network_cidr):
-        network = ipaddress.ip_network(network_cidr)
-        root = ElementTree.fromstring(NETWORK_XML)
-        root.find("./name").text = network_name
-        root.find("./bridge").attrib["name"] = network_name
-        root.find("./ip").attrib = {
-            "address": network[1].exploded,
-            "netmask": network.netmask.exploded,
-        }
-        xml = ElementTree.tostring(root).decode()
-        return self.conn.networkCreateXML(xml)
-
     def distro_available(self):
         path = self.storage.storage_dir / "upstream"
         return [path.stem for path in sorted(path.glob("*.qcow2"))]
-
-    def set_dns_entry(self, ipv4, names=None):
-        root = ElementTree.fromstring(NETWORK_HOST_ENTRY)
-        for name in names:
-            if name:
-                ElementTree.SubElement(root, "hostname").text = name
-        root.attrib["ip"] = str(ipv4.ip)
-        xml = ElementTree.tostring(root).decode()
-        self.network_obj.update(
-            libvirt.VIR_NETWORK_UPDATE_COMMAND_ADD_FIRST,
-            libvirt.VIR_NETWORK_SECTION_DNS_HOST,
-            0,
-            xml,
-            libvirt.VIR_NETWORK_UPDATE_AFFECT_LIVE,
-        )
-
-    def set_dhcp_entry(self, ipv4, mac=None):
-        root = ElementTree.fromstring(NETWORK_DHCP_ENTRY)
-        root.attrib["mac"] = mac
-        root.attrib["ip"] = str(ipv4.ip)
-        xml = ElementTree.tostring(root).decode()
-        self.network_obj.update(
-            libvirt.VIR_NETWORK_UPDATE_COMMAND_ADD_FIRST,
-            libvirt.VIR_NETWORK_SECTION_IP_DHCP_HOST,
-            0,
-            xml,
-            libvirt.VIR_NETWORK_UPDATE_AFFECT_LIVE,
-        )
 
 
 class LibvirtDomain:
