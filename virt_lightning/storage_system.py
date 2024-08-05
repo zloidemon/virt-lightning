@@ -29,7 +29,8 @@ class StorageSystem:
             raise Exception("Failed to create pool:", name, xml)
         return pool
 
-    def get_storage_dir(self):
+    @property
+    def storage_dir(self):
         xml = self.storage_pool_obj.XMLDesc(0)
         root = ElementTree.fromstring(xml)
         disk_source = root.find("./target/path")
@@ -61,7 +62,7 @@ class StorageSystem:
                     user=getpass.getuser(),
                     qemu_user=qemu_dir.owner(),
                     qemu_group=qemu_dir.group(),
-                    storage_dir=self.get_storage_dir(),
+                    storage_dir=self.storage_dir,
                 )
             )
             exit(consts.ExitCode.FAIL.value)

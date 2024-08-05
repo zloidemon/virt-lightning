@@ -160,7 +160,7 @@ def _ensure_image_exists(configuration, hv, hosts):
             try:
                 downloader = DownloaderNative(
                     configuration,
-                    hv.get_storage_dir(),
+                    hv.storage.storage_dir,
                 )
                 downloader.pull(distro=distro)
             except ImageNotFoundUpstreamError:
@@ -174,7 +174,7 @@ def pull(configuration, **kwargs):
 
     downloader = DownloaderNative(
         configuration,
-        hv.get_storage_dir(),
+        hv.storage.storage_dir,
     )
     downloader.pull(**kwargs)
 
@@ -450,4 +450,4 @@ def storage_dir(configuration, **kwargs):
     conn = _connect_libvirt(configuration.libvirt_uri)
     hv = vl.LibvirtHypervisor(conn)
     hv.storage.init_storage_pool(configuration.storage_pool)
-    return hv.get_storage_dir()
+    return hv.storage.storage_dir
