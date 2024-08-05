@@ -64,18 +64,15 @@ class AuxiliaryCloudInitDisk(IDisk):
                 fd.write(yaml.dump(domain._network_meta, Dumper=yaml.Dumper))
 
             cidata_file = temp_dir / f"{domain.name}-cidata.iso"
-            run_cmd(
-                [
-                    str(ExecFileISOTool().entrypoint),
-                    "-output",
-                    cidata_file.name,
-                    "-volid",
-                    "cidata",
-                    "-joliet",
-                    "-R",
-                    str(cd_dir),
-                ],
+            ExecFileISOTool().run_cmd(
                 cwd=str(temp_dir),
+                "-output",
+                cidata_file.name,
+                "-volid",
+                "cidata",
+                "-joliet",
+                "-R",
+                str(cd_dir),
             )
 
             cdrom = self.create_disk(name=cidata_file.stem, size=1)

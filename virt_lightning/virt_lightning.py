@@ -9,7 +9,6 @@ import math
 import pathlib
 import re
 import string
-import subprocess
 import sys
 import tempfile
 import uuid
@@ -37,16 +36,6 @@ from .templates import (
 )
 
 logger = logging.getLogger("virt_lightning")
-
-
-def run_cmd(cmd, cwd=None):
-    proc = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=cwd
-    )
-    outs, errs = proc.communicate()
-    if proc.returncode != 0:
-        raise Exception("A command has failed: ", outs, errs)
-    return outs
 
 
 class LibvirtHypervisor:
@@ -184,8 +173,8 @@ class LibvirtHypervisor:
         return pathlib.PosixPath(disk_source.text)
 
     def get_qcow_virtual_size(self, qcow_path):
-        qemu_img_info = run_cmd(
-            [ExecFileQemuIMG().entrypoint, "info", "--output=json", str(qcow_path)]
+        qemu_img_info = ExecFileQemuIMG().run_cmd(
+            "info", "--output=json", str(qcow_path)
         )
         return math.ceil(json.loads(qemu_img_info)["virtual-size"] / 1024**3)
 
