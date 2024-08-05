@@ -1,7 +1,11 @@
+import json
 import pathlib
+import tempfile
 
-from virt_lightning.idisk import IDisk
+import yaml
+
 from virt_lightning.execfile_iso_tools import ExecFileISOTool
+from virt_lightning.idisk import IDisk
 
 
 class AuxiliaryOpenstackInitDisk(IDisk):
@@ -103,7 +107,6 @@ class AuxiliaryOpenstackInitDisk(IDisk):
 
             cidata_file = temp_dir / f"{domain.name}-cidata.iso"
             ExecFileISOTool().run_cmd(
-                cwd=str(temp_dir),
                 "-output",
                 cidata_file.name,
                 "-ldots",
@@ -118,6 +121,7 @@ class AuxiliaryOpenstackInitDisk(IDisk):
                 "-V",
                 "config-2",
                 str(cd_dir),
+                cwd=str(temp_dir),
             )
 
             cdrom = self.create_disk(name=cidata_file.stem, size=1)

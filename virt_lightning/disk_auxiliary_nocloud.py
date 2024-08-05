@@ -1,8 +1,11 @@
 import pathlib
+import tempfile
 
-from virt_lightning.templates import META_DATA_ENI
-from virt_lightning.idisk import IDisk
+import yaml
+
 from virt_lightning.execfile_iso_tools import ExecFileISOTool
+from virt_lightning.idisk import IDisk
+from virt_lightning.templates import META_DATA_ENI
 
 
 class AuxiliaryCloudInitDisk(IDisk):
@@ -65,7 +68,6 @@ class AuxiliaryCloudInitDisk(IDisk):
 
             cidata_file = temp_dir / f"{domain.name}-cidata.iso"
             ExecFileISOTool().run_cmd(
-                cwd=str(temp_dir),
                 "-output",
                 cidata_file.name,
                 "-volid",
@@ -73,6 +75,7 @@ class AuxiliaryCloudInitDisk(IDisk):
                 "-joliet",
                 "-R",
                 str(cd_dir),
+                cwd=str(temp_dir),
             )
 
             cdrom = self.create_disk(name=cidata_file.stem, size=1)

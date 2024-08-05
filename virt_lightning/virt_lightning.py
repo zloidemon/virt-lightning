@@ -9,9 +9,8 @@ import math
 import pathlib
 import re
 import string
-import sys
-import tempfile
 import uuid
+from xml.etree import ElementTree
 
 import libvirt
 import yaml
@@ -31,7 +30,6 @@ from .templates import (
     NETWORK_HOST_ENTRY,
     NETWORK_XML,
     STORAGE_POOL_XML,
-    STORAGE_VOLUME_XML,
     USER_CREATE_STORAGE_POOL_DIR,
 )
 
@@ -55,13 +53,13 @@ class LibvirtHypervisor:
     @property
     def arch(self):
         caps = self.conn.getCapabilities()
-        root = ET.fromstring(caps)
+        root = ElementTree.fromstring(caps)
         return root.find("./host/cpu/arch").text
 
     @property
     def domain_type(self):
         caps = self.conn.getCapabilities()
-        root = ET.fromstring(caps)
+        root = ElementTree.fromstring(caps)
         available = [
             e.attrib["type"] for e in root.findall("./guest/arch/domain[@type]")
         ]
@@ -75,13 +73,13 @@ class LibvirtHypervisor:
     def create_domain(self, name=None, distro=None):
         if not name:
             name = uuid.uuid4().hex[0:10]
-        root = ET.fromstring(DOMAIN_XML)
+        root = ElementTree.fromstring(DOMAIN_XML)
         root.attrib["type"] = self.domain_type
         root.find("./name").text = name
         root.find("./vcpu").text = str(self.conn.getInfo()[2])
         root.find("./devices/emulator").text = str(ExecFileVirtTool().entrypoint)
         root.find("./os/type").attrib["arch"] = self.arch
-        dom = self.conn.defineXML(ET.tostring(root).decode())
+        dom = self.conn.defineXML(ElementTree.tostring(root).decode())
         domain = LibvirtDomain(dom)
         domain.distro = distro
         return domain
@@ -168,7 +166,7 @@ class LibvirtHypervisor:
 
     def get_storage_dir(self):
         xml = self.storage_pool_obj.XMLDesc(0)
-        root = ET.fromstring(xml)
+        root = ElementTree.fromstring(xml)
         disk_source = root.find("./target/path")
         return pathlib.PosixPath(disk_source.text)
 
@@ -177,7 +175,6 @@ class LibvirtHypervisor:
             "info", "--output=json", str(qcow_path)
         )
         return math.ceil(json.loads(qemu_img_info)["virtual-size"] / 1024**3)
-
 
     def start(self, domain, metadata_format):
         if metadata_format.get("provider", "") == "nocloud":  # noqa: SIM114
@@ -198,13 +195,13 @@ class LibvirtHypervisor:
         self.set_dhcp_entry(domain.ipv4, domain.nics[0]["mac"])
 
     def remove_domain_from_network(self, domain):
-        root = ET.fromstring(self.network_obj.XMLDesc(0))
+        root = ElementTree.fromstring(self.network_obj.XMLDesc(0))
         if not domain.ipv4:
             return
         for host in root.findall("./dns/host[@ip]"):
             if host.attrib["ip"] != str(domain.ipv4.ip):
                 continue
-            xml = ET.tostring(host, encoding="unicode")
+            xml = ElementTree.tostring(host, encoding="unicode")
             self.network_obj.update(
                 libvirt.VIR_NETWORK_UPDATE_COMMAND_DELETE,
                 libvirt.VIR_NETWORK_SECTION_DNS_HOST,
@@ -213,11 +210,11 @@ class LibvirtHypervisor:
                 libvirt.VIR_NETWORK_UPDATE_AFFECT_LIVE,
             )
 
-        root = ET.fromstring(self.network_obj.XMLDesc(0))
+        root = ElementTree.fromstring(self.network_obj.XMLDesc(0))
         for host in root.findall("./ip/dhcp/host[@ip]"):
             if host.attrib["ip"] != str(domain.ipv4.ip):
                 continue
-            xml = ET.tostring(host, encoding="unicode")
+            xml = ElementTree.tostring(host, encoding="unicode")
             self.network_obj.update(
                 libvirt.VIR_NETWORK_UPDATE_COMMAND_DELETE,
                 libvirt.VIR_NETWORK_SECTION_IP_DHCP_HOST,
@@ -226,15 +223,15 @@ class LibvirtHypervisor:
                 libvirt.VIR_NETWORK_UPDATE_AFFECT_LIVE,
             )
 
-        domain_root = ET.fromstring(domain.dom.XMLDesc(0))
+        domain_root = ElementTree.fromstring(domain.dom.XMLDesc(0))
         ifaces = domain_root.findall("./devices/interface/mac[@address]")
         domain_macs = [iface.attrib["address"] for iface in ifaces]
 
-        root = ET.fromstring(self.network_obj.XMLDesc(0))
+        root = ElementTree.fromstring(self.network_obj.XMLDesc(0))
         for host in root.findall("./ip/dhcp/host[@mac]"):
             if host.attrib["mac"] not in domain_macs:
                 continue
-            xml = ET.tostring(host, encoding="unicode")
+            xml = ElementTree.tostring(host, encoding="unicode")
             self.network_obj.update(
                 libvirt.VIR_NETWORK_UPDATE_COMMAND_DELETE,
                 libvirt.VIR_NETWORK_SECTION_IP_DHCP_HOST,
@@ -254,7 +251,7 @@ class LibvirtHypervisor:
         domain.dom.undefineFlags(flag)
 
         self.storage_pool_obj.refresh()
-        root = ET.fromstring(xml)
+        root = ElementTree.fromstring(xml)
         for disk in root.findall("./devices/disk[@type='file']/source[@file]"):
             filepath = pathlib.PosixPath(disk.attrib["file"])
             if filepath.exists():
@@ -288,7 +285,7 @@ class LibvirtHypervisor:
     def get_network_gateway(self, network_name):
         network_obj = self.get_network_by_name(network_name)
         xml = network_obj.XMLDesc(0)
-        root = ET.fromstring(xml)
+        root = ElementTree.fromstring(xml)
         ip = root.find("./ip")
         return ipaddress.IPv4Interface("{address}/{netmask}".format(**ip.attrib))
 
@@ -300,14 +297,14 @@ class LibvirtHypervisor:
 
     def create_network(self, network_name, network_cidr):
         network = ipaddress.ip_network(network_cidr)
-        root = ET.fromstring(NETWORK_XML)
+        root = ElementTree.fromstring(NETWORK_XML)
         root.find("./name").text = network_name
         root.find("./bridge").attrib["name"] = network_name
         root.find("./ip").attrib = {
             "address": network[1].exploded,
             "netmask": network.netmask.exploded,
         }
-        xml = ET.tostring(root).decode()
+        xml = ElementTree.tostring(root).decode()
         return self.conn.networkCreateXML(xml)
 
     def init_storage_pool(self, storage_pool):
@@ -345,10 +342,10 @@ class LibvirtHypervisor:
             self.storage_pool_obj.create(0)
 
     def create_storage_pool(self, name, directory):
-        root = ET.fromstring(STORAGE_POOL_XML)
+        root = ElementTree.fromstring(STORAGE_POOL_XML)
         root.find("./name").text = name
         root.find("./target/path").text = str(directory)
-        xml = ET.tostring(root).decode()
+        xml = ElementTree.tostring(root).decode()
         pool = self.conn.storagePoolDefineXML(xml, 0)
         if not pool:
             raise Exception("Failed to create pool:", name, xml)
@@ -359,12 +356,12 @@ class LibvirtHypervisor:
         return [path.stem for path in sorted(path.glob("*.qcow2"))]
 
     def set_dns_entry(self, ipv4, names=None):
-        root = ET.fromstring(NETWORK_HOST_ENTRY)
+        root = ElementTree.fromstring(NETWORK_HOST_ENTRY)
         for name in names:
             if name:
-                ET.SubElement(root, "hostname").text = name
+                ElementTree.SubElement(root, "hostname").text = name
         root.attrib["ip"] = str(ipv4.ip)
-        xml = ET.tostring(root).decode()
+        xml = ElementTree.tostring(root).decode()
         self.network_obj.update(
             libvirt.VIR_NETWORK_UPDATE_COMMAND_ADD_FIRST,
             libvirt.VIR_NETWORK_SECTION_DNS_HOST,
@@ -374,10 +371,10 @@ class LibvirtHypervisor:
         )
 
     def set_dhcp_entry(self, ipv4, mac=None):
-        root = ET.fromstring(NETWORK_DHCP_ENTRY)
+        root = ElementTree.fromstring(NETWORK_DHCP_ENTRY)
         root.attrib["mac"] = mac
         root.attrib["ip"] = str(ipv4.ip)
-        xml = ET.tostring(root).decode()
+        xml = ElementTree.tostring(root).decode()
         self.network_obj.update(
             libvirt.VIR_NETWORK_UPDATE_COMMAND_ADD_FIRST,
             libvirt.VIR_NETWORK_SECTION_IP_DHCP_HOST,
@@ -501,7 +498,7 @@ class LibvirtDomain:
     @property
     def vcpus(self):
         xml = self.dom.XMLDesc(0)
-        root = ET.fromstring(xml)
+        root = ElementTree.fromstring(xml)
         vcpu = root.findall("./vcpu")[0]
         return int(vcpu.attrib.get("current", vcpu.text))
 
@@ -512,7 +509,7 @@ class LibvirtDomain:
     @property
     def memory(self):
         xml = self.dom.XMLDesc(0)
-        root = ET.fromstring(xml)
+        root = ElementTree.fromstring(xml)
         memory = root.findall("./memory")[0]
         unit = memory.attrib["unit"]
 
@@ -554,7 +551,7 @@ class LibvirtDomain:
             if e.get_error_code() == libvirt.VIR_ERR_NO_DOMAIN_METADATA:
                 return None
             raise (e)
-        elt = ET.fromstring(xml)
+        elt = ElementTree.fromstring(xml)
         return elt.attrib["name"]
 
     @property
@@ -584,12 +581,12 @@ class LibvirtDomain:
             bus = self.default_bus_type or "virtio"
 
         device_name = self.get_next_block_device()
-        disk_root = ET.fromstring(DISK_XML)
+        disk_root = ElementTree.fromstring(DISK_XML)
         disk_root.attrib["device"] = device
         disk_root.findall("./driver")[0].attrib = {"name": "qemu", "type": disk_type}
         disk_root.findall("./source")[0].attrib = {"file": volume.path()}
         disk_root.findall("./target")[0].attrib = {"dev": device_name, "bus": bus}
-        xml = ET.tostring(disk_root).decode()
+        xml = ElementTree.tostring(disk_root).decode()
         self.dom.attachDeviceFlags(xml, libvirt.VIR_DOMAIN_AFFECT_CONFIG)
         return device_name
 
@@ -604,7 +601,7 @@ class LibvirtDomain:
     ):
         if not nic_model:
             nic_model = self.default_nic_model
-        net_root = ET.fromstring(BRIDGE_XML)
+        net_root = ElementTree.fromstring(BRIDGE_XML)
 
         if bridge:
             source_attrs = {"bridge": bridge}
@@ -615,10 +612,10 @@ class LibvirtDomain:
         net_root.findall("./model")[0].attrib = {"type": nic_model}
 
         if virtualport_type:
-            net_root.append(ET.Element("virtualport", type=virtualport_type))
+            net_root.append(ElementTree.Element("virtualport", type=virtualport_type))
 
         if mac:
-            mac_el = ET.SubElement(net_root, "mac")
+            mac_el = ElementTree.SubElement(net_root, "mac")
             mac_el.attrib = {"address": mac}
 
         if not ipv4:
@@ -635,11 +632,11 @@ class LibvirtDomain:
 
         self.ipv4 = self.nics[0]["ipv4"]
 
-        xml = ET.tostring(net_root).decode()
+        xml = ElementTree.tostring(net_root).decode()
         self.dom.attachDeviceFlags(xml, libvirt.VIR_DOMAIN_AFFECT_CONFIG)
 
         xml = self.dom.XMLDesc(0)
-        root = ET.fromstring(xml)
+        root = ElementTree.fromstring(xml)
         ifaces = root.findall("./devices/interface/mac[@address]")
         for i, iface in enumerate(ifaces):
             self.nics[i]["mac"] = iface.attrib["address"]
