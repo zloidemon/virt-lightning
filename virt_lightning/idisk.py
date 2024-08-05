@@ -23,6 +23,10 @@ class IDisk(metaclass=ABCMeta):
     def __init__(self, conn):
         pass
 
+    @abstractmethod
+    def init(self, domain):
+        pass
+
     def create(self, name, size=None, backing_on=None):
         backing_file = None
         min_size = 0
