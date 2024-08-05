@@ -1,4 +1,6 @@
+import json
 import logging
+import math
 import pathlib
 import sys
 from abc import (
@@ -10,6 +12,7 @@ from xml.etree import ElementTree
 import libvirt
 
 import virt_lightning.consts as consts
+from virt_lightning.execfile_virtualization_tools import ExecFileQemuIMG
 from virt_lightning.templates import STORAGE_VOLUME_XML
 
 logger = logging.getLogger("virt_lightning")
@@ -27,6 +30,12 @@ class IDisk(metaclass=ABCMeta):
     def init(self, domain):
         pass
 
+    def __get_qcow_virtual_size(self, qcow_path):
+        qemu_img_info = ExecFileQemuIMG().run_cmd(
+            "info", "--output=json", str(qcow_path)
+        )
+        return math.ceil(json.loads(qemu_img_info)["virtual-size"] / 1024**3)
+
     def create(self, name, size=None, backing_on=None):
         backing_file = None
         min_size = 0
@@ -34,7 +43,7 @@ class IDisk(metaclass=ABCMeta):
             backing_file = pathlib.PosixPath(
                 f"{self.get_storage_dir()}/upstream/{backing_on}.qcow2"
             )
-            min_size = self.get_qcow_virtual_size(backing_file)
+            min_size = self.__get_qcow_virtual_size(backing_file)
         disk_path = pathlib.PosixPath(f"{self.get_storage_dir()}/{name}.qcow2")
 
         if "/" in name:
