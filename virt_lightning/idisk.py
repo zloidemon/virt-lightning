@@ -11,6 +11,10 @@ from abc import (
 # Общий интерфейс для работы с дисками
 #
 class IDisk(metaclass=ABCMeta):
+    @abstractmethod
+    def __init__(self, conn):
+        pass
+
     def create(self, name, size=None, backing_on=None):
         backing_file = None
         min_size = 0
