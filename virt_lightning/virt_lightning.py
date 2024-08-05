@@ -3,9 +3,7 @@
 import asyncio
 import getpass
 import ipaddress
-import json
 import logging
-import math
 import pathlib
 import re
 import string
@@ -19,10 +17,7 @@ import virt_lightning.consts as consts
 from virt_lightning.disk_auxiliary_nocloud import AuxiliaryCloudInitDisk
 from virt_lightning.disk_auxiliary_openstack import AuxiliaryOpenstackInitDisk
 from virt_lightning.execfile_connection_tools import ExecFileSSH
-from virt_lightning.execfile_virtualization_tools import (
-    ExecFileQemuIMG,
-    ExecFileVirtTool,
-)
+from virt_lightning.execfile_virtualization_tools import ExecFileVirtTool
 
 from .templates import (
     BRIDGE_XML,
@@ -171,12 +166,6 @@ class LibvirtHypervisor:
         root = ElementTree.fromstring(xml)
         disk_source = root.find("./target/path")
         return pathlib.PosixPath(disk_source.text)
-
-    def get_qcow_virtual_size(self, qcow_path):
-        qemu_img_info = ExecFileQemuIMG().run_cmd(
-            "info", "--output=json", str(qcow_path)
-        )
-        return math.ceil(json.loads(qemu_img_info)["virtual-size"] / 1024**3)
 
     def start(self, domain, metadata_format):
         if metadata_format.get("provider", "") == "nocloud":  # noqa: SIM114
