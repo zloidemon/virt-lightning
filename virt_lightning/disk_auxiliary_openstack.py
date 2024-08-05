@@ -12,7 +12,7 @@ class AuxiliaryOpenstackInitDisk(IDisk):
     def __init__(self, conn):
         self.conn = conn
 
-    def get_openstack_network_data(self, domain):
+    def __get_network_data(self, domain):
         openstack_network_data = {
             "links": [],
             "networks": [],
@@ -70,7 +70,7 @@ class AuxiliaryOpenstackInitDisk(IDisk):
 
         return openstack_network_data
 
-    def prepare_cloud_init_openstack_iso(self, domain):
+    def init(self, domain):
         with tempfile.TemporaryDirectory() as base_temp_dir:
             temp_dir = pathlib.Path(base_temp_dir)
             cd_dir = temp_dir / "cd_dir"
@@ -98,7 +98,7 @@ class AuxiliaryOpenstackInitDisk(IDisk):
 
             openstack_networkdata_file = openstack_dir / "network_data.json"
             with openstack_networkdata_file.open("w") as fd:
-                fd.write(json.dumps(self.get_openstack_network_data(domain)))
+                fd.write(json.dumps(self.__get_network_data(domain)))
 
             openstack_userdata_file = openstack_dir / "user_data"
             with openstack_userdata_file.open("w") as fd:

@@ -12,7 +12,7 @@ class AuxiliaryCloudInitDisk(IDisk):
     def __init__(self, conn):
         self.conn = conn
 
-    def prepare_cloud_init_nocloud_iso(self, domain):
+    def init(self, domain):
         self._network_meta = {"config": "disabled"}
         network_config = []
         for i, nic in enumerate(domain.nics):
