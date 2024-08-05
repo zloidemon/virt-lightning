@@ -170,7 +170,7 @@ def _ensure_image_exists(configuration, hv, hosts):
 def pull(configuration, **kwargs):
     conn = _connect_libvirt(configuration.libvirt_uri)
     hv = vl.LibvirtHypervisor(conn)
-    hv.init_storage_pool(configuration.storage_pool)
+    hv.storage.init_storage_pool(configuration.storage_pool)
 
     downloader = DownloaderNative(
         configuration,
@@ -193,7 +193,7 @@ def up(virt_lightning_yaml, configuration, context="default", **kwargs):
     hv = vl.LibvirtHypervisor(conn)
 
     hv.init_network(configuration.network_name, configuration.network_cidr)
-    hv.init_storage_pool(configuration.storage_pool)
+    hv.storage.init_storage_pool(configuration.storage_pool)
 
     _ensure_image_exists(configuration, hv, virt_lightning_yaml)
     conn = _connect_libvirt(configuration.libvirt_uri)
@@ -240,7 +240,7 @@ def start(
     conn = _connect_libvirt(configuration.libvirt_uri)
     hv = vl.LibvirtHypervisor(conn)
     hv.init_network(configuration.network_name, configuration.network_cidr)
-    hv.init_storage_pool(configuration.storage_pool)
+    hv.storage.init_storage_pool(configuration.storage_pool)
     host = {
         k: kwargs[k] for k in ["name", "distro", "memory", "vcpus"] if kwargs.get(k)
     }
@@ -295,7 +295,7 @@ def stop(configuration, **kwargs):
     conn = _connect_libvirt(configuration.libvirt_uri)
     hv = vl.LibvirtHypervisor(conn)
     hv.init_network(configuration.network_name, configuration.network_cidr)
-    hv.init_storage_pool(configuration.storage_pool)
+    hv.storage.init_storage_pool(configuration.storage_pool)
     domain = hv.get_domain_by_name(kwargs["name"])
     if not domain:
         vm_list = [d.name for d in hv.list_domains()]
@@ -426,7 +426,7 @@ def down(configuration, context="default", **kwargs):
     conn = _connect_libvirt(configuration.libvirt_uri)
     hv = vl.LibvirtHypervisor(conn)
     hv.init_network(configuration.network_name, configuration.network_cidr)
-    hv.init_storage_pool(configuration.storage_pool)
+    hv.storage.init_storage_pool(configuration.storage_pool)
     for domain in hv.list_domains():
         if domain.context != context:
             continue
@@ -441,7 +441,7 @@ def distro_list(configuration, **kwargs):
     """Return a list of VM images that are available on the system."""
     conn = _connect_libvirt(configuration.libvirt_uri)
     hv = vl.LibvirtHypervisor(conn)
-    hv.init_storage_pool(configuration.storage_pool)
+    hv.storage.init_storage_pool(configuration.storage_pool)
     return hv.distro_available()
 
 
@@ -449,5 +449,5 @@ def storage_dir(configuration, **kwargs):
     """Return the location of the VM image storage directory."""
     conn = _connect_libvirt(configuration.libvirt_uri)
     hv = vl.LibvirtHypervisor(conn)
-    hv.init_storage_pool(configuration.storage_pool)
+    hv.storage.init_storage_pool(configuration.storage_pool)
     return hv.get_storage_dir()
