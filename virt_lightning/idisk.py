@@ -41,10 +41,10 @@ class IDisk(metaclass=ABCMeta):
         min_size = 0
         if backing_on:
             backing_file = pathlib.PosixPath(
-                f"{self.get_storage_dir()}/upstream/{backing_on}.qcow2"
+                f"{self.storage_dir}/upstream/{backing_on}.qcow2"
             )
             min_size = self.__get_qcow_virtual_size(backing_file)
-        disk_path = pathlib.PosixPath(f"{self.get_storage_dir()}/{name}.qcow2")
+        disk_path = pathlib.PosixPath(f"{self.storage_dir}/{name}.qcow2")
 
         if "/" in name:
             raise TypeError
