@@ -1,6 +1,7 @@
 import os
 import pathlib
 import shutil
+import subprocess
 from abc import (
     ABCMeta,
     abstractproperty,
@@ -32,3 +33,14 @@ class IExecFile(metaclass=ABCMeta):
             str(self.entrypoint),
             *args,
         )
+
+    def run_cmd(self, cwd=None, *args):
+        cmd = [self.entrypoint] + list(args)
+
+        proc = subprocess.Popen(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=cwd
+        )
+        outs, errs = proc.communicate()
+        if proc.returncode != 0:
+            raise Exception("A command has failed: ", outs, errs)
+        return outs

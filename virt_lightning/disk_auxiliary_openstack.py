@@ -102,25 +102,22 @@ class AuxiliaryOpenstackInitDisk(IDisk):
                 fd.write(yaml.dump(domain.user_data, Dumper=yaml.Dumper))
 
             cidata_file = temp_dir / f"{domain.name}-cidata.iso"
-            run_cmd(
-                [
-                    str(ExecFileISOTool().entrypoint),
-                    "-output",
-                    cidata_file.name,
-                    "-ldots",
-                    "-allow-lowercase",
-                    "-allow-multidot",
-                    "-l",
-                    "-publisher",
-                    "virt-lighting",
-                    "-quiet",
-                    "-J",
-                    "-r",
-                    "-V",
-                    "config-2",
-                    str(cd_dir),
-                ],
+            ExecFileISOTool().run_cmd(
                 cwd=str(temp_dir),
+                "-output",
+                cidata_file.name,
+                "-ldots",
+                "-allow-lowercase",
+                "-allow-multidot",
+                "-l",
+                "-publisher",
+                "virt-lighting",
+                "-quiet",
+                "-J",
+                "-r",
+                "-V",
+                "config-2",
+                str(cd_dir),
             )
 
             cdrom = self.create_disk(name=cidata_file.stem, size=1)
