@@ -66,27 +66,6 @@ BRIDGE_XML = """
 </interface>
 """
 
-NETWORK_XML = """
-<network>
-  <name></name>
-  <forward mode='nat'/>
-  <bridge name='virbr0' stp='off' delay='0'/>
-  <ip address='192.168.123.1' netmask='255.255.255.0'>
-  <dhcp>
-    <leasetime>10s</leasetime>
-  </dhcp>
-  </ip>
-</network>
-"""
-
-NETWORK_HOST_ENTRY = """
-<host ip="">
-</host>"""
-
-NETWORK_DHCP_ENTRY = """
-<host />
-"""
-
 # TODO
 META_DATA_ENI = """
 dsmode: local
