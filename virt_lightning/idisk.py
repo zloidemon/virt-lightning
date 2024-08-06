@@ -13,9 +13,21 @@ import libvirt
 
 import virt_lightning.consts as consts
 from virt_lightning.execfile_virtualization_tools import ExecFileQemuIMG
-from virt_lightning.templates import STORAGE_VOLUME_XML
 
 logger = logging.getLogger("virt_lightning")
+
+
+STORAGE_VOLUME_XML = """
+<volume>
+  <name></name>
+  <allocation>0</allocation>
+  <capacity unit="G">1</capacity>
+  <target>
+    <format type='qcow2'/>
+    <path></path>
+  </target>
+</volume>
+"""
 
 
 #
