@@ -18,8 +18,8 @@ from virt_lightning.disk_auxiliary_nocloud import AuxiliaryCloudInitDisk
 from virt_lightning.disk_auxiliary_openstack import AuxiliaryOpenstackInitDisk
 from virt_lightning.execfile_connection_tools import ExecFileSSH
 from virt_lightning.execfile_virtualization_tools import ExecFileVirtTool
-from virt_lightning.storage_system import StorageSystem
 from virt_lightning.network_system import NetworkSystem
+from virt_lightning.storage_system import StorageSystem
 from virt_lightning.templates import (
     BRIDGE_XML,
     DISK_XML,
@@ -120,8 +120,8 @@ class LibvirtHypervisor:
         return config
 
     def list_domains(self):
-        for i in self.conn.listAllDomains():
-            yield LibvirtDomain(i)
+        for domain in self.conn.listAllDomains():
+            yield LibvirtDomain(domain)
 
     def get_domain_by_name(self, name):
         try:
