@@ -7,7 +7,6 @@ import pytest
 
 import virt_lightning.consts as consts
 import virt_lightning.virt_lightning as vl
-
 from virt_lightning.disk_system import DiskSystem
 
 DEFAULT_INI = """
