@@ -12,7 +12,7 @@ from urllib.parse import urlparse
 import libvirt
 
 import virt_lightning.consts as consts
-import virt_lightning.virt_lightning as vl
+import virt_lightning.vmm_libvirt as vl
 from virt_lightning.disk_system import DiskSystem
 from virt_lightning.downloader_native import DownloaderNative
 from virt_lightning.exceptions import (
