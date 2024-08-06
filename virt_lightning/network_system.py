@@ -19,12 +19,24 @@ class NetworkSystem:
         self.network = None
         self.network_obj = None
 
-    def get_network_by_name(self, network_name):
+    def __get_network_by_name(self, network_name):
         try:
             return self.conn.networkLookupByName(network_name)
         except libvirt.libvirtError as e:
             if e.get_error_code() != libvirt.VIR_ERR_NO_NETWORK:
                 raise (e)
+
+    def __create_network(self, network_name, network_cidr):
+        network = ipaddress.ip_network(network_cidr)
+        root = ElementTree.fromstring(NETWORK_XML)
+        root.find("./name").text = network_name
+        root.find("./bridge").attrib["name"] = network_name
+        root.find("./ip").attrib = {
+            "address": network[1].exploded,
+            "netmask": network.netmask.exploded,
+        }
+        xml = ElementTree.tostring(root).decode()
+        return self.conn.networkCreateXML(xml)
 
     def reuse_mac_address(self, network_name, domain_name, ipv4):
         network_obj = self.get_network_by_name(network_name)
@@ -60,18 +72,6 @@ class NetworkSystem:
             libvirt.VIR_NETWORK_UPDATE_AFFECT_LIVE,
         )
 
-    def create_network(self, network_name, network_cidr):
-        network = ipaddress.ip_network(network_cidr)
-        root = ElementTree.fromstring(NETWORK_XML)
-        root.find("./name").text = network_name
-        root.find("./bridge").attrib["name"] = network_name
-        root.find("./ip").attrib = {
-            "address": network[1].exploded,
-            "netmask": network.netmask.exploded,
-        }
-        xml = ElementTree.tostring(root).decode()
-        return self.conn.networkCreateXML(xml)
-
     def init_network(self, network_name, network_cidr):
         try:
             self.network_obj = self.conn.networkLookupByName(network_name)
@@ -80,7 +80,7 @@ class NetworkSystem:
                 raise (e)
 
         if not self.network_obj:
-            self.network_obj = self.create_network(network_name, network_cidr)
+            self.network_obj = self.__create_network(network_name, network_cidr)
 
         if not self.network_obj.isActive():
             self.network_obj.create()
@@ -89,7 +89,7 @@ class NetworkSystem:
         self.network = self.gateway.network
 
     def get_network_gateway(self, network_name):
-        network_obj = self.get_network_by_name(network_name)
+        network_obj = self.__get_network_by_name(network_name)
         xml = network_obj.XMLDesc(0)
         root = ElementTree.fromstring(xml)
         ip = root.find("./ip")
