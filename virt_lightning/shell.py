@@ -15,6 +15,13 @@ import virt_lightning.api
 import virt_lightning.consts as consts
 import virt_lightning.virt_lightning as vl
 from virt_lightning.configuration import ProxyLegacyConfiguration as Configuration
+from virt_lightning.exceptions import (
+    CannotConnectToLibvirtError,
+    ImageNotFoundLocallyError,
+    ImageNotFoundUpstreamError,
+    VMNotFoundError,
+    VMNotRunningError,
+)
 from virt_lightning.execfile_connection_tools import (
     ExecFileVirsh,
     ExecFileVirtViewer,
@@ -362,9 +369,9 @@ Commands:
                 configuration=configuration,
                 **vars(args),
             )
-        except virt_lightning.api.CannotConnectToLibvirtError:
+        except CannotConnectToLibvirtError:
             how_to_fix_auth_error()
-        except virt_lightning.api.ImageNotFoundUpstreamError:
+        except ImageNotFoundUpstreamError:
             print(  # noqa: T001
                 f"Distro {args.distro} cannot be downloaded.\n"
                 f"  Visit {virt_lightning.api.BASE_URL}/images/ or private image hub"
@@ -375,21 +382,21 @@ Commands:
         action_func = getattr(virt_lightning.api, args.action)
         try:
             action_func(configuration=configuration, **vars(args))
-        except virt_lightning.api.ImageNotFoundLocallyError as e:
+        except ImageNotFoundLocallyError as e:
             print(f"Image not found from url: {e.name}")  # noqa: T001
             exit(consts.ExitCode.FAIL.value)
-        except virt_lightning.api.CannotConnectToLibvirtError:
+        except CannotConnectToLibvirtError:
             how_to_fix_auth_error()
-        except virt_lightning.api.VMNotRunningError as e:
+        except VMNotRunningError as e:
             print(f"The following instance is not running: {e.name}")  # noqa: T001
             exit(consts.ExitCode.FAIL.value)
     else:
         try:
             action_func = getattr(virt_lightning.api, args.action)
             action_func(configuration=configuration, **vars(args))
-        except virt_lightning.api.VMNotFoundError as e:
+        except VMNotFoundError as e:
             logger.error(f"VM {e.name} not found")
-        except virt_lightning.api.ImageNotFoundLocallyError as e:
+        except ImageNotFoundLocallyError as e:
             logger.error(
                 f"! You may be able to download the image with the `vl pull {e.name}` command."  # noqa: E501
             )
