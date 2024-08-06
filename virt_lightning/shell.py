@@ -61,7 +61,7 @@ def how_to_fix_auth_error():
 
 def console(configuration, name=None, **kwargs):
     conn = virt_lightning.api._connect_libvirt(configuration.libvirt_uri)
-    hv = vl.LibvirtHypervisor(conn)
+    hv = vl.VMMLibvirt(conn)
 
     def go_console(domain):
         ExecFileVirsh().run(
@@ -79,7 +79,7 @@ def console(configuration, name=None, **kwargs):
 
 def viewer(configuration, name=None, **kwargs):
     conn = virt_lightning.api._connect_libvirt(configuration.libvirt_uri)
-    hv = vl.LibvirtHypervisor(conn)
+    hv = vl.VMMLibvirt(conn)
 
     def go_viewer(domain):
         pid = os.fork()

@@ -73,7 +73,7 @@ DOMAIN_XML = """
 logger = logging.getLogger("virt_lightning")
 
 
-class LibvirtHypervisor:
+class VMMLibvirt:
     def __init__(self, conn):
         if conn is None:
             logger.error("Failed to open connection to libvirt")
