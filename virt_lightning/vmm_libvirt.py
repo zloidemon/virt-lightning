@@ -182,7 +182,10 @@ class VMMLibvirt:
             init_builder = AuxiliaryCloudInitDisk
         elif domain.distro.startswith("rhel-6") or domain.distro.startswith("centos-6"):
             init_builder = AuxiliaryCloudInitDisk
-        else:  # OpenStack format is the default
+        else:
+            #
+            # NOTE: OpenStack format is the default
+            #
             init_builder = AuxiliaryOpenstackInitDisk
 
         cloud_init_iso = init_builder(self.conn, self.storage, self.network).init(
