@@ -14,7 +14,7 @@ import libvirt
 import yaml
 
 import virt_lightning.consts as consts
-from virt_lightning.disk_auxiliary_nocloud import AuxiliaryCloudInitDisk
+from virt_lightning.disk_auxiliary_cloudinit import AuxiliaryCloudInitDisk
 from virt_lightning.disk_auxiliary_openstack import AuxiliaryOpenstackInitDisk
 from virt_lightning.execfile_connection_tools import ExecFileSSH
 from virt_lightning.execfile_virtualization_tools import ExecFileVirtTool
