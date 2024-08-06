@@ -54,7 +54,7 @@ class NetworkSystem:
         return self.conn.networkCreateXML(xml)
 
     def reuse_mac_address(self, network_name, domain_name, ipv4):
-        network_obj = self.get_network_by_name(network_name)
+        network_obj = self.__get_network_by_name(network_name)
         for lease in network_obj.DHCPLeases():
             if lease["hostname"] == domain_name and lease["ipaddr"] == str(ipv4.ip):
                 return lease["mac"]
