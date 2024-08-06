@@ -424,7 +424,7 @@ def down(configuration, context="default", **kwargs):
         hv.network.network_obj.destroy()
 
 
-def distro_list(configuration, **kwargs):
+def images(configuration, **kwargs):
     """Return a list of VM images that are available on the system."""
     conn = _connect_libvirt(configuration.libvirt_uri)
     hv = vl.LibvirtHypervisor(conn)
