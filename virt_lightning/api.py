@@ -389,13 +389,6 @@ def exec_ssh(configuration, name=None, **kwargs):
     domain.exec_ssh()
 
 
-def list_domains(configuration, name=None, **kwargs):
-    """Return a list Python-libvirt instance of the running libvirt VM."""
-    conn = _connect_libvirt(configuration.libvirt_uri)
-    hv = vl.VMMLibvirt(conn)
-    return sorted(hv.list_domains())
-
-
 def down(configuration, context="default", **kwargs):
     """Stop and remove a running environment."""
     conn = _connect_libvirt(configuration.libvirt_uri)
