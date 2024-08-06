@@ -3,11 +3,26 @@ from xml.etree import ElementTree
 
 import libvirt
 
-from virt_lightning.templates import (
-    NETWORK_DHCP_ENTRY,
-    NETWORK_HOST_ENTRY,
-    NETWORK_XML,
-)
+NETWORK_DHCP_ENTRY = """
+<host />
+"""
+
+NETWORK_HOST_ENTRY = """
+<host ip="">
+</host>"""
+
+NETWORK_XML = """
+<network>
+  <name></name>
+  <forward mode='nat'/>
+  <bridge name='virbr0' stp='off' delay='0'/>
+  <ip address='192.168.123.1' netmask='255.255.255.0'>
+  <dhcp>
+    <leasetime>10s</leasetime>
+  </dhcp>
+  </ip>
+</network>
+"""
 
 
 class NetworkSystem:
