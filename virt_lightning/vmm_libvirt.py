@@ -73,7 +73,7 @@ DOMAIN_XML = """
 logger = logging.getLogger("virt_lightning")
 
 
-class LibvirtHypervisor:
+class VMMLibvirt:
     def __init__(self, conn):
         if conn is None:
             logger.error("Failed to open connection to libvirt")
@@ -152,7 +152,7 @@ class LibvirtHypervisor:
         if "fqdn" in config:
             domain.fqdn = config["fqdn"]
 
-    def get_distro_configuration(self, distro) -> dict:
+    def get_distro_configuration(self, distro):
         distro_configuration_file = pathlib.PosixPath(
             f"{self.storage.storage_dir}/upstream/{distro}.yaml"
         )
@@ -182,7 +182,10 @@ class LibvirtHypervisor:
             init_builder = AuxiliaryCloudInitDisk
         elif domain.distro.startswith("rhel-6") or domain.distro.startswith("centos-6"):
             init_builder = AuxiliaryCloudInitDisk
-        else:  # OpenStack format is the default
+        else:
+            #
+            # NOTE: OpenStack format is the default
+            #
             init_builder = AuxiliaryOpenstackInitDisk
 
         cloud_init_iso = init_builder(self.conn, self.storage, self.network).init(
