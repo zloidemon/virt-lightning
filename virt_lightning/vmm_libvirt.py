@@ -152,7 +152,7 @@ class VMMLibvirt:
         if "fqdn" in config:
             domain.fqdn = config["fqdn"]
 
-    def get_distro_configuration(self, distro) -> dict:
+    def get_distro_configuration(self, distro):
         distro_configuration_file = pathlib.PosixPath(
             f"{self.storage.storage_dir}/upstream/{distro}.yaml"
         )
