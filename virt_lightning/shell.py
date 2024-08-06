@@ -13,8 +13,9 @@ import yaml
 
 import virt_lightning.api
 import virt_lightning.consts as consts
-import virt_lightning.virt_lightning as vl
+import virt_lightning.vmm_libvirt as vl
 from virt_lightning.configuration import ProxyLegacyConfiguration as Configuration
+from virt_lightning.downloader_native import DownloaderNative
 from virt_lightning.exceptions import (
     CannotConnectToLibvirtError,
     ImageNotFoundLocallyError,
@@ -26,7 +27,11 @@ from virt_lightning.execfile_connection_tools import (
     ExecFileVirsh,
     ExecFileVirtViewer,
 )
+from virt_lightning.network_system import NetworkSystem
+from virt_lightning.storage_system import StorageSystem
 from virt_lightning.tui import VirtTUI
+from virt_lightning.vmm_builder import VMMBuilder
+from virt_lightning.vmm_libvirt import VMMLibvirt
 
 logger = logging.getLogger("virt_lightning")
 logger.setLevel(logging.INFO)
@@ -61,7 +66,7 @@ def how_to_fix_auth_error():
 
 def console(configuration, name=None, **kwargs):
     conn = virt_lightning.api._connect_libvirt(configuration.libvirt_uri)
-    hv = vl.LibvirtHypervisor(conn)
+    hv = vl.VMMLibvirt(conn)
 
     def go_console(domain):
         ExecFileVirsh().run(
@@ -79,7 +84,7 @@ def console(configuration, name=None, **kwargs):
 
 def viewer(configuration, name=None, **kwargs):
     conn = virt_lightning.api._connect_libvirt(configuration.libvirt_uri)
-    hv = vl.LibvirtHypervisor(conn)
+    hv = vl.VMMLibvirt(conn)
 
     def go_viewer(domain):
         pid = os.fork()
@@ -124,7 +129,7 @@ Run vl without a command to see list of accepted commands.
 Example:
 
  We export the list of the distro in the virt-lightning.yaml file.
-   $ vl distro_list > virt-lightning.yaml
+   $ vl images > virt-lightning.yaml
 
  For each line of the virt-lightning.yaml, start a VM with the associated distro.
    $ vl up
@@ -140,7 +145,7 @@ Commands:
     down                Delete all VMs created by virt-lightning
     start               Start a new VM
     stop                Delete a VM
-    distro_list         Dump list of supported distros
+    images              Dump list of supported distros
     storage_dir         Dump the VM image storage directory
     ansible_inventory   Dump an inventory file for ansible
     ssh                 SSH into VM
@@ -242,7 +247,7 @@ Commands:
     config_parser.add_argument("--context", **context_args)
 
     action_subparsers.add_parser(
-        "distro_list",
+        "images",
         help="List all the images available locally",
         parents=[parent_parser],
     )
@@ -294,6 +299,13 @@ Commands:
         exit(consts.ExitCode.FAIL.value)
 
     configuration = Configuration(args.config)
+    builder = VMMBuilder(configuration)
+
+    builder.set_storage(StorageSystem)
+    builder.set_network(NetworkSystem)
+    builder.set_vmm(VMMLibvirt)
+
+    vmm = builder.connect()
 
     if args.debug:
         logger.setLevel(logging.DEBUG)
@@ -308,20 +320,14 @@ Commands:
         print(  # noqa: T001
             virt_lightning.api.ssh_config(configuration=configuration, **vars(args))
         )
-    elif args.action == "distro_list":
-        for distro_name in virt_lightning.api.distro_list(
-            configuration=configuration, **vars(args)
-        ):
-            print(f"- distro: {distro_name}")  # noqa: T001
+    elif args.action == "images":
+        for distro_name in vmm.distro_available():
+            logger.info(f"- distro: {distro_name}")
     elif args.action == "storage_dir":
-        print(  # noqa: T001
-            virt_lightning.api.storage_dir(configuration=configuration, **vars(args))
-        )
+        logger.info(f"{vmm.storage.storage_dir}")
     elif args.action == "ps":
         results = {}
-        for status in virt_lightning.api.status(
-            configuration=configuration, **vars(args)
-        ):
+        for status in virt_lightning.api.ps(configuration=configuration, **vars(args)):
             results[status["name"]] = {
                 "name": status["name"],
                 "ipv4": status["ipv4"] or "waiting",
@@ -360,15 +366,16 @@ Commands:
 
         curses.wrapper(
             VirtTUI,
-            virt_lightning.api.list_domains(configuration=configuration, **vars(args)),
+            sorted(vmm.list_domains()),
             go_ssh,
         )
     elif args.action == "pull":
         try:
-            virt_lightning.api.pull(
-                configuration=configuration,
-                **vars(args),
+            downloader = DownloaderNative(
+                configuration,
+                vmm.storage.storage_dir,
             )
+            downloader.pull(**vars(args))
         except CannotConnectToLibvirtError:
             how_to_fix_auth_error()
         except ImageNotFoundUpstreamError:
