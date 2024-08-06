@@ -29,7 +29,7 @@ def clean_up():
 def hv(scope="function"):
     conn = libvirt.open("test:///default")
     conn.getURI = Mock(return_value="qemu:///system")
-    hv = vl.LibvirtHypervisor(conn)
+    hv = vl.VMMLibvirt(conn)
     with patch.object(pathlib.Path, "exists") as mock_exists:
         mock_exists.return_value = False
         hv.storage.init_storage_pool("foo_bar")
