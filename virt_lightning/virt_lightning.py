@@ -14,17 +14,80 @@ import libvirt
 import yaml
 
 import virt_lightning.consts as consts
-from virt_lightning.disk_auxiliary_nocloud import AuxiliaryCloudInitDisk
+from virt_lightning.disk_auxiliary_cloudinit import AuxiliaryCloudInitDisk
 from virt_lightning.disk_auxiliary_openstack import AuxiliaryOpenstackInitDisk
 from virt_lightning.execfile_connection_tools import ExecFileSSH
 from virt_lightning.execfile_virtualization_tools import ExecFileVirtTool
 from virt_lightning.network_system import NetworkSystem
 from virt_lightning.storage_system import StorageSystem
-from virt_lightning.templates import (
-    BRIDGE_XML,
-    DISK_XML,
-    DOMAIN_XML,
-)
+
+DOMAIN_XML = """
+<domain type='kvm'>
+  <name></name>
+  <memory unit='KiB'>786432</memory>
+  <currentMemory unit='KiB'>786432</currentMemory>
+  <vcpu>2</vcpu>
+  <os>
+    <type arch='x86_64' machine='pc'>hvm</type>
+    <boot dev='hd'/>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+    <vmport state='off'/>
+  </features>
+  <cpu mode='host-model' check='partial'>
+    <model fallback='allow'/>
+  </cpu>
+  <clock offset='utc'>
+    <timer name='rtc' tickpolicy='catchup'/>
+    <timer name='pit' tickpolicy='delay'/>
+    <timer name='hpet' present='no'/>
+  </clock>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>destroy</on_crash>
+  <pm>
+    <suspend-to-mem enabled='no'/>
+    <suspend-to-disk enabled='no'/>
+  </pm>
+  <devices>
+    <emulator>/usr/bin/qemu-kvm</emulator>
+    <controller type='usb'></controller>
+    <controller type='pci' model='pci-root'/>
+    <console type='pty'>
+      <target type='serial'/>
+    </console>
+    <console type='pty'>
+      <target type='virtio'/>
+    </console>
+    <channel type='unix'>
+      <target type='virtio' name='org.qemu.guest_agent.0' state='connected'/>
+    </channel>
+    <input type='mouse' bus='ps2'/>
+    <input type='keyboard' bus='ps2'/>
+    <graphics type="vnc" port="-1" autoport="yes" listen="127.0.0.1" keymap="en-us">
+      <listen type="address" address="127.0.0.1"/>
+    </graphics>
+    <memballoon model='virtio'></memballoon>
+  </devices>
+</domain>
+"""
+
+DISK_XML = """
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2'/>
+      <source />
+      <target bus='virtio'/>
+    </disk>
+"""
+
+BRIDGE_XML = """
+<interface type='network'>
+  <source network='virt-lightning'/>
+  <model type='virtio'/>
+</interface>
+"""
 
 logger = logging.getLogger("virt_lightning")
 
