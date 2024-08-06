@@ -366,7 +366,7 @@ Commands:
 
         curses.wrapper(
             VirtTUI,
-            virt_lightning.api.list_domains(configuration=configuration, **vars(args)),
+            sorted(vmm.list_domains()),
             go_ssh,
         )
     elif args.action == "pull":
