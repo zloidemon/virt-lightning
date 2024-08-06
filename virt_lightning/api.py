@@ -154,18 +154,6 @@ def _ensure_image_exists(configuration, hv, hosts):
                 raise ImageNotFoundLocallyError(distro) from None
 
 
-def pull(configuration, **kwargs):
-    conn = _connect_libvirt(configuration.libvirt_uri)
-    hv = vl.VMMLibvirt(conn)
-    hv.storage.init_storage_pool(configuration.storage_pool)
-
-    downloader = DownloaderNative(
-        configuration,
-        hv.storage.storage_dir,
-    )
-    downloader.pull(**kwargs)
-
-
 def up(virt_lightning_yaml, configuration, context="default", **kwargs):
     """Create a list of VM."""
 
@@ -371,7 +359,7 @@ def ssh_config(configuration, context="default", **kwargs):
     return output
 
 
-def status(configuration, context="default", name=None, **kwargs):
+def ps(configuration, context="default", name=None, **kwargs):
     """Returns the status of the VM of the envionment."""
     conn = _connect_libvirt(configuration.libvirt_uri)
     hv = vl.VMMLibvirt(conn)
@@ -422,14 +410,6 @@ def down(configuration, context="default", **kwargs):
 
     if configuration.network_auto_clean_up:
         hv.network.network_obj.destroy()
-
-
-def images(configuration, **kwargs):
-    """Return a list of VM images that are available on the system."""
-    conn = _connect_libvirt(configuration.libvirt_uri)
-    hv = vl.VMMLibvirt(conn)
-    hv.storage.init_storage_pool(configuration.storage_pool)
-    return hv.distro_available()
 
 
 def storage_dir(configuration, **kwargs):

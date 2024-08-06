@@ -15,6 +15,7 @@ import virt_lightning.api
 import virt_lightning.consts as consts
 import virt_lightning.vmm_libvirt as vl
 from virt_lightning.configuration import ProxyLegacyConfiguration as Configuration
+from virt_lightning.downloader_native import DownloaderNative
 from virt_lightning.exceptions import (
     CannotConnectToLibvirtError,
     ImageNotFoundLocallyError,
@@ -26,7 +27,11 @@ from virt_lightning.execfile_connection_tools import (
     ExecFileVirsh,
     ExecFileVirtViewer,
 )
+from virt_lightning.network_system import NetworkSystem
+from virt_lightning.storage_system import StorageSystem
 from virt_lightning.tui import VirtTUI
+from virt_lightning.vmm_builder import VMMBuilder
+from virt_lightning.vmm_libvirt import VMMLibvirt
 
 logger = logging.getLogger("virt_lightning")
 logger.setLevel(logging.INFO)
@@ -294,6 +299,13 @@ Commands:
         exit(consts.ExitCode.FAIL.value)
 
     configuration = Configuration(args.config)
+    builder = VMMBuilder(configuration)
+
+    builder.set_storage(StorageSystem)
+    builder.set_network(NetworkSystem)
+    builder.set_vmm(VMMLibvirt)
+
+    vmm = builder.connect()
 
     if args.debug:
         logger.setLevel(logging.DEBUG)
@@ -309,19 +321,13 @@ Commands:
             virt_lightning.api.ssh_config(configuration=configuration, **vars(args))
         )
     elif args.action == "images":
-        for distro_name in virt_lightning.api.images(
-            configuration=configuration, **vars(args)
-        ):
-            print(f"- distro: {distro_name}")  # noqa: T001
+        for distro_name in vmm.distro_available():
+            logger.info(f"- distro: {distro_name}")
     elif args.action == "storage_dir":
-        print(  # noqa: T001
-            virt_lightning.api.storage_dir(configuration=configuration, **vars(args))
-        )
+        logger.info(f"{vmm.storage.storage_dir}")
     elif args.action == "ps":
         results = {}
-        for status in virt_lightning.api.status(
-            configuration=configuration, **vars(args)
-        ):
+        for status in virt_lightning.api.ps(configuration=configuration, **vars(args)):
             results[status["name"]] = {
                 "name": status["name"],
                 "ipv4": status["ipv4"] or "waiting",
@@ -365,10 +371,11 @@ Commands:
         )
     elif args.action == "pull":
         try:
-            virt_lightning.api.pull(
-                configuration=configuration,
-                **vars(args),
+            downloader = DownloaderNative(
+                configuration,
+                vmm.storage.storage_dir,
             )
+            downloader.pull(**vars(args))
         except CannotConnectToLibvirtError:
             how_to_fix_auth_error()
         except ImageNotFoundUpstreamError:
