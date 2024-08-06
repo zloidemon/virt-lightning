@@ -15,7 +15,13 @@ import virt_lightning.consts as consts
 import virt_lightning.virt_lightning as vl
 from virt_lightning.disk_system import DiskSystem
 from virt_lightning.downloader_native import DownloaderNative
-from virt_lightning.exceptions import ImageNotFoundUpstreamError
+from virt_lightning.exceptions import (
+    CannotConnectToLibvirtError,
+    ImageNotFoundLocallyError,
+    ImageNotFoundUpstreamError,
+    VMNotFoundError,
+    VMNotRunningError,
+)
 
 logger = logging.getLogger("virt_lightning")
 
@@ -25,25 +31,6 @@ def libvirt_callback(userdata, err):
 
 
 libvirt.registerErrorHandler(f=libvirt_callback, ctx=None)
-
-
-class VMNotFoundError(Exception):
-    def __init__(self, name):
-        self.name = name
-
-
-class VMNotRunningError(Exception):
-    def __init__(self, name):
-        self.name = name
-
-
-class ImageNotFoundLocallyError(Exception):
-    def __init__(self, name):
-        self.name = name
-
-
-class CannotConnectToLibvirtError(Exception):
-    pass
 
 
 def _register_aio_virt_impl(loop):
