@@ -13,7 +13,7 @@ import yaml
 
 import virt_lightning.api
 import virt_lightning.consts as consts
-import virt_lightning.virt_lightning as vl
+import virt_lightning.vmm_libvirt as vl
 from virt_lightning.configuration import ProxyLegacyConfiguration as Configuration
 from virt_lightning.exceptions import (
     CannotConnectToLibvirtError,
