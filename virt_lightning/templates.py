@@ -78,23 +78,3 @@ network-interfaces: |
    netmask 255.255.255.0
    gateway {gateway}
 """
-
-STORAGE_POOL_XML = """
-<pool type='dir'>
-  <name></name>
-  <source>
-  </source>
-  <target>
-    <path></path>
-  </target>
-</pool>
-"""
-
-USER_CREATE_STORAGE_POOL_DIR = """
-You need root privilege to create the storage pool, please do:
-  sudo mkdir -p {storage_dir}/upstream
-  sudo chown -R {qemu_user}:{qemu_group} {storage_dir}
-  sudo chown -R {user} {storage_dir}/upstream
-  sudo chmod 775 /var/lib/virt-lightning
-  sudo chmod 775 {storage_dir} {storage_dir}/upstream
-"""
