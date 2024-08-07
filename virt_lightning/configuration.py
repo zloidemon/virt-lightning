@@ -114,9 +114,10 @@ class ConfigurationLoadFile(IConfigurationSource):
         #
         # NOTE: Добавление адреса к хранилищу образов по-умолчанию в конец
         #
-        registries.append(
-            ConfigurationRegistry(consts.DEFAULT_BASE_REGISTRY_URL + "/images/{distro}")
+        path = (
+            consts.DEFAULT_BASE_REGISTRY_URL + "/v2/library/{resource}/blobs/{hashsum}"
         )
+        registries.append(ConfigurationRegistry(path))
 
         return registries
 
