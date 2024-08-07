@@ -1,0 +1,182 @@
+[images]
+
+# DragonFlyBSD
+
+[images.dragonflybsd]
+url = "https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/dragonflybsd/{rel}"
+file = "dragonflybsd-{rel}.qcow2"
+base = [
+  {tag = "5.8.3", rel = "5.8.3"},
+  {tag = "6.0.0", rel = "6.0.0"},
+  {tag = "6.0.0-ufs", rel = "6.0.0", file = "dragonflybsd-{rel}.qcow2"},
+  {tag = "6.0.0-hammer2", rel = "6.0.0", file = "dragonflybsd-{rel}.qcow2"},
+  {tag = "6.0.1-ufs", rel = "6.0.1", date = "2021-12-11", file = "{date}/dragonflybsd-{tag}.qcow2"},
+  {tag = "6.0.1-hammer2", rel = "6.0.1", date = "2021-12-11", file = "{date}/dragonflybsd-{tag}.qcow2"},
+  {tag = "6.0.2-ufs", rel = "6.0.2", date = "2022-09-06", file = "{date}/dragonflybsd-{tag}-{date}.qcow2"},
+  {tag = "6.0.2-hammer2", rel = "6.0.2", date = "2022-09-06", file = "{date}/dragonflybsd-{tag}-{date}.qcow2"},
+  {tag = "6.4.0-ufs", rel = "6.4.0", date = "2022-04-23", file = "{date}/dragonflybsd-{tag}-{date}.qcow2"},
+  {tag = "6.4.0-hammer2", rel = "6.4.0", date = "2022-04-23", file = "{date}/dragonflybsd-{tag}-{date}.qcow2"},
+]
+
+# FreeBSD
+
+[images.freebsd]
+url = "https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/freebsd/{rel}"
+file = "freebsd-{rel}.qcow2"
+base = [
+  {tag = "11.4", rel = "11.4"},
+  {tag = "12.2", rel = "12.2"},
+  {tag = "13.0", rel = "13.0"},
+  {tag = "13.0-ufs", rel = "13.0", file = "freebsd-{tag}.qcow2"},
+  {tag = "13.0-zfs", rel = "13.0", file = "freebsd-{tag}.qcow2"},
+  {tag = "13.2-ufs", rel = "13.2", date = "2023-04-22", file = "{date}/freebsd-{tag}-{date}.qcow2"},
+  {tag = "13.2-zfs", rel = "13.2", date = "2023-04-21", file = "{date}/freebsd-{tag}-{date}.qcow2"},
+]
+
+[images.netbsd]
+url = "https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/netbsd/{tag}"
+file = "netbsd-{tag}.qcow2"
+base = [
+  {tag = "8.1"},
+  {tag = "8.2"},
+  {tag = "9.0"},
+  {tag = "9.1"},
+  {tag = "9.2", data = "2021-12-11", file = "{data}/netbsd-{tag}.qcow2"},
+#  {tag = "9.3"}, FIXME: not found
+]
+
+# OpenBSD
+
+[images.openbsd]
+url = "https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/openbsd/{tag}"
+file = "{date}/{fs}/openbsd-{tag}-{date}.qcow2"
+base = [
+  {tag = "6.6", file = "openbsd-{tag}.qcow2"},
+  {tag = "6.7", file = "openbsd-{tag}.qcow2"},
+  {tag = "6.8", file = "openbsd-{tag}.qcow2"},
+  {tag = "6.9", file = "openbsd-{tag}.qcow2"},
+  {tag = "7.0", date = "2021-12-11", file = "{date}/openbsd-{tag}.qcow2"},
+  {tag = "7.1", date = "2022-06-27", fs = "ufs"},
+  {tag = "7.2", date = "2022-11-06", fs = "ufs"},
+  {tag = "7.3", date = "2023-04-22", fs = "ufs"},
+]
+
+# Almalinux
+
+[images.almalinux]
+url = "https://repo.almalinux.org/almalinux/{tag}/cloud/x86_64/images/"
+file = "AlmaLinux-{tag}-GenericCloud-latest.x86_64.qcow2"
+base = [
+  {tag = "8"},
+  {tag = "9"},
+]
+
+# AmazonLinux 2
+
+[images.amazon2]
+url = "https://cdn.amazonlinux.com/os-images/{tag}/kvm"
+file = "amzn2-kvm-{tag}-x86_64.xfs.gpt.qcow2"
+base = [
+  {tag = "2.0.20210126.0"},
+  {tag = "2.0.20230320.0"},
+]
+
+# CentOS
+
+[images.centos]
+url = "https://cloud.centos.org/centos/{tag}"
+file = "CentOS-Stream-GenericCloud-{tag}-latest.x86_64.qcow2"
+base = [
+  {tag = "6", file = "images/CentOS-{tag}-x86_64-GenericCloud.qcow2"},
+  {tag = "7", file = "images/CentOS-{tag}-x86_64-GenericCloud.qcow2"},
+  {tag = "8", file = "x86_64/images/CentOS-8-GenericCloud-8.4.2105-20210603.0.x86_64.qcow2"},
+  {tag = "8-stream", file = "x86_64/images/CentOS-Stream-GenericCloud-{tag}-latest.x86_64.qcow2"},
+  {tag = "9-stream", file = "x86_64/images/CentOS-Stream-GenericCloud-{tag}-latest.x86_64.qcow2"},
+]
+
+# Cirros (broken: cannot login, no Python)
+
+[images.cirros]
+url = "http://download.cirros-cloud.net/{tag}/"
+file = "cirros-{tag}-x86_64-disk.img"
+base = [{tag = "0.4.0"}]
+
+# Debian
+
+[images.debian]
+url = "https://cloud.debian.org/images/cloud/{rel}/daily/latest"
+file = "debian-{tag}-generic-amd64-daily.qcow2"
+base = [
+#  {tag = "9", rel = "stretch"}, FIXME: not found
+  {tag = "10", rel = "buster"},
+  {tag = "11", rel = "bullseye"},
+  {tag = "12", rel = "bookworm"},
+  {tag = "13", rel = "trixie"},
+  {tag = "sid", rel = "sid"},
+]
+
+# Fedora
+
+[images.fedora]
+url = "https://download.fedoraproject.org/pub/{sub}fedora/linux/releases/{tag}/Cloud/x86_64/images"
+file = "Fedora-Cloud-Base-{tag}-{patch}.x86_64.qcow2"
+base = [
+  {tag = "31", patch = "1.9", sub = "archive/"},
+  {tag = "32", patch = "1.6", sub = "archive/"},
+  {tag = "33", patch = "1.2", sub = "archive/"},
+  {tag = "34", patch = "1.2", sub = "archive/"},
+  {tag = "35", patch = "1.2", sub = "archive/"},
+  {tag = "36", patch = "1.5", sub = "archive/"},
+  {tag = "37", patch = "1.7", sub = "archive/"},
+  {tag = "38", patch = "1.6", sub = "archive/"},
+  {tag = "39", patch = "1.5", sub = ""},
+  {tag = "40", patch = "1.14", sub = ""},
+]
+
+# Gentoo (broken: SSH key missing, and user not created)
+
+[images.gentoo]
+url = "http://gentoo.osuosl.org/experimental/amd64/openstack"
+file = "gentoo-openstack-amd64-{tag}-latest.qcow2"
+base = [
+  {tag = "default"},
+  {tag = "systemd"},
+]
+
+# OpenSUSE
+
+[images.opensuse]
+url = "https://download.opensuse.org/repositories/Cloud:/Images:/Leap_{tag}/images"
+file = "openSUSE-Leap-{tag}-OpenStack.x86_64.qcow2"
+base = [
+  {tag = "15.2"}
+]
+
+# RockyLinux
+[images.rockylinux]
+url = "https://download.rockylinux.org/pub/rocky/8/images/x86_64"
+file = "Rocky-{tag}-GenericCloud.latest.x86_64.qcow2"
+base = [
+  {tag = "8"},
+  {tag = "9"},
+]
+
+# Ubuntu
+
+[images.ubuntu]
+url = "https://cloud-images.ubuntu.com/{rel}/current"
+file = "{rel}-server-cloudimg-amd64.img"
+base = [
+  {tag = "14.04", rel = "trusty", file = "{rel}-server-cloudimg-amd64-disk1.img"},
+  {tag = "16.04", rel = "xenial", file = "{rel}-server-cloudimg-amd64-disk1.img"},
+  {tag = "18.04", rel = "bionic"},
+  {tag = "19.04", rel = "disco"},
+  {tag = "19.10", rel = "eoan"},
+  {tag = "20.04", rel = "focal"},
+  {tag = "21.04", rel = "hirsute"},
+  {tag = "22.04", rel = "jammy"},
+  {tag = "22.10", rel = "kinetic"},
+  {tag = "23.04", rel = "lunar"},
+  {tag = "23.10", rel = "mantic"},
+  {tag = "24.04", rel = "noble"},
+]
