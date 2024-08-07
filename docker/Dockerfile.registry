@@ -1,0 +1,17 @@
+ARG ALPINE_VERSION=3.19
+ARG ANGIE_VERSION=1.6.0
+
+FROM alpine:${ALPINE_VERSION} AS builder
+
+WORKDIR /app
+
+RUN apk add --no-cache python3
+
+COPY registry /app
+
+RUN python3 parse.py > images.map
+
+FROM docker.angie.software/angie:${ANGIE_VERSION}-alpine
+
+COPY --from=builder /app/images.map /etc/angie
+COPY --from=builder /app/default.conf /etc/angie/http.d
