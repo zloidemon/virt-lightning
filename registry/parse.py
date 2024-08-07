@@ -1,4 +1,7 @@
+from pathlib import Path
+
 import tomllib
+
 
 def gen_angie_map(configuration):
     for name, distro in configuration["images"].items():
@@ -12,7 +15,7 @@ def gen_angie_map(configuration):
 
             print(url_template.format(name=name, **image))
 
-with open('config.toml', mode='rb') as fh:
+with Path.open("config.toml", mode="rb") as fh:
     configuration = tomllib.load(fh)
 
 gen_angie_map(configuration)
