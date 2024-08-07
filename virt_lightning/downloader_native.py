@@ -23,10 +23,15 @@ class DownloaderNative(IDownloader):
     def __to_mb(self, val):
         return 1024 * 1000 * val
 
-    def __fetch_from_url(self, url=None, **kwargs):
+    def __fetch_from_url(self, url=None, resource=None, hashsum=None, **kwargs):
         """Retrieve a VM image from a given url."""
+        distro = f"{resource}-{hashsum}"
+
         target_file = pathlib.PosixPath(
-            "{storage_dir}/upstream/{distro}.qcow2".format(**kwargs)
+            "{storage_dir}/upstream/{distro}.qcow2".format(
+                storage_dir=kwargs["storage_dir"],
+                distro=distro,
+            )
         )
         temp_file = target_file.with_suffix(".temp")
         if target_file.exists():
@@ -43,14 +48,12 @@ class DownloaderNative(IDownloader):
         opener = urllib.request.build_opener(RedirectFilter)
         urllib.request.install_opener(opener)
 
-        parent_url = url.format(**kwargs)
+        parent_url = url.format(resource=resource, hashsum=hashsum, **kwargs)
         try:
-            r = urllib.request.urlopen(
-                "{url}/{distro}.qcow2".format(url=parent_url, **kwargs)
-            )
+            r = urllib.request.urlopen(f"{parent_url}")
         except urllib.error.HTTPError as e:
             if e.code == 404:
-                raise ImageNotFoundUpstreamError(kwargs["distro"]) from None
+                raise ImageNotFoundUpstreamError(distro) from None
             raise
         last_modified = r.headers["Last-Modified"]
         logger.debug("Date: %s", last_modified)
@@ -65,22 +68,29 @@ class DownloaderNative(IDownloader):
                 self.__progress_callback(temp_file, fd.tell(), length)
         temp_file.rename(target_file)
         try:
-            r = urllib.request.urlopen(f"{parent_url}/{kwargs['distro']}.yaml")
+            r = urllib.request.urlopen(f"{parent_url}/{distro}.yaml")
         except urllib.error.HTTPError as e:
             if e.code == 404:
                 pass
         with target_file.with_suffix(".yaml").open("wb") as fd:
             fd.write(r.read())
-        logger.info(f"Image {kwargs['distro']} is ready!")
+        logger.info(f"Image {distro} is ready!")
 
-    def pull(self, **kwargs):
+    def pull(self, distro=None, **kwargs):
         """Retrieve a VM image from Internet."""
 
         for registry in self.configuration.registry_urls:
             try:
+                resource, hashsum = distro.split(":")
+
+                if not resource or not hashsum:
+                    raise Exception("wrong distro argument")
+
                 self.__fetch_from_url(
                     storage_dir=self.storage_dir,
                     url=registry.entrypoint,
+                    resource=resource,
+                    hashsum=hashsum,
                     **kwargs,
                 )
                 break

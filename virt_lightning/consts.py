@@ -12,7 +12,7 @@ class ExitCode(Enum):
     FAIL = 1
 
 
-DEFAULT_BASE_REGISTRY_URL = "https://virt-lightning.org"
+DEFAULT_BASE_REGISTRY_URL = "http://localhost"
 DEFAULT_CONFIGFILE = "~/.config/virt-lightning/config.ini"
 DEFAULT_USER_USERNAME = "root"
 DEFAULT_USER_PASSWORD = "root"
