@@ -60,7 +60,11 @@ def _connect_libvirt(uri):
 
 
 def _start_domain(hv, host, context, configuration):
-    distro = host["distro"]
+    #
+    # FIXME: Убрать replace() у названии образа. Надо хранить по иному для
+    #        новой схемы хранения образов.
+    #
+    distro = host["distro"].replace(":", "-")
     #
     # FIXME: Переделать выделение имен на использование FQDN
     #
