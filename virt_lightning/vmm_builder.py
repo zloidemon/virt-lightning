@@ -17,6 +17,10 @@ class VMMBuilder:
 
         vmm = self.__vmm(self.__connection)
         vmm.storage.init_storage_pool(self.__configuration.storage_pool)
+        vmm.network.init_network(
+            self.__configuration.network_name,
+            self.__configuration.network_cidr,
+        )
 
         return vmm
 
