@@ -85,3 +85,7 @@ class StorageSystem:
 
         if not self.storage_pool_obj.isActive():
             self.storage_pool_obj.create(0)
+
+    def distro_available(self):
+        path = self.storage_dir / "upstream"
+        return [path.stem for path in sorted(path.glob("*.qcow2"))]
