@@ -227,7 +227,3 @@ class VMMLibvirt:
                     filepath.name
                 )
                 vol.delete()
-
-    def distro_available(self):
-        path = self.storage.storage_dir / "upstream"
-        return [path.stem for path in sorted(path.glob("*.qcow2"))]
