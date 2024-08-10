@@ -391,11 +391,3 @@ def down(configuration, context="default", **kwargs):
 
     if configuration.network_auto_clean_up:
         hv.network.network_obj.destroy()
-
-
-def storage_dir(configuration, **kwargs):
-    """Return the location of the VM image storage directory."""
-    conn = _connect_libvirt(configuration.libvirt_uri)
-    hv = vl.VMMLibvirt(conn)
-    hv.storage.init_storage_pool(configuration.storage_pool)
-    return hv.storage.storage_dir
