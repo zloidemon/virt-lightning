@@ -6,6 +6,11 @@ from xml.etree import ElementTree
 import libvirt
 
 import virt_lightning.consts as consts
+from virt_lightning.downloader_native import DownloaderNative
+from virt_lightning.exceptions import (
+    ImageNotFoundLocallyError,
+    ImageNotFoundUpstreamError,
+)
 
 STORAGE_POOL_XML = """
 <pool type='dir'>
@@ -89,3 +94,15 @@ class StorageSystem:
     def distro_available(self):
         path = self.storage_dir / "upstream"
         return [path.stem for path in sorted(path.glob("*.qcow2"))]
+
+    def ensure_image_exists(self, configuration, distro):
+        if distro not in self.distro_available():
+            logger.debug("distro not available: %s, will be fetched", distro)
+            try:
+                downloader = DownloaderNative(
+                    configuration,
+                    self.storage_dir,
+                )
+                downloader.pull(distro=distro)
+            except ImageNotFoundUpstreamError:
+                raise ImageNotFoundLocallyError(distro) from None

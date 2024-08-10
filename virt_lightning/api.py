@@ -14,11 +14,8 @@ import libvirt
 import virt_lightning.consts as consts
 import virt_lightning.vmm_libvirt as vl
 from virt_lightning.disk_system import DiskSystem
-from virt_lightning.downloader_native import DownloaderNative
 from virt_lightning.exceptions import (
     CannotConnectToLibvirtError,
-    ImageNotFoundLocallyError,
-    ImageNotFoundUpstreamError,
     VMNotFoundError,
     VMNotRunningError,
 )
@@ -139,21 +136,6 @@ def _start_domain(hv, host, context, configuration):
     return domain
 
 
-def _ensure_image_exists(configuration, hv, hosts):
-    for host in hosts:
-        distro = host.get("distro")
-        if distro not in hv.distro_available():
-            logger.debug("distro not available: %s, will be fetched", distro)
-            try:
-                downloader = DownloaderNative(
-                    configuration,
-                    hv.storage.storage_dir,
-                )
-                downloader.pull(distro=distro)
-            except ImageNotFoundUpstreamError:
-                raise ImageNotFoundLocallyError(distro) from None
-
-
 def up(virt_lightning_yaml, configuration, context="default", **kwargs):
     """Create a list of VM."""
 
@@ -170,7 +152,9 @@ def up(virt_lightning_yaml, configuration, context="default", **kwargs):
     hv.network.init_network(configuration.network_name, configuration.network_cidr)
     hv.storage.init_storage_pool(configuration.storage_pool)
 
-    _ensure_image_exists(configuration, hv, virt_lightning_yaml)
+    for hosts in virt_lightning_yaml:
+        hv.storage.ensure_image_exists(configuration, hosts["distro"])
+
     conn = _connect_libvirt(configuration.libvirt_uri)
     #
     # FIXME: Перенести константы в конфигурацию
@@ -221,7 +205,7 @@ def start(
     }
     if kwargs.get("disk"):
         host.update({"disks": [{"size": x} for x in kwargs["disk"]]})
-    _ensure_image_exists(configuration, hv, [host])
+    hv.storage.ensure_image_exists(configuration, host["distro"])
     domain = _start_domain(hv, host, context, configuration)
     if not domain:
         return
