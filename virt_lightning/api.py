@@ -14,11 +14,8 @@ import libvirt
 import virt_lightning.consts as consts
 import virt_lightning.vmm_libvirt as vl
 from virt_lightning.disk_system import DiskSystem
-from virt_lightning.downloader_native import DownloaderNative
 from virt_lightning.exceptions import (
     CannotConnectToLibvirtError,
-    ImageNotFoundLocallyError,
-    ImageNotFoundUpstreamError,
     VMNotFoundError,
     VMNotRunningError,
 )
@@ -63,7 +60,11 @@ def _connect_libvirt(uri):
 
 
 def _start_domain(hv, host, context, configuration):
-    distro = host["distro"]
+    #
+    # FIXME: Убрать replace() у названии образа. Надо хранить по иному для
+    #        новой схемы хранения образов.
+    #
+    distro = host["distro"].replace(":", "-")
     #
     # FIXME: Переделать выделение имен на использование FQDN
     #
@@ -139,21 +140,6 @@ def _start_domain(hv, host, context, configuration):
     return domain
 
 
-def _ensure_image_exists(configuration, hv, hosts):
-    for host in hosts:
-        distro = host.get("distro")
-        if distro not in hv.distro_available():
-            logger.debug("distro not available: %s, will be fetched", distro)
-            try:
-                downloader = DownloaderNative(
-                    configuration,
-                    hv.storage.storage_dir,
-                )
-                downloader.pull(distro=distro)
-            except ImageNotFoundUpstreamError:
-                raise ImageNotFoundLocallyError(distro) from None
-
-
 def up(virt_lightning_yaml, configuration, context="default", **kwargs):
     """Create a list of VM."""
 
@@ -170,7 +156,9 @@ def up(virt_lightning_yaml, configuration, context="default", **kwargs):
     hv.network.init_network(configuration.network_name, configuration.network_cidr)
     hv.storage.init_storage_pool(configuration.storage_pool)
 
-    _ensure_image_exists(configuration, hv, virt_lightning_yaml)
+    for hosts in virt_lightning_yaml:
+        hv.storage.ensure_image_exists(configuration, hosts["distro"])
+
     conn = _connect_libvirt(configuration.libvirt_uri)
     #
     # FIXME: Перенести константы в конфигурацию
@@ -221,7 +209,7 @@ def start(
     }
     if kwargs.get("disk"):
         host.update({"disks": [{"size": x} for x in kwargs["disk"]]})
-    _ensure_image_exists(configuration, hv, [host])
+    hv.storage.ensure_image_exists(configuration, host["distro"])
     domain = _start_domain(hv, host, context, configuration)
     if not domain:
         return
@@ -265,15 +253,11 @@ def start(
     return domain
 
 
-def stop(configuration, **kwargs):
+def stop(vmm, configuration, **kwargs):
     """Stop and delete a given VM."""
-    conn = _connect_libvirt(configuration.libvirt_uri)
-    hv = vl.VMMLibvirt(conn)
-    hv.network.init_network(configuration.network_name, configuration.network_cidr)
-    hv.storage.init_storage_pool(configuration.storage_pool)
-    domain = hv.get_domain_by_name(kwargs["name"])
+    domain = vmm.get_domain_by_name(kwargs["name"])
     if not domain:
-        vm_list = [d.name for d in hv.list_domains()]
+        vm_list = [d.name for d in vmm.list_domains()]
         if vm_list:
             logger.info(
                 "No VM called %s in: %s", kwargs.get("name"), ", ".join(vm_list)
@@ -281,13 +265,11 @@ def stop(configuration, **kwargs):
         else:
             logger.info("No running VM.")
         raise VMNotFoundError(kwargs["name"])
-    hv.clean_up(domain)
+    vmm.clean_up(domain)
 
 
-def ansible_inventory(configuration, context="default", **kwargs):
+def ansible_inventory(vmm, configuration, context="default", **kwargs):
     """Generate an Ansible inventory based on the running VM."""
-    conn = _connect_libvirt(configuration.libvirt_uri)
-    hv = vl.VMMLibvirt(conn)
 
     ssh_cmd_template = (
         "{name} ansible_host={ipv4} ansible_user={username} "
@@ -299,7 +281,7 @@ def ansible_inventory(configuration, context="default", **kwargs):
 
     output = ""
     groups = collections.defaultdict(list)
-    for domain in hv.list_domains():
+    for domain in vmm.list_domains():
         if domain.context != context:
             continue
 
@@ -322,10 +304,8 @@ def ansible_inventory(configuration, context="default", **kwargs):
     return output
 
 
-def ssh_config(configuration, context="default", **kwargs):
+def ssh_config(vmm, configuration, context="default", **kwargs):
     """Generate an SSH configuration based on the running VM."""
-    conn = _connect_libvirt(configuration.libvirt_uri)
-    hv = vl.VMMLibvirt(conn)
 
     ssh_host_template = (
         "Host {name}\n"
@@ -336,7 +316,7 @@ def ssh_config(configuration, context="default", **kwargs):
 
     output = ""
     groups = {}
-    for domain in hv.list_domains():
+    for domain in vmm.list_domains():
         for group in domain.groups:
             groups[group].append(domain)
 
@@ -359,12 +339,10 @@ def ssh_config(configuration, context="default", **kwargs):
     return output
 
 
-def ps(configuration, context="default", name=None, **kwargs):
+def ps(vmm, configuration, context="default", name=None, **kwargs):
     """Returns the status of the VM of the envionment."""
-    conn = _connect_libvirt(configuration.libvirt_uri)
-    hv = vl.VMMLibvirt(conn)
 
-    for domain in hv.list_domains():
+    for domain in vmm.list_domains():
         if context and context != domain.context:
             continue
         name = domain.name
@@ -389,25 +367,14 @@ def exec_ssh(configuration, name=None, **kwargs):
     domain.exec_ssh()
 
 
-def down(configuration, context="default", **kwargs):
+def down(vmm, configuration, context="default", **kwargs):
     """Stop and remove a running environment."""
-    conn = _connect_libvirt(configuration.libvirt_uri)
-    hv = vl.VMMLibvirt(conn)
-    hv.network.init_network(configuration.network_name, configuration.network_cidr)
-    hv.storage.init_storage_pool(configuration.storage_pool)
-    for domain in hv.list_domains():
+
+    for domain in vmm.list_domains():
         if domain.context != context:
             continue
         logger.info("x purging %s", domain.name)
-        hv.clean_up(domain)
+        vmm.clean_up(domain)
 
     if configuration.network_auto_clean_up:
-        hv.network.network_obj.destroy()
-
-
-def storage_dir(configuration, **kwargs):
-    """Return the location of the VM image storage directory."""
-    conn = _connect_libvirt(configuration.libvirt_uri)
-    hv = vl.VMMLibvirt(conn)
-    hv.storage.init_storage_pool(configuration.storage_pool)
-    return hv.storage.storage_dir
+        vmm.network.network_obj.destroy()
