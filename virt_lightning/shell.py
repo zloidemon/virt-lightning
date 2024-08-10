@@ -321,7 +321,7 @@ Commands:
             virt_lightning.api.ssh_config(configuration=configuration, **vars(args))
         )
     elif args.action == "images":
-        for distro_name in vmm.distro_available():
+        for distro_name in vmm.storage.distro_available():
             logger.info(f"- distro: {distro_name}")
     elif args.action == "storage_dir":
         logger.info(f"{vmm.storage.storage_dir}")
