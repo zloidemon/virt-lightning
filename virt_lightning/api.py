@@ -253,15 +253,11 @@ def start(
     return domain
 
 
-def stop(configuration, **kwargs):
+def stop(vmm, configuration, **kwargs):
     """Stop and delete a given VM."""
-    conn = _connect_libvirt(configuration.libvirt_uri)
-    hv = vl.VMMLibvirt(conn)
-    hv.network.init_network(configuration.network_name, configuration.network_cidr)
-    hv.storage.init_storage_pool(configuration.storage_pool)
-    domain = hv.get_domain_by_name(kwargs["name"])
+    domain = vmm.get_domain_by_name(kwargs["name"])
     if not domain:
-        vm_list = [d.name for d in hv.list_domains()]
+        vm_list = [d.name for d in vmm.list_domains()]
         if vm_list:
             logger.info(
                 "No VM called %s in: %s", kwargs.get("name"), ", ".join(vm_list)
@@ -269,13 +265,11 @@ def stop(configuration, **kwargs):
         else:
             logger.info("No running VM.")
         raise VMNotFoundError(kwargs["name"])
-    hv.clean_up(domain)
+    vmm.clean_up(domain)
 
 
-def ansible_inventory(configuration, context="default", **kwargs):
+def ansible_inventory(vmm, configuration, context="default", **kwargs):
     """Generate an Ansible inventory based on the running VM."""
-    conn = _connect_libvirt(configuration.libvirt_uri)
-    hv = vl.VMMLibvirt(conn)
 
     ssh_cmd_template = (
         "{name} ansible_host={ipv4} ansible_user={username} "
@@ -287,7 +281,7 @@ def ansible_inventory(configuration, context="default", **kwargs):
 
     output = ""
     groups = collections.defaultdict(list)
-    for domain in hv.list_domains():
+    for domain in vmm.list_domains():
         if domain.context != context:
             continue
 
@@ -310,10 +304,8 @@ def ansible_inventory(configuration, context="default", **kwargs):
     return output
 
 
-def ssh_config(configuration, context="default", **kwargs):
+def ssh_config(vmm, configuration, context="default", **kwargs):
     """Generate an SSH configuration based on the running VM."""
-    conn = _connect_libvirt(configuration.libvirt_uri)
-    hv = vl.VMMLibvirt(conn)
 
     ssh_host_template = (
         "Host {name}\n"
@@ -324,7 +316,7 @@ def ssh_config(configuration, context="default", **kwargs):
 
     output = ""
     groups = {}
-    for domain in hv.list_domains():
+    for domain in vmm.list_domains():
         for group in domain.groups:
             groups[group].append(domain)
 
@@ -347,12 +339,10 @@ def ssh_config(configuration, context="default", **kwargs):
     return output
 
 
-def ps(configuration, context="default", name=None, **kwargs):
+def ps(vmm, configuration, context="default", name=None, **kwargs):
     """Returns the status of the VM of the envionment."""
-    conn = _connect_libvirt(configuration.libvirt_uri)
-    hv = vl.VMMLibvirt(conn)
 
-    for domain in hv.list_domains():
+    for domain in vmm.list_domains():
         if context and context != domain.context:
             continue
         name = domain.name
@@ -377,17 +367,14 @@ def exec_ssh(configuration, name=None, **kwargs):
     domain.exec_ssh()
 
 
-def down(configuration, context="default", **kwargs):
+def down(vmm, configuration, context="default", **kwargs):
     """Stop and remove a running environment."""
-    conn = _connect_libvirt(configuration.libvirt_uri)
-    hv = vl.VMMLibvirt(conn)
-    hv.network.init_network(configuration.network_name, configuration.network_cidr)
-    hv.storage.init_storage_pool(configuration.storage_pool)
-    for domain in hv.list_domains():
+
+    for domain in vmm.list_domains():
         if domain.context != context:
             continue
         logger.info("x purging %s", domain.name)
-        hv.clean_up(domain)
+        vmm.clean_up(domain)
 
     if configuration.network_auto_clean_up:
-        hv.network.network_obj.destroy()
+        vmm.network.network_obj.destroy()
