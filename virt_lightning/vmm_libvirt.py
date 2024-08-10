@@ -11,6 +11,7 @@ import yaml
 
 import virt_lightning.consts as consts
 from virt_lightning.disk_auxiliary_cloudinit import AuxiliaryCloudInitDisk
+from virt_lightning.disk_auxiliary_ignition import AuxiliaryIgnitionDisk
 from virt_lightning.disk_auxiliary_openstack import AuxiliaryOpenstackInitDisk
 from virt_lightning.domain_libvirt import LibvirtDomain
 from virt_lightning.execfile_virtualization_tools import ExecFileVirtTool
@@ -178,22 +179,26 @@ class VMMLibvirt:
                 raise
 
     def start(self, domain, metadata_format):
+        cloud_init_iso, init_builder = None, None
         if metadata_format.get("provider", "") == "nocloud":  # noqa: SIM114
             init_builder = AuxiliaryCloudInitDisk
         elif domain.distro.startswith("centos-6"):
             init_builder = AuxiliaryCloudInitDisk
+        elif domain.distro.startswith("coreos"):
+            init_builder = AuxiliaryIgnitionDisk
         else:
             #
             # NOTE: OpenStack format is the default
             #
             init_builder = AuxiliaryOpenstackInitDisk
 
-        cloud_init_iso = init_builder(self.conn, self.storage, self.network).init(
-            domain
-        )
+        if init_builder:
+            cloud_init_iso = init_builder(self.conn, self.storage, self.network).init(
+                domain
+            )
+            media_type = domain.meta_data_media_type
+            domain.attach_disk(cloud_init_iso, device=media_type, disk_type="raw")
 
-        media_type = domain.meta_data_media_type
-        domain.attach_disk(cloud_init_iso, device=media_type, disk_type="raw")
         domain.dom.create()
         self.network.remove_domain_from_network(domain)
         self.add_domain_to_network(domain)
