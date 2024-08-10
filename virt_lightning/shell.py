@@ -313,12 +313,12 @@ Commands:
     if args.action == "ansible_inventory":
         print(  # noqa: T001
             virt_lightning.api.ansible_inventory(
-                configuration=configuration, **vars(args)
+                vmm, configuration=configuration, **vars(args)
             )
         )
     elif args.action == "ssh_config":
         print(  # noqa: T001
-            virt_lightning.api.ssh_config(configuration=configuration, **vars(args))
+            virt_lightning.api.ssh_config(vmm, configuration=configuration, **vars(args))
         )
     elif args.action == "images":
         for distro_name in vmm.storage.distro_available():
@@ -327,7 +327,7 @@ Commands:
         logger.info(f"{vmm.storage.storage_dir}")
     elif args.action == "ps":
         results = {}
-        for status in virt_lightning.api.ps(configuration=configuration, **vars(args)):
+        for status in virt_lightning.api.ps(vmm, configuration=configuration, **vars(args)):
             results[status["name"]] = {
                 "name": status["name"],
                 "ipv4": status["ipv4"] or "waiting",
@@ -400,7 +400,7 @@ Commands:
     else:
         try:
             action_func = getattr(virt_lightning.api, args.action)
-            action_func(configuration=configuration, **vars(args))
+            action_func(vmm, configuration=configuration, **vars(args))
         except VMNotFoundError as e:
             logger.error(f"VM {e.name} not found")
         except ImageNotFoundLocallyError as e:
