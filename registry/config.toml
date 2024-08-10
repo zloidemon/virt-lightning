@@ -116,7 +116,7 @@ base = [{tag = "0.4.0"}]
 
 [images.coreos]
 url = "https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/{tag}/x86_64"
-file = "fedora-coreos-{tag}-qemu.x86_64.qcow2.xz"
+file = "fedora-coreos-{tag}-openstack.x86_64.qcow2.xz"
 base = [
   {tag = "40.20240709.3.1"}
 ]
