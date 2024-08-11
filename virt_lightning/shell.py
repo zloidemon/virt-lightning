@@ -16,6 +16,18 @@ import libvirt
 import yaml
 
 import virt_lightning.consts as consts
+from virt_lightning.cli_ansible import CLIAnsible
+from virt_lightning.cli_config import CLIConfig
+from virt_lightning.cli_console import CLIConsole
+from virt_lightning.cli_down import CLIDown
+from virt_lightning.cli_images import CLIImages
+from virt_lightning.cli_ps import CLIps
+from virt_lightning.cli_pull import CLIPull
+from virt_lightning.cli_ssh import CLIssh
+from virt_lightning.cli_start import CLIStart
+from virt_lightning.cli_stop import CLIStop
+from virt_lightning.cli_up import CLIup
+from virt_lightning.cli_viewer import CLIViewer
 from virt_lightning.configuration import ProxyLegacyConfiguration as Configuration
 from virt_lightning.domain_libvirt import LibvirtDomain
 from virt_lightning.downloader_native import DownloaderNative
@@ -406,81 +418,24 @@ Commands:
 
     action_subparsers = main_parser.add_subparsers(title="action", dest="action")
 
-    up_parser = action_subparsers.add_parser(
-        "up",
-        help="Start the VM listed in the virt-lightning.yaml file",
-        parents=[parent_parser],
+    CLIDown(action_subparsers, parent_parser).context(context_args)
+    CLIStart(action_subparsers, parent_parser).context(context_args).arguments()
+    CLIssh(action_subparsers, parent_parser).arguments()
+    CLIViewer(action_subparsers, parent_parser).arguments()
+    CLIConsole(action_subparsers, parent_parser).arguments()
+    CLIStop(action_subparsers, parent_parser).arguments()
+    CLIPull(action_subparsers, parent_parser).arguments()
+    CLIAnsible(action_subparsers, parent_parser).context(context_args)
+    CLIConfig(action_subparsers, parent_parser).context(context_args)
+    CLIps(action_subparsers, parent_parser).context(context_args)
+    CLIup(action_subparsers, parent_parser).context(context_args).arguments(
+        vl_lightning_yaml_args
     )
-    up_parser.add_argument("--virt-lightning-yaml", **vl_lightning_yaml_args)
-    up_parser.add_argument("--context", **context_args)
+    CLIImages(action_subparsers, parent_parser)
 
-    down_parser = action_subparsers.add_parser(
-        "down",
-        help="Destroy all the VM created with VirtLightning",
-        parents=[parent_parser],
-    )
-    down_parser.add_argument("--context", **context_args)
-
-    start_parser = action_subparsers.add_parser(
-        "start", help="Start a new VM", parents=[parent_parser]
-    )
-    start_parser.add_argument(
-        "--ssh",
-        help="Automatically open a SSH connection.",
-        action="store_true",
-        default=False,
-    )
-    start_parser.add_argument("--name", help="Name of the VM", type=str)
-    start_parser.add_argument("--memory", help="Memory in MB", type=int)
-    start_parser.add_argument("--vcpus", help="Number of VCPUS", type=int)
-    start_parser.add_argument("--context", **context_args)
-    start_parser.add_argument(
-        "--show-console",
-        help="Suppress console output during VM creation",
-        type=bool,
-        dest="enable_console",
-        default=True,
-    )
-    start_parser.add_argument("distro", help="Name of the distro", type=str)
-    start_parser.add_argument(
-        "--disk",
-        action="extend",
-        nargs=1,
-        metavar="SIZE",
-        help="Size of disk in GB. Multiple disks might be defined",
-        type=int,
-    )
-
-    stop_parser = action_subparsers.add_parser(
-        "stop", help="Stop and delete a VM", parents=[parent_parser]
-    )
-    stop_parser.add_argument("name", help="Name of the VM", type=str)
-
-    ps_parser = action_subparsers.add_parser(
-        "ps", help="List the VM currently running", parents=[parent_parser]
-    )
-    ps_parser.add_argument("--context", **context_args)
-
-    config_parser = action_subparsers.add_parser(
-        "config", help="Dump configuration", parents=[parent_parser]
-    )
-    config_parser.add_argument("--context", **context_args)
-
-    action_subparsers.add_parser(
-        "images",
-        help="List all the images available locally",
-        parents=[parent_parser],
-    )
     action_subparsers.add_parser(
         "storage_dir", help="Print the storage directory", parents=[parent_parser]
     )
-
-    ansible_inventory_parser = action_subparsers.add_parser(
-        "ansible_inventory",
-        help="Print an ansible_inventory of the running environment",
-        parents=[parent_parser],
-    )
-    ansible_inventory_parser.add_argument("--context", **context_args)
 
     ssh_config_parser = action_subparsers.add_parser(
         "ssh_config",
@@ -488,28 +443,6 @@ Commands:
         parents=[parent_parser],
     )
     ssh_config_parser.add_argument("--context", **context_args)
-
-    ssh_parser = action_subparsers.add_parser(
-        "ssh", help="SSH to a given host", parents=[parent_parser]
-    )
-    ssh_parser.add_argument("name", help="Name of the host", type=str, nargs="?")
-
-    console_parser = action_subparsers.add_parser(
-        "console", help="Open the console of a given host", parents=[parent_parser]
-    )
-    console_parser.add_argument("name", help="Name of the host", type=str, nargs="?")
-
-    viewer_parser = action_subparsers.add_parser(
-        "viewer",
-        help="Open the SPICE console of a given host with virt-viewer",
-        parents=[parent_parser],
-    )
-    viewer_parser.add_argument("name", help="Name of the host", type=str, nargs="?")
-
-    pull_parser = action_subparsers.add_parser(
-        "pull", help="Pull a VM image", parents=[parent_parser]
-    )
-    pull_parser.add_argument("distro", help="Name of the VM image", type=str)
 
     args = main_parser.parse_args()
     if not args.action:
