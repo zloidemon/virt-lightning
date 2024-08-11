@@ -40,7 +40,6 @@ from virt_lightning.exceptions import (
 )
 from virt_lightning.execfile_connection_tools import (
     ExecFileSSH,
-    ExecFileVirtViewer,
 )
 from virt_lightning.network_system import NetworkSystem
 from virt_lightning.storage_system import StorageSystem
@@ -77,27 +76,6 @@ def how_to_fix_auth_error():
         print(  # noqa: T001
             f"    sudo usermod --append --groups libvirt {getpass.getuser()}"
         )
-
-
-def viewer(vmm, configuration, name=None, **kwargs):
-    def go_viewer(domain):
-        pid = os.fork()
-        if pid == 0:
-            os.close(1)
-            os.close(2)
-            ExecFileVirtViewer().run(
-                "-c",
-                configuration.libvirt_uri,
-                "--domain-name",
-                domain.name,
-            )
-        else:
-            sys.exit(consts.ExitCode.OK.value)
-
-    if name:
-        go_viewer(vmm.get_domain_by_name(name))
-
-    curses.wrapper(VirtTUI, sorted(vmm.list_domains()), go_viewer)
 
 
 def ps(vmm, configuration, context="default", name=None, **kwargs):
@@ -478,7 +456,7 @@ Commands:
     elif args.action == "console":
         CLIConsole.run(vmm, configuration=configuration, name=args.name)
     elif args.action == "viewer":
-        viewer(vmm, configuration=configuration, name=args.name)
+        CLIViewer.run(vmm, configuration=configuration, name=args.name)
     elif args.action == "ssh":
 
         def go_ssh(domain):
