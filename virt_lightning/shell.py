@@ -65,10 +65,7 @@ def how_to_fix_auth_error():
         )
 
 
-def console(configuration, name=None, **kwargs):
-    conn = virt_lightning.api._connect_libvirt(configuration.libvirt_uri)
-    hv = vl.VMMLibvirt(conn)
-
+def console(vmm, configuration, name=None, **kwargs):
     def go_console(domain):
         ExecFileVirsh().run(
             "-c",
@@ -78,9 +75,9 @@ def console(configuration, name=None, **kwargs):
         )
 
     if name:
-        go_console(hv.get_domain_by_name(name))
+        go_console(vmm.get_domain_by_name(name))
 
-    curses.wrapper(VirtTUI, sorted(hv.list_domains()), go_console)
+    curses.wrapper(VirtTUI, sorted(vmm.list_domains()), go_console)
 
 
 def viewer(configuration, name=None, **kwargs):
@@ -359,7 +356,7 @@ Commands:
             f"    root_password:            {'*' * 8}\n"
         )
     elif args.action == "console":
-        console(configuration=configuration, name=args.name)
+        console(vmm, configuration=configuration, name=args.name)
     elif args.action == "viewer":
         viewer(configuration=configuration, name=args.name)
     elif args.action == "ssh":
@@ -403,7 +400,7 @@ Commands:
     elif args.action in ["up", "start"]:
         action_func = getattr(virt_lightning.api, args.action)
         try:
-            action_func(configuration=configuration, **vars(args))
+            action_func(vmm, configuration=configuration, **vars(args))
         except ImageNotFoundLocallyError as e:
             print(f"Image not found from url: {e.name}")  # noqa: T001
             exit(consts.ExitCode.FAIL.value)
