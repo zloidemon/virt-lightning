@@ -1,4 +1,5 @@
 import asyncio
+import libvirt
 
 from urllib.parse import urlparse
 
@@ -44,7 +45,6 @@ class VMMBuilder:
     def __connect_libvirt(self):
         uri = self.__configuration.libvirt_uri
         try:
-            import libvirt
 
             def libvirt_callback(userdata, err):
                 pass
