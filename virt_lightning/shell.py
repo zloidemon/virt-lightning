@@ -2,7 +2,6 @@
 
 import argparse
 import asyncio
-import collections
 import curses
 import grp
 import logging
@@ -237,42 +236,6 @@ def ssh_config(vmm, configuration, context="default", **kwargs):
     return output
 
 
-def ansible_inventory(vmm, configuration, context="default", **kwargs):
-    """Generate an Ansible inventory based on the running VM."""
-
-    ssh_cmd_template = (
-        "{name} ansible_host={ipv4} ansible_user={username} "
-        "ansible_python_interpreter={python_interpreter} "
-        'ansible_ssh_common_args="-o UserKnownHostsFile=/dev/null '
-        "-o GSSAPIAuthentication=no -o GSSAPIKeyExchange=no "
-        '-o StrictHostKeyChecking=no"\n'
-    )
-
-    output = ""
-    groups = collections.defaultdict(list)
-    for domain in vmm.list_domains():
-        if domain.context != context:
-            continue
-
-        for group in domain.groups:
-            groups[group].append(domain)
-
-        template = ssh_cmd_template
-
-        output += template.format(
-            name=domain.name,
-            username=domain.username,
-            ipv4=domain.ipv4.ip,
-            python_interpreter=domain.python_interpreter,
-        )  # noqa: T001
-
-    for group_name, domains in groups.items():
-        output += f"\n[{group_name}]\n"
-        for domain in domains:
-            output += domain.name + "\n"
-    return output
-
-
 def list_from_yaml_file(value):
     file_path = pathlib.PosixPath(value)
     if not file_path.exists():
@@ -400,7 +363,7 @@ Commands:
 
     if args.action == "ansible_inventory":
         print(  # noqa: T001
-            ansible_inventory(vmm, configuration=configuration, **vars(args))
+            CLIAnsible.run(vmm, configuration, context="default")
         )
     elif args.action == "ssh_config":
         print(ssh_config(vmm, configuration=configuration, **vars(args)))  # noqa: T001
