@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import asyncio
 import collections
 import curses
 import grp
@@ -8,14 +9,15 @@ import logging
 import os
 import pathlib
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urlparse
 
+import libvirt
 import yaml
 
-import virt_lightning.api
 import virt_lightning.consts as consts
-import virt_lightning.vmm_libvirt as vl
 from virt_lightning.configuration import ProxyLegacyConfiguration as Configuration
+from virt_lightning.domain_libvirt import LibvirtDomain
 from virt_lightning.downloader_native import DownloaderNative
 from virt_lightning.exceptions import (
     CannotConnectToLibvirtError,
@@ -81,10 +83,7 @@ def console(vmm, configuration, name=None, **kwargs):
     curses.wrapper(VirtTUI, sorted(vmm.list_domains()), go_console)
 
 
-def viewer(configuration, name=None, **kwargs):
-    conn = virt_lightning.api._connect_libvirt(configuration.libvirt_uri)
-    hv = vl.VMMLibvirt(conn)
-
+def viewer(vmm, configuration, name=None, **kwargs):
     def go_viewer(domain):
         pid = os.fork()
         if pid == 0:
@@ -100,9 +99,9 @@ def viewer(configuration, name=None, **kwargs):
             sys.exit(consts.ExitCode.OK.value)
 
     if name:
-        go_viewer(hv.get_domain_by_name(name))
+        go_viewer(vmm.get_domain_by_name(name))
 
-    curses.wrapper(VirtTUI, sorted(hv.list_domains()), go_viewer)
+    curses.wrapper(VirtTUI, sorted(vmm.list_domains()), go_viewer)
 
 
 def ps(vmm, configuration, context="default", name=None, **kwargs):
@@ -149,6 +148,111 @@ def stop(vmm, configuration, **kwargs):
             logger.info("No running VM.")
         raise VMNotFoundError(kwargs["name"])
     vmm.clean_up(domain)
+
+
+def up(vmm, virt_lightning_yaml, configuration, context="default", **kwargs):
+    """Create a list of VM."""
+
+    def _lifecycle_callback(conn, dom, state, reason, opaque):  # noqa: N802
+        if state == 1:
+            logger.info("+ %s QEMU agent found", dom.name())
+
+    loop = asyncio.get_event_loop()
+
+    for hosts in virt_lightning_yaml:
+        vmm.storage.ensure_image_exists(configuration, hosts["distro"])
+
+    vmm.conn.domainEventRegisterAny(
+        None,
+        libvirt.VIR_DOMAIN_EVENT_ID_AGENT_LIFECYCLE,
+        _lifecycle_callback,
+        None,
+    )
+
+    async def deploy():
+        futures = []
+        for host in virt_lightning_yaml:
+            futures.append(
+                loop.run_in_executor(
+                    ThreadPoolExecutor(max_workers=10),
+                    LibvirtDomain._start_domain,
+                    vmm,
+                    host,
+                    context,
+                    configuration,
+                )
+            )
+
+        domain_reachable_futures = []
+        for f in futures:
+            await f
+            domain = f.result()
+            if domain:
+                domain_reachable_futures.append(domain.reachable())
+        logger.info("waiting...")
+
+        await asyncio.gather(*domain_reachable_futures)
+
+    loop.run_until_complete(deploy())
+    logger.info("+ You are all set")
+
+
+def start(
+    vmm,
+    configuration,
+    context="default",
+    enable_console=False,
+    console_fd=None,
+    **kwargs,
+):
+    """Start a single VM."""
+    host = {
+        k: kwargs[k] for k in ["name", "distro", "memory", "vcpus"] if kwargs.get(k)
+    }
+    if kwargs.get("disk"):
+        host.update({"disks": [{"size": x} for x in kwargs["disk"]]})
+
+    vmm.storage.ensure_image_exists(configuration, host["distro"])
+    domain = LibvirtDomain._start_domain(vmm, host, context, configuration)
+
+    if not domain:
+        return None
+
+    loop = asyncio.get_event_loop()
+
+    if enable_console:
+        import time
+
+        if console_fd is None:
+            console_fd = sys.stdout
+
+        time.sleep(4)
+        stream = vmm.conn.newStream(libvirt.VIR_STREAM_NONBLOCK)
+        console = domain.dom.openConsole(None, stream, 0)
+
+        def stream_callback(stream, events, _):
+            content = stream.recv(1024 * 1024).decode("utf-8", errors="ignore")
+            console_fd.write(content)
+
+        stream.eventAddCallback(
+            libvirt.VIR_STREAM_EVENT_READABLE, stream_callback, console
+        )
+
+    async def deploy():
+        await domain.reachable()
+
+    loop.run_until_complete(deploy())
+    logger.info(  # noqa: T001
+        (
+            "\033[0m\n**** System is online ****\n"
+            "To connect use:\n"
+            "  vl console %s (virsh console)"
+            "  vl ssh %s"
+        ),
+        domain.name,
+        domain.name,
+    )
+    return domain
 
 
 def ssh_config(vmm, configuration, context="default", **kwargs):
@@ -470,7 +574,7 @@ Commands:
     elif args.action == "console":
         console(vmm, configuration=configuration, name=args.name)
     elif args.action == "viewer":
-        viewer(configuration=configuration, name=args.name)
+        viewer(vmm, configuration=configuration, name=args.name)
     elif args.action == "ssh":
 
         def go_ssh(domain):
@@ -505,12 +609,16 @@ Commands:
         except ImageNotFoundUpstreamError:
             print(  # noqa: T001
                 f"Distro {args.distro} cannot be downloaded.\n"
-                f"  Visit {virt_lightning.api.BASE_URL}/images/ or private image hub"
+                f"  Visit {consts.BASE_URL}/images/ or private image hub"
                 "to get an up to date list."
             )
             exit(consts.ExitCode.FAIL.value)
     elif args.action in ["up", "start"]:
-        action_func = getattr(virt_lightning.api, args.action)
+        if args.action == "up":
+            action_func = up
+        elif args.action == "start":
+            action_func = start
+
         try:
             action_func(vmm, configuration=configuration, **vars(args))
         except ImageNotFoundLocallyError as e:
@@ -522,13 +630,4 @@ Commands:
             print(f"The following instance is not running: {e.name}")  # noqa: T001
             exit(consts.ExitCode.FAIL.value)
     else:
-        try:
-            action_func = getattr(virt_lightning.api, args.action)
-            action_func(vmm, configuration=configuration, **vars(args))
-        except VMNotFoundError as e:
-            logger.error(f"VM {e.name} not found")
-        except ImageNotFoundLocallyError as e:
-            logger.error(
-                f"! You may be able to download the image with the `vl pull {e.name}` command."  # noqa: E501
-            )
-            exit(consts.ExitCode.FAIL.value)
+        raise NotImplementedError(f"command: {args.action}")
