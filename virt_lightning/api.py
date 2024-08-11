@@ -7,15 +7,12 @@ import logging
 import re
 import sys
 from concurrent.futures import ThreadPoolExecutor
-from urllib.parse import urlparse
 
 import libvirt
 
 import virt_lightning.consts as consts
-import virt_lightning.vmm_libvirt as vl
 from virt_lightning.disk_system import DiskSystem
 from virt_lightning.exceptions import (
-    CannotConnectToLibvirtError,
     VMNotFoundError,
     VMNotRunningError,
 )
@@ -153,7 +150,12 @@ def up(vmm, virt_lightning_yaml, configuration, context="default", **kwargs):
 
 
 def start(
-    vmm, configuration, context="default", enable_console=False, console_fd=None, **kwargs
+    vmm,
+    configuration,
+    context="default",
+    enable_console=False,
+    console_fd=None,
+    **kwargs,
 ):
     """Start a single VM."""
     host = {
