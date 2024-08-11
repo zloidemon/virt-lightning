@@ -96,19 +96,6 @@ def ps(vmm, configuration, context="default", name=None, **kwargs):
         }
 
 
-def down(vmm, configuration, context="default", **kwargs):
-    """Stop and remove a running environment."""
-
-    for domain in vmm.list_domains():
-        if domain.context != context:
-            continue
-        logger.info("x purging %s", domain.name)
-        vmm.clean_up(domain)
-
-    if configuration.network_auto_clean_up:
-        vmm.network.network_obj.destroy()
-
-
 
 def up(vmm, virt_lightning_yaml, configuration, context="default", **kwargs):
     """Create a list of VM."""
@@ -422,7 +409,7 @@ Commands:
     elif args.action == "storage_dir":
         logger.info(f"{vmm.storage.storage_dir}")
     elif args.action == "down" or args.action == "stop":
-        down(vmm, configuration=configuration, **vars(args))
+        CLIDown.run(vmm, configuration=configuration, **vars(args))
     elif args.action == "ps":
         results = {}
         for status in ps(vmm, configuration=configuration, **vars(args)):
