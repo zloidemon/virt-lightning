@@ -34,11 +34,7 @@ from virt_lightning.exceptions import (
     CannotConnectToLibvirtError,
     ImageNotFoundLocallyError,
     ImageNotFoundUpstreamError,
-    VMNotFoundError,
     VMNotRunningError,
-)
-from virt_lightning.execfile_connection_tools import (
-    ExecFileSSH,
 )
 from virt_lightning.network_system import NetworkSystem
 from virt_lightning.storage_system import StorageSystem
@@ -363,27 +359,7 @@ Commands:
     elif args.action == "viewer":
         CLIViewer.run(vmm, configuration=configuration, name=args.name)
     elif args.action == "ssh":
-
-        def go_ssh(domain):
-            ExecFileSSH().run(
-                "-o",
-                "StrictHostKeyChecking=no",
-                "-o",
-                "UserKnownHostsFile=/dev/null",
-                f"{domain.username}@{domain.ipv4.ip}",
-            )
-
-        if args.name:
-            domain = vmm.get_domain_by_name(args.name)
-            if not domain:
-                raise VMNotFoundError(args.name)
-            go_ssh(domain)
-
-        curses.wrapper(
-            VirtTUI,
-            sorted(vmm.list_domains()),
-            go_ssh,
-        )
+        CLIssh.run(vmm, args.name)
     elif args.action == "pull":
         try:
             downloader = DownloaderNative(
