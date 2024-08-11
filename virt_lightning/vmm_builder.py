@@ -1,7 +1,7 @@
 import asyncio
-import libvirt
-
 from urllib.parse import urlparse
+
+import libvirt
 
 from virt_lightning.exceptions import CannotConnectToLibvirtError
 
