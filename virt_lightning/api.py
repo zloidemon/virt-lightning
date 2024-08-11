@@ -35,14 +35,17 @@ def up(vmm, virt_lightning_yaml, configuration, context="default", **kwargs):
         None,
     )
 
-    pool = ThreadPoolExecutor(max_workers=10)
-
     async def deploy():
         futures = []
         for host in virt_lightning_yaml:
             futures.append(
                 loop.run_in_executor(
-                    pool, LibvirtDomain._start_domain, vmm, host, context, configuration
+                    ThreadPoolExecutor(max_workers=10),
+                    LibvirtDomain._start_domain,
+                    vmm,
+                    host,
+                    context,
+                    configuration,
                 )
             )
 
