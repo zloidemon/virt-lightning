@@ -8,7 +8,6 @@ from xml.etree import ElementTree
 import libvirt
 
 import virt_lightning.consts as consts
-from virt_lightning.execfile_connection_tools import ExecFileSSH
 
 DISK_XML = """
     <disk type='file' device='disk'>
@@ -336,12 +335,3 @@ class LibvirtDomain:
                     return
             except OSError:
                 pass
-
-    def exec_ssh(self):
-        ExecFileSSH().run(
-            "-o",
-            "StrictHostKeyChecking=no",
-            "-o",
-            "UserKnownHostsFile=/dev/null",
-            f"{self.username}@{self.ipv4.ip}",
-        )

@@ -24,6 +24,7 @@ from virt_lightning.exceptions import (
     VMNotRunningError,
 )
 from virt_lightning.execfile_connection_tools import (
+    ExecFileSSH,
     ExecFileVirsh,
     ExecFileVirtViewer,
 )
@@ -362,11 +363,21 @@ Commands:
     elif args.action == "viewer":
         viewer(configuration=configuration, name=args.name)
     elif args.action == "ssh":
-        if args.name:
-            virt_lightning.api.exec_ssh(configuration=configuration, name=args.name)
 
         def go_ssh(domain):
-            domain.exec_ssh()
+            ExecFileSSH().run(
+                "-o",
+                "StrictHostKeyChecking=no",
+                "-o",
+                "UserKnownHostsFile=/dev/null",
+                f"{domain.username}@{domain.ipv4.ip}",
+            )
+
+        if args.name:
+            domain = vmm.get_domain_by_name(args.name)
+            if not domain:
+                raise VMNotFoundError(args.name)
+            go_ssh(domain)
 
         curses.wrapper(
             VirtTUI,
