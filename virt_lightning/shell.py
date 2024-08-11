@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import collections
 import curses
 import grp
 import logging
@@ -102,6 +103,123 @@ def viewer(configuration, name=None, **kwargs):
         go_viewer(hv.get_domain_by_name(name))
 
     curses.wrapper(VirtTUI, sorted(hv.list_domains()), go_viewer)
+
+
+def ps(vmm, configuration, context="default", name=None, **kwargs):
+    """Returns the status of the VM of the envionment."""
+
+    for domain in vmm.list_domains():
+        if context and context != domain.context:
+            continue
+        name = domain.name
+        if not domain.ipv4:  # Not a VL managed VM
+            continue
+        yield {
+            "name": name,
+            "ipv4": domain.ipv4 and str(domain.ipv4.ip),
+            "context": domain.context,
+            "username": domain.username,
+            "distro": domain.distro,
+        }
+
+
+def down(vmm, configuration, context="default", **kwargs):
+    """Stop and remove a running environment."""
+
+    for domain in vmm.list_domains():
+        if domain.context != context:
+            continue
+        logger.info("x purging %s", domain.name)
+        vmm.clean_up(domain)
+
+    if configuration.network_auto_clean_up:
+        vmm.network.network_obj.destroy()
+
+
+def stop(vmm, configuration, **kwargs):
+    """Stop and delete a given VM."""
+    domain = vmm.get_domain_by_name(kwargs["name"])
+    if not domain:
+        vm_list = [d.name for d in vmm.list_domains()]
+        if vm_list:
+            logger.info(
+                "No VM called %s in: %s", kwargs.get("name"), ", ".join(vm_list)
+            )
+        else:
+            logger.info("No running VM.")
+        raise VMNotFoundError(kwargs["name"])
+    vmm.clean_up(domain)
+
+
+def ssh_config(vmm, configuration, context="default", **kwargs):
+    """Generate an SSH configuration based on the running VM."""
+
+    ssh_host_template = (
+        "Host {name}\n"
+        "     Hostname {ipv4}\n"
+        "     User {username}\n"
+        "     IdentityFile {ssh_key_file}\n"
+    )
+
+    output = ""
+    groups = {}
+    for domain in vmm.list_domains():
+        for group in domain.groups:
+            groups[group].append(domain)
+
+        if domain.context != context:
+            continue
+
+        template = ssh_host_template
+
+        output += template.format(
+            name=domain.name,
+            username=domain.username,
+            ipv4=domain.ipv4.ip,
+            ssh_key_file=domain.ssh_key,
+        )
+
+    for group_name, domains in groups.items():
+        output += f"\n[{group_name}]"
+        for domain in domains:
+            output += domain.name
+    return output
+
+
+def ansible_inventory(vmm, configuration, context="default", **kwargs):
+    """Generate an Ansible inventory based on the running VM."""
+
+    ssh_cmd_template = (
+        "{name} ansible_host={ipv4} ansible_user={username} "
+        "ansible_python_interpreter={python_interpreter} "
+        'ansible_ssh_common_args="-o UserKnownHostsFile=/dev/null '
+        "-o GSSAPIAuthentication=no -o GSSAPIKeyExchange=no "
+        '-o StrictHostKeyChecking=no"\n'
+    )
+
+    output = ""
+    groups = collections.defaultdict(list)
+    for domain in vmm.list_domains():
+        if domain.context != context:
+            continue
+
+        for group in domain.groups:
+            groups[group].append(domain)
+
+        template = ssh_cmd_template
+
+        output += template.format(
+            name=domain.name,
+            username=domain.username,
+            ipv4=domain.ipv4.ip,
+            python_interpreter=domain.python_interpreter,
+        )  # noqa: T001
+
+    for group_name, domains in groups.items():
+        output += f"\n[{group_name}]\n"
+        for domain in domains:
+            output += domain.name + "\n"
+    return output
 
 
 def list_from_yaml_file(value):
@@ -310,26 +428,20 @@ Commands:
 
     if args.action == "ansible_inventory":
         print(  # noqa: T001
-            virt_lightning.api.ansible_inventory(
-                vmm, configuration=configuration, **vars(args)
-            )
+            ansible_inventory(vmm, configuration=configuration, **vars(args))
         )
     elif args.action == "ssh_config":
-        print(  # noqa: T001
-            virt_lightning.api.ssh_config(
-                vmm, configuration=configuration, **vars(args)
-            )
-        )
+        print(ssh_config(vmm, configuration=configuration, **vars(args)))  # noqa: T001
     elif args.action == "images":
         for distro_name in vmm.storage.distro_available():
             logger.info(f"- distro: {distro_name}")
     elif args.action == "storage_dir":
         logger.info(f"{vmm.storage.storage_dir}")
+    elif args.action == "down" or args.action == "stop":
+        down(vmm, configuration=configuration, **vars(args))
     elif args.action == "ps":
         results = {}
-        for status in virt_lightning.api.ps(
-            vmm, configuration=configuration, **vars(args)
-        ):
+        for status in ps(vmm, configuration=configuration, **vars(args)):
             results[status["name"]] = {
                 "name": status["name"],
                 "ipv4": status["ipv4"] or "waiting",
