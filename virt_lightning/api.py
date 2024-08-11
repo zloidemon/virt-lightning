@@ -357,16 +357,6 @@ def ps(vmm, configuration, context="default", name=None, **kwargs):
         }
 
 
-def exec_ssh(configuration, name=None, **kwargs):
-    """Open an SSH connection on a host."""
-    conn = _connect_libvirt(configuration.libvirt_uri)
-    hv = vl.VMMLibvirt(conn)
-    domain = hv.get_domain_by_name(name)
-    if not domain:
-        raise VMNotFoundError(name)
-    domain.exec_ssh()
-
-
 def down(vmm, configuration, context="default", **kwargs):
     """Stop and remove a running environment."""
 
