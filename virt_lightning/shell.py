@@ -491,19 +491,7 @@ Commands:
         for _, v in sorted(results.items()):
             print(output_template.format(**v))  # noqa: T001
     elif args.action == "config":
-        print(  # noqa: T001
-            "Libvirt\n"
-            f"    libvirt_uri:              {configuration.libvirt_uri}\n"
-            "Network\n"
-            f"    network_name:             {configuration.network_name}\n"
-            f"    network_cidr:             {configuration.network_cidr}\n"
-            f"    network_auto_clean_up:    {configuration.network_auto_clean_up}\n"
-            "Storage\n"
-            f"    storage_pool:             {configuration.storage_pool}\n"
-            "User\n"
-            f"    ssh_key_file:             {configuration.ssh_key_file}\n"
-            f"    root_password:            {'*' * 8}\n"
-        )
+        CLIConfig.run(configuration)
     elif args.action == "console":
         console(vmm, configuration=configuration, name=args.name)
     elif args.action == "viewer":
