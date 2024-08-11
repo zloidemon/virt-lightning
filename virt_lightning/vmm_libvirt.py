@@ -7,7 +7,6 @@ import uuid
 from xml.etree import ElementTree
 
 import libvirt
-import yaml
 
 import virt_lightning.consts as consts
 from virt_lightning.disk_auxiliary_cloudinit import AuxiliaryCloudInitDisk
@@ -132,7 +131,7 @@ class VMMLibvirt:
             "meta_data_media_type": "cdrom",
             "default_bus_type": "virtio",
         }
-        for k, v in self.get_distro_configuration(domain.distro).items():
+        for k, v in self.storage.get_distro_configuration(domain.distro).items():
             if v:
                 config[k] = v
         for k, v in user_config.items():
@@ -152,17 +151,6 @@ class VMMLibvirt:
         domain.default_bus_type = config["default_bus_type"]
         if "fqdn" in config:
             domain.fqdn = config["fqdn"]
-
-    def get_distro_configuration(self, distro):
-        distro_configuration_file = pathlib.PosixPath(
-            f"{self.storage.storage_dir}/upstream/{distro}.yaml"
-        )
-        if not distro_configuration_file.exists():
-            return {}
-        config: dict = (
-            yaml.load(distro_configuration_file.open("r"), Loader=yaml.SafeLoader) or {}
-        )
-        return config
 
     def list_domains(self):
         for domain in self.conn.listAllDomains():

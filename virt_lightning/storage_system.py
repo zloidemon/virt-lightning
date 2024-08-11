@@ -4,6 +4,7 @@ import pathlib
 from xml.etree import ElementTree
 
 import libvirt
+import yaml
 
 import virt_lightning.consts as consts
 from virt_lightning.downloader_native import DownloaderNative
@@ -106,3 +107,14 @@ class StorageSystem:
                 downloader.pull(distro=distro)
             except ImageNotFoundUpstreamError:
                 raise ImageNotFoundLocallyError(distro) from None
+
+    def get_distro_configuration(self, distro):
+        distro_configuration_file = pathlib.PosixPath(
+            f"{self.storage_dir}/upstream/{distro}.yaml"
+        )
+        if not distro_configuration_file.exists():
+            return {}
+        config: dict = (
+            yaml.load(distro_configuration_file.open("r"), Loader=yaml.SafeLoader) or {}
+        )
+        return config
