@@ -470,8 +470,7 @@ Commands:
     elif args.action == "ssh_config":
         print(ssh_config(vmm, configuration=configuration, **vars(args)))  # noqa: T001
     elif args.action == "images":
-        for distro_name in vmm.storage.distro_available():
-            logger.info(f"- distro: {distro_name}")
+        CLIImages.run(vmm)
     elif args.action == "storage_dir":
         logger.info(f"{vmm.storage.storage_dir}")
     elif args.action == "down" or args.action == "stop":
