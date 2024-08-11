@@ -29,7 +29,6 @@ from virt_lightning.cli_up import CLIup
 from virt_lightning.cli_viewer import CLIViewer
 from virt_lightning.configuration import ProxyLegacyConfiguration as Configuration
 from virt_lightning.domain_libvirt import LibvirtDomain
-from virt_lightning.downloader_native import DownloaderNative
 from virt_lightning.exceptions import (
     CannotConnectToLibvirtError,
     ImageNotFoundLocallyError,
@@ -361,21 +360,7 @@ Commands:
     elif args.action == "ssh":
         CLIssh.run(vmm, args.name)
     elif args.action == "pull":
-        try:
-            downloader = DownloaderNative(
-                configuration,
-                vmm.storage.storage_dir,
-            )
-            downloader.pull(**vars(args))
-        except CannotConnectToLibvirtError:
-            how_to_fix_auth_error()
-        except ImageNotFoundUpstreamError:
-            print(  # noqa: T001
-                f"Distro {args.distro} cannot be downloaded.\n"
-                f"  Visit {consts.BASE_URL}/images/ or private image hub"
-                "to get an up to date list."
-            )
-            exit(consts.ExitCode.FAIL.value)
+        CLIPull.run(vmm, configuration, args)
     elif args.action in ["up", "start"]:
         if args.action == "up":
             action_func = up
