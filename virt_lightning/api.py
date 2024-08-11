@@ -37,7 +37,7 @@ def _start_domain(vmm, host, context, configuration):
         pass
     elif domain.dom.isActive():
         logger.info(f"Skipping {host['name']}, already here.")
-        return
+        return None
     else:
         logger.info(f"Skipping {host['name']}, already here but is not running.")
         logger.info(
@@ -168,7 +168,7 @@ def start(
     domain = _start_domain(vmm, host, context, configuration)
 
     if not domain:
-        return
+        return None
 
     loop = asyncio.get_event_loop()
 
