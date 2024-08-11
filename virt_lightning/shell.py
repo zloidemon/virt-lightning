@@ -109,20 +109,6 @@ def down(vmm, configuration, context="default", **kwargs):
         vmm.network.network_obj.destroy()
 
 
-def stop(vmm, configuration, **kwargs):
-    """Stop and delete a given VM."""
-    domain = vmm.get_domain_by_name(kwargs["name"])
-    if not domain:
-        vm_list = [d.name for d in vmm.list_domains()]
-        if vm_list:
-            logger.info(
-                "No VM called %s in: %s", kwargs.get("name"), ", ".join(vm_list)
-            )
-        else:
-            logger.info("No running VM.")
-        raise VMNotFoundError(kwargs["name"])
-    vmm.clean_up(domain)
-
 
 def up(vmm, virt_lightning_yaml, configuration, context="default", **kwargs):
     """Create a list of VM."""
