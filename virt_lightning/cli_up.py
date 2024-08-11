@@ -11,5 +11,5 @@ class CLIup:
         return self
 
     def arguments(self, args):
-        self.add_argument("--virt-lightning-yaml", args)
+        self.parser.add_argument("--virt-lightning-yaml", **args)
         return self
