@@ -77,25 +77,6 @@ def how_to_fix_auth_error():
         )
 
 
-def ps(vmm, configuration, context="default", name=None, **kwargs):
-    """Returns the status of the VM of the envionment."""
-
-    for domain in vmm.list_domains():
-        if context and context != domain.context:
-            continue
-        name = domain.name
-        if not domain.ipv4:  # Not a VL managed VM
-            continue
-        yield {
-            "name": name,
-            "ipv4": domain.ipv4 and str(domain.ipv4.ip),
-            "context": domain.context,
-            "username": domain.username,
-            "distro": domain.distro,
-        }
-
-
-
 def up(vmm, virt_lightning_yaml, configuration, context="default", **kwargs):
     """Create a list of VM."""
 
@@ -374,19 +355,7 @@ Commands:
     elif args.action == "down" or args.action == "stop":
         CLIDown.run(vmm, configuration=configuration, **vars(args))
     elif args.action == "ps":
-        results = {}
-        for status in ps(vmm, configuration=configuration, **vars(args)):
-            results[status["name"]] = {
-                "name": status["name"],
-                "ipv4": status["ipv4"] or "waiting",
-                "context": status["context"],
-                "username": status["username"],
-                "distro": status["distro"],
-            }
-
-        output_template = "+ {name:<13}   {username}@{ipv4:>5} [{distro}]"
-        for _, v in sorted(results.items()):
-            print(output_template.format(**v))  # noqa: T001
+        CLIps.run(vmm, configuration=configuration)
     elif args.action == "config":
         CLIConfig.run(configuration)
     elif args.action == "console":
