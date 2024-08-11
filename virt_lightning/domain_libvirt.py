@@ -8,6 +8,8 @@ from xml.etree import ElementTree
 import libvirt
 
 import virt_lightning.consts as consts
+from virt_lightning.disk_system import DiskSystem
+from virt_lightning.exceptions import VMNotRunningError
 
 DISK_XML = """
     <disk type='file' device='disk'>
@@ -335,3 +337,88 @@ class LibvirtDomain:
                     return
             except OSError:
                 pass
+
+    @staticmethod
+    def _start_domain(vmm, host, context, configuration):
+        #
+        # FIXME: Убрать replace() у названии образа. Надо хранить по иному для
+        #        новой схемы хранения образов.
+        #
+        distro = host["distro"].replace(":", "-")
+        #
+        # FIXME: Переделать выделение имен на использование FQDN
+        #
+        if "name" not in host:
+            host["name"] = re.sub(consts.RE_DISTRO_HOSTNAME_PATTERN, "", distro)
+
+        domain = vmm.get_domain_by_name(host["name"])
+        if not domain:
+            pass
+        elif domain.dom.isActive():
+            logger.info(f"Skipping {host['name']}, already here.")
+            return None
+        else:
+            logger.info(f"Skipping {host['name']}, already here but is not running.")
+            logger.info(
+                f"You can restart with: virsh -c {configuration.libvirt_uri} start {host['name']}"
+            )
+            logger.info(
+                f"You can also destroy the instance with: vl stop {host['name']}"
+            )
+            raise VMNotRunningError(host["name"])
+
+        logger.info(f"^ {host['name']} ")
+
+        user_config = {
+            "groups": host.get("groups"),
+            "memory": host.get("memory"),
+            "python_interpreter": host.get("python_interpreter"),
+            "root_password": host.get("root_password", configuration.root_password),
+            "ssh_key_file": host.get("ssh_key_file", configuration.ssh_key_file),
+            "username": host.get("username"),
+            "vcpus": host.get("vcpus"),
+            "fqdn": host.get("fqdn"),
+            "default_nic_mode": host.get("default_nic_model"),
+            "bootcmd": host.get("bootcmd"),
+            "runcmd": host.get("runcmd"),
+            "meta_data_media_type": host.get("meta_data_media_type"),
+            "default_bus_type": host.get("default_bus_type"),
+        }
+        domain = vmm.create_domain(name=host["name"], distro=distro)
+        vmm.configure_domain(domain, user_config)
+        domain.context = context
+        networks = host.get("networks", [{}])
+        for i, network in enumerate(networks):
+            if "network" not in network:
+                network["network"] = configuration.network_name
+            if i == 0 and not network.get("ipv4"):
+                network["ipv4"] = vmm.network.get_free_ipv4(vmm.list_domains())
+            ipv4 = network.get("ipv4")
+            if ipv4:
+                network["mac"] = vmm.network.reuse_mac_address(
+                    network["network"], host["name"], ipaddress.ip_interface(ipv4)
+                )
+            domain.attach_network(**network)
+
+        if "root_disk_size" in host:
+            logger.debug("The key 'root_disk_size' is deprecated. Use 'disks' instead")
+
+        disks = host.get("disks", [{"size": 15}])
+        for i, disk in enumerate(disks):
+            size = 1
+            if "size" in disk:
+                size = int(disk["size"])
+
+            # Old behavior
+            if "disks" not in host and "root_disk_size" in host:
+                size = int(host["root_disk_size"])
+
+            volume = DiskSystem(None, vmm.storage, vmm.network).create(
+                name=f"{host['name']}-{i}",
+                backing_on=(distro if i == 0 else ""),
+                size=size,
+            )
+            domain.attach_disk(volume=volume)
+
+        vmm.start(domain, metadata_format=host.get("metadata_format", {}))
+        return domain
