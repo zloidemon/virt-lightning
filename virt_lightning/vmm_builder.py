@@ -32,6 +32,10 @@ class VMMBuilder:
 
     def connect(self):
         self.__connection = self.__connect_libvirt()
+        #
+        # FIXME: Перенести константы в конфигурацию
+        #
+        self.__connection.setKeepAlive(interval=5, count=3)
 
         vmm = self.__vmm(self.__connection)
         vmm.storage.init_storage_pool(self.__configuration.storage_pool)

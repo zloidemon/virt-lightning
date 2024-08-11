@@ -24,10 +24,6 @@ def up(vmm, virt_lightning_yaml, configuration, context="default", **kwargs):
     for hosts in virt_lightning_yaml:
         vmm.storage.ensure_image_exists(configuration, hosts["distro"])
 
-    #
-    # FIXME: Перенести константы в конфигурацию
-    #
-    vmm.conn.setKeepAlive(interval=5, count=3)
     vmm.conn.domainEventRegisterAny(
         None,
         libvirt.VIR_DOMAIN_EVENT_ID_AGENT_LIFECYCLE,
