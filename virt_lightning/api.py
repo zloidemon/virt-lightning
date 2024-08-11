@@ -141,7 +141,7 @@ def up(vmm, virt_lightning_yaml, configuration, context="default", **kwargs):
             domain = f.result()
             if domain:
                 domain_reachable_futures.append(domain.reachable())
-        logger.info("... ok Waiting...")
+        logger.info("waiting...")
 
         await asyncio.gather(*domain_reachable_futures)
 
