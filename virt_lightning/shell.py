@@ -30,24 +30,56 @@ from virt_lightning.vmm_builder import VMMBuilder
 from virt_lightning.vmm_libvirt import VMMLibvirt
 
 logger = logging.getLogger("virt_lightning")
-logger.setLevel(logging.INFO)
 ch = logging.StreamHandler()
 logger.addHandler(ch)
 
 
 class CLIBuilder:
-    def __init__(self, action_subparsers, parent_parser, context_args):
+    __context_args = {
+        "default": "default",
+        "help": "alternative context (default: %(default)s)",
+        "dest": "context",
+    }
+
+    def __init__(self, main_parser, action_subparsers, parent_parser):
+        self.main_parser = main_parser
         self.action_subparsers = action_subparsers
         self.parent_parser = parent_parser
-        self.context_args = context_args
 
     def add_command(self, cmd, *args, **kwargs):
         cmd(self.action_subparsers, self.parent_parser).context(
-            self.context_args
+            self.__context_args
         ).arguments(*args, **kwargs)
         return self
 
+    def build(self):
+        return self.main_parser.parse_args()
 
+    @classmethod
+    def create(cls):
+        main_parser = argparse.ArgumentParser()
+        main_parser.add_argument(
+            "--debug",
+            action="store_true",
+            default=False,
+            help="Print extra information (default: %(default)s)",
+        )
+        main_parser.add_argument(
+            "--config",
+            help="path to configuration file",
+            required=False,
+            default=DEFAULT_CONFIGFILE,
+            type=urlparse,
+        )
+
+        parent_parser = argparse.ArgumentParser(add_help=False)
+        action_subparsers = main_parser.add_subparsers(title="action", dest="action")
+
+        return cls(main_parser, action_subparsers, parent_parser)
+
+#
+#  FIXME: Сделать отдельный файл конфигурации и класс к нему
+#
 def list_from_yaml_file(value):
     file_path = pathlib.PosixPath(value)
     if not file_path.exists():
@@ -101,31 +133,8 @@ Commands:
         "type": list_from_yaml_file,
         "dest": "virt_lightning_yaml",
     }
-    context_args = {
-        "default": "default",
-        "help": "alternative context (default: %(default)s)",
-        "dest": "context",
-    }
+    cli_builder = CLIBuilder.create()
 
-    parent_parser = argparse.ArgumentParser(add_help=False)
-    main_parser = argparse.ArgumentParser()
-    main_parser.add_argument(
-        "--debug",
-        action="store_true",
-        default=False,
-        help="Print extra information (default: %(default)s)",
-    )
-    main_parser.add_argument(
-        "--config",
-        help="path to configuration file",
-        required=False,
-        default=DEFAULT_CONFIGFILE,
-        type=urlparse,
-    )
-
-    action_subparsers = main_parser.add_subparsers(title="action", dest="action")
-
-    cli_builder = CLIBuilder(action_subparsers, parent_parser, context_args)
     cli_builder.add_command(CLIAnsible)
     cli_builder.add_command(CLIConfig)
     cli_builder.add_command(CLIConsole)
@@ -140,7 +149,7 @@ Commands:
     cli_builder.add_command(CLIssh)
     cli_builder.add_command(CLIup, vl_lightning_yaml_args)
 
-    args = main_parser.parse_args()
+    args = cli_builder.build()
 
     if not args.action:
         sys.stdout.write(f"{usage}\n")
@@ -158,6 +167,8 @@ Commands:
 
     if args.debug:
         logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.INFO)
 
     match args.action:
         case "ansible":
