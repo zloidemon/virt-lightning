@@ -12,6 +12,35 @@ class ExitCode(Enum):
     FAIL = 1
 
 
+CLI_MESSAGE_HELP = """
+Example:
+
+ We export the list of the distro in the virt-lightning.yaml file.
+   $ {cli} images > virt-lightning.yaml
+
+ For each line of the virt-lightning.yaml, start a VM with the associated distro.
+   $ {cli} up
+
+ Once the VM are up, we can generate an Ansible inventory file:
+   $ {cli} ansible inventory
+
+ The file is ready to be used by Ansible:
+   $ ansible all -m ping -i inventory
+
+Commands:
+    up                  Start VMs defined in virt-lightning.yaml
+    down                Delete all VMs created by virt-lightning
+    start               Start a new VM
+    stop                Delete a VM
+    images              Dump list of supported distros
+    storage             Dump the VM image storage directory
+    ansible             Ansible commands
+    ssh                 SSH into VM
+    console             Open console on a VM
+    viewer              Open VM with virt-viewer
+    ps                  Get list of running VM's
+    config              Dump configuration
+"""
 CLI_MESSAGE_USAGE = """
 usage: {cli} [--debug DEBUG] [--config CONFIG] COMMAND
 
