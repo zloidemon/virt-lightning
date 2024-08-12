@@ -174,30 +174,31 @@ Commands:
     if args.debug:
         logger.setLevel(logging.DEBUG)
 
-    if args.action == "ansible":
-        CLIAnsible.run(vmm, configuration, args)
-    elif args.action == "images":
-        CLIImages.run(vmm)
-    elif args.action == "storage":
-        CLIStorage.run(vmm.storage, args)
-    elif args.action == "down" or args.action == "stop":
-        CLIDown.run(vmm, configuration=configuration, **vars(args))
-    elif args.action == "ps":
-        CLIps.run(vmm, configuration=configuration)
-    elif args.action == "config":
-        CLIConfig.run(configuration)
-    elif args.action == "console":
-        CLIConsole.run(vmm, configuration=configuration, name=args.name)
-    elif args.action == "viewer":
-        CLIViewer.run(vmm, configuration=configuration, name=args.name)
-    elif args.action == "ssh":
-        CLIssh.run(vmm, configuration, args)
-    elif args.action == "pull":
-        CLIPull.run(vmm, configuration, args)
-    elif args.action == "start":
-        CLIStart.run(vmm, configuration=configuration, **vars(args))
-    elif args.action == "up":
-        CLIup.run(vmm, args.virt_lightning_yaml, configuration=configuration)
-    else:
-        how_to_fix_auth_error()
-        raise NotImplementedError(f"command: {args.action}")
+    match args.action:
+        case "ansible":
+            CLIAnsible.run(vmm, configuration, args)
+        case "images":
+            CLIImages.run(vmm)
+        case "storage":
+            CLIStorage.run(vmm.storage, args)
+        case "down" | "stop":
+            CLIDown.run(vmm, configuration=configuration, **vars(args))
+        case "ps":
+            CLIps.run(vmm, configuration=configuration)
+        case "config":
+            CLIConfig.run(configuration)
+        case "console":
+            CLIConsole.run(vmm, configuration=configuration, name=args.name)
+        case "viewer":
+            CLIViewer.run(vmm, configuration=configuration, name=args.name)
+        case "ssh":
+            CLIssh.run(vmm, configuration, args)
+        case "pull":
+            CLIPull.run(vmm, configuration, args)
+        case "start":
+            CLIStart.run(vmm, configuration=configuration, **vars(args))
+        case "up":
+            CLIup.run(vmm, args.virt_lightning_yaml, configuration=configuration)
+        case _:
+            how_to_fix_auth_error()
+            raise NotImplementedError(f"command: {args.action}")
