@@ -12,6 +12,11 @@ class ExitCode(Enum):
     FAIL = 1
 
 
+CLI_MESSAGE_USAGE = """
+usage: {cli} [--debug DEBUG] [--config CONFIG] COMMAND
+
+Run {cli} without a command to see list of accepted commands.
+"""
 DEFAULT_VL_COMMAND = "vl"
 DEFAULT_BASE_REGISTRY_URL = "http://localhost"
 DEFAULT_CONFIGFILE = "~/.config/virt-lightning/config.ini"
