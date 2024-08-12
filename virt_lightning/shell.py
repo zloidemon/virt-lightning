@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
-import grp
 import logging
-import os
 import pathlib
 from urllib.parse import urlparse
 
@@ -14,6 +12,7 @@ from virt_lightning.cli_ansible import CLIAnsible
 from virt_lightning.cli_config import CLIConfig
 from virt_lightning.cli_console import CLIConsole
 from virt_lightning.cli_down import CLIDown
+from virt_lightning.cli_help import CLIHelp
 from virt_lightning.cli_images import CLIImages
 from virt_lightning.cli_ps import CLIps
 from virt_lightning.cli_pull import CLIPull
@@ -22,7 +21,6 @@ from virt_lightning.cli_start import CLIStart
 from virt_lightning.cli_stop import CLIStop
 from virt_lightning.cli_storage import CLIStorage
 from virt_lightning.cli_up import CLIup
-from virt_lightning.cli_help import CLIHelp
 from virt_lightning.cli_viewer import CLIViewer
 from virt_lightning.configuration import ProxyLegacyConfiguration as Configuration
 from virt_lightning.network_system import NetworkSystem
