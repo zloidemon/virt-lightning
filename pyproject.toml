@@ -27,8 +27,8 @@ test = [
 ]
 
 [project.scripts]
-virt-lightning = "virt_lightning.shell:main"
-vl = "virt_lightning.shell:main"
+virt-lightning = "virt_lightning.cli:main"
+vl = "virt_lightning.cli:main"
 
 
 [tool]
