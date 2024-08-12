@@ -2,7 +2,7 @@ import grp
 import os
 import sys
 
-from virt_lightning.consts import DEFAULT_LIBVIRT_GROUP
+from virt_lightning.consts import DEFAULT_LIBVIRT_GROUP, ExitCode
 from virt_lightning.icli import ICLIcmd
 
 _HELP_MESSAGE = """
@@ -32,13 +32,12 @@ class CLIHelp(ICLIcmd):
             for entry in grp.getgrall():
                 if entry.gr_name == DEFAULT_LIBVIRT_GROUP:
                     return (entry.gr_name, entry.gr_gid)
+            return (None, None)
 
-        libvirt_group = get_local_libvirt_group()
+        group, gid = get_local_libvirt_group()
 
-        if not libvirt_group:
-            return
-
-        group, gid = libvirt_group
+        if not group:
+            exit(ExitCode.FAIL.value)
 
         if gid not in os.getgroups():
             msg = _HELP_MESSAGE.format(username=getpass.getuser(), groupname=group)
