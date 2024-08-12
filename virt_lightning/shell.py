@@ -77,6 +77,7 @@ class CLIBuilder:
 
         return cls(main_parser, action_subparsers, parent_parser)
 
+
 #
 #  FIXME: Сделать отдельный файл конфигурации и класс к нему
 #
