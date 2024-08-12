@@ -1,7 +1,16 @@
 import grp
 import os
+import sys
 
 from virt_lightning.consts import DEFAULT_LIBVIRT_GROUP
+
+_HELP_MESSAGE = """
+Cannot access to VMM service. Your user should probably be in the "{groupname}"
+group. You can add the user "{username}" in the group "{groupname}" with the
+following command:
+
+    sudo usermod --append --groups libvirt {username}
+"""
 
 
 class CLIHelp:
@@ -23,13 +32,7 @@ class CLIHelp:
             return
 
         group, gid = libvirt_group
+
         if gid not in os.getgroups():
-            print("Virt-Lightning cannot access the local libvirt service.")  # noqa: T001
-            print(  # noqa: T001
-                f"Your user should probably be in the {group} group. "
-                f"You can add the user {getpass. getuser()} in the group {group} with the "
-                "following command:"
-            )
-            print(  # noqa: T001
-                f"    sudo usermod --append --groups libvirt {getpass.getuser()}"
-            )
+            msg = _HELP_MESSAGE.format(username=getpass.getuser(), groupname=group)
+            sys.stdout.write(f"{msg}\n")
