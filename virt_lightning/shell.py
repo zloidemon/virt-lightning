@@ -148,13 +148,13 @@ Commands:
         exit(ExitCode.FAIL.value)
 
     configuration = Configuration(args.config)
-    builder = VMMBuilder(configuration)
+    vmm_builder = VMMBuilder(configuration)
 
-    builder.set_storage(StorageSystem)
-    builder.set_network(NetworkSystem)
-    builder.set_vmm(VMMLibvirt)
+    vmm_builder.set_storage(StorageSystem)
+    vmm_builder.set_network(NetworkSystem)
+    vmm_builder.set_vmm(VMMLibvirt)
 
-    vmm = builder.connect()
+    vmm = vmm_builder.connect()
 
     if args.debug:
         logger.setLevel(logging.DEBUG)
