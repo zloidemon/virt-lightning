@@ -23,7 +23,12 @@ from virt_lightning.cli_storage import CLIStorage
 from virt_lightning.cli_up import CLIup
 from virt_lightning.cli_viewer import CLIViewer
 from virt_lightning.configuration import ProxyLegacyConfiguration as Configuration
-from virt_lightning.consts import DEFAULT_CONFIGFILE, ExitCode
+from virt_lightning.consts import (
+    CLI_MESSAGE_USAGE,
+    DEFAULT_CONFIGFILE,
+    DEFAULT_VL_COMMAND,
+    ExitCode,
+)
 from virt_lightning.network_system import NetworkSystem
 from virt_lightning.storage_system import StorageSystem
 from virt_lightning.vmm_builder import VMMBuilder
@@ -93,11 +98,6 @@ def list_from_yaml_file(value):
 
 
 def main():
-    usage = """
-usage: vl [--debug DEBUG] [--config CONFIG] COMMAND
-
-Run vl without a command to see list of accepted commands.
-"""
     example = """
 Example:
 
@@ -153,6 +153,9 @@ Commands:
     args = cli_builder.build()
 
     if not args.action:
+        usage = CLI_MESSAGE_USAGE.format(
+            cli=DEFAULT_VL_COMMAND,
+        )
         sys.stdout.write(f"{usage}\n")
         sys.stdout.write(f"{example}\n")
         exit(ExitCode.FAIL.value)
