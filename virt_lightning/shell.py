@@ -24,6 +24,7 @@ from virt_lightning.cli_up import CLIup
 from virt_lightning.cli_viewer import CLIViewer
 from virt_lightning.configuration import ProxyLegacyConfiguration as Configuration
 from virt_lightning.consts import (
+    CLI_MESSAGE_HELP,
     CLI_MESSAGE_USAGE,
     DEFAULT_CONFIGFILE,
     DEFAULT_VL_COMMAND,
@@ -98,36 +99,6 @@ def list_from_yaml_file(value):
 
 
 def main():
-    example = """
-Example:
-
- We export the list of the distro in the virt-lightning.yaml file.
-   $ vl images > virt-lightning.yaml
-
- For each line of the virt-lightning.yaml, start a VM with the associated distro.
-   $ vl up
-
- Once the VM are up, we can generate an Ansible inventory file:
-   $ vl ansible inventory
-
- The file is ready to be used by Ansible:
-   $ ansible all -m ping -i inventory
-
-Commands:
-    up                  Start VMs defined in virt-lightning.yaml
-    down                Delete all VMs created by virt-lightning
-    start               Start a new VM
-    stop                Delete a VM
-    images              Dump list of supported distros
-    storage             Dump the VM image storage directory
-    ansible             Ansible commands
-    ssh                 SSH into VM
-    console             Open console on a VM
-    viewer              Open VM with virt-viewer
-    ps                  Get list of running VM's
-    config              Dump configuration
-    """
-
     vl_lightning_yaml_args = {
         "default": "virt-lightning.yaml",
         "help": "point on an alternative virt-lightning.yaml file (default: %(default)s)",
@@ -154,6 +125,9 @@ Commands:
 
     if not args.action:
         usage = CLI_MESSAGE_USAGE.format(
+            cli=DEFAULT_VL_COMMAND,
+        )
+        example = CLI_MESSAGE_HELP.format(
             cli=DEFAULT_VL_COMMAND,
         )
         sys.stdout.write(f"{usage}\n")
