@@ -1,4 +1,7 @@
-class CLIps:
+from virt_lightning.icli import ICLIcmd
+
+
+class CLIps(ICLIcmd):
     def __init__(self, action_subparsers, parent_parser):
         self.parser = action_subparsers.add_parser(
             "ps", help="List the VM currently running", parents=[parent_parser]
@@ -6,6 +9,9 @@ class CLIps:
 
     def context(self, args):
         self.parser.add_argument("--context", **args)
+        return self
+
+    def arguments(self):
         return self
 
     @staticmethod

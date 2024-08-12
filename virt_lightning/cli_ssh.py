@@ -4,10 +4,11 @@ import sys
 from virt_lightning.consts import DEFAULT_VL_COMMAND
 from virt_lightning.exceptions import VMNotFoundError
 from virt_lightning.execfile_connection_tools import ExecFileSSH
+from virt_lightning.icli import ICLIcmd
 from virt_lightning.tui import VirtTUI
 
 
-class CLIssh:
+class CLIssh(ICLIcmd):
     def __init__(self, action_subparsers, parent_parser):
         self.parser = action_subparsers.add_parser(
             "ssh", help="SSH commands", parents=[parent_parser]
@@ -26,6 +27,9 @@ class CLIssh:
         self.connect_parser.add_argument(
             "name", help="Name of the host", type=str, nargs="?"
         )
+        return self
+
+    def context(self, args):
         return self
 
     @staticmethod

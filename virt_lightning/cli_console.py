@@ -1,10 +1,11 @@
 import curses
 
 from virt_lightning.execfile_connection_tools import ExecFileVirsh
+from virt_lightning.icli import ICLIcmd
 from virt_lightning.tui import VirtTUI
 
 
-class CLIConsole:
+class CLIConsole(ICLIcmd):
     def __init__(self, action_subparsers, parent_parser):
         self.parser = action_subparsers.add_parser(
             "console", help="Open the console of a given host", parents=[parent_parser]
@@ -12,6 +13,9 @@ class CLIConsole:
 
     def arguments(self):
         self.parser.add_argument("name", help="Name of the host", type=str, nargs="?")
+        return self
+
+    def context(self, args):
         return self
 
     @staticmethod

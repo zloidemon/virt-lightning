@@ -5,11 +5,12 @@ import sys
 import libvirt
 
 from virt_lightning.domain_libvirt import LibvirtDomain
+from virt_lightning.icli import ICLIcmd
 
 logger = logging.getLogger("virt_lightning")
 
 
-class CLIStart:
+class CLIStart(ICLIcmd):
     def __init__(self, action_subparsers, parent_parser):
         self.parser = action_subparsers.add_parser(
             "start", help="Start a new VM", parents=[parent_parser]

@@ -1,9 +1,11 @@
 import logging
 
+from virt_lightning.icli import ICLIcmd
+
 logger = logging.getLogger("virt_lightning")
 
 
-class CLIDown:
+class CLIDown(ICLIcmd):
     def __init__(self, action_subparsers, parent_parser):
         self.parser = action_subparsers.add_parser(
             "down",
@@ -13,6 +15,9 @@ class CLIDown:
 
     def context(self, args):
         self.parser.add_argument("--context", **args)
+        return self
+
+    def arguments(self):
         return self
 
     @staticmethod
