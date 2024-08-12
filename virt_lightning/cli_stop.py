@@ -1,4 +1,5 @@
 import logging
+
 from virt_lightning.exceptions import VMNotFoundError
 
 logger = logging.getLogger("virt_lightning")

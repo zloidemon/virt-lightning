@@ -1,8 +1,10 @@
 import curses
+import os
 import sys
-from virt_lightning.tui import VirtTUI
+
 import virt_lightning.consts as consts
 from virt_lightning.execfile_connection_tools import ExecFileVirtViewer
+from virt_lightning.tui import VirtTUI
 
 
 class CLIViewer:

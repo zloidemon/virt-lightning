@@ -1,12 +1,21 @@
 import collections
+import sys
+
+from virt_lightning.consts import DEFAULT_VL_COMMAND
 
 
 class CLIAnsible:
     def __init__(self, action_subparsers, parent_parser):
         self.parser = action_subparsers.add_parser(
-            "ansible_inventory",
-            help="Print an ansible_inventory of the running environment",
+            "ansible",
+            help="Ansible commands of the running environment",
             parents=[parent_parser],
+        )
+        self.sub_parser = self.parser.add_subparsers(
+            help="Sub commands list", dest="command"
+        )
+        self.inventory_parser = self.sub_parser.add_parser(
+            "inventory", help="Generate inventory"
         )
 
     def context(self, args):
@@ -14,7 +23,17 @@ class CLIAnsible:
         return self
 
     @staticmethod
-    def run(vmm, configuration, context="default"):
+    def run(vmm, configuration, args):
+        match args.command:
+            case "inventory":
+                CLIAnsible.inventory(vmm, configuration, args.context)
+            case _:
+                sys.stdout.write(
+                    f"use {DEFAULT_VL_COMMAND} --help to see available commands\n"
+                )
+
+    @staticmethod
+    def inventory(vmm, configuration, context):
         """Generate an Ansible inventory based on the running VM."""
 
         ssh_cmd_template = (
@@ -50,4 +69,4 @@ class CLIAnsible:
             for domain in domains:
                 output += domain.name + "\n"
 
-        return output
+        sys.stdout.write(output)

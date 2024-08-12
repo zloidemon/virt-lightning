@@ -1,6 +1,6 @@
+import virt_lightning.consts as consts
 from virt_lightning.downloader_native import DownloaderNative
 from virt_lightning.exceptions import ImageNotFoundUpstreamError
-import virt_lightning.consts as consts
 
 
 class CLIPull:
