@@ -12,7 +12,7 @@ class CLIps:
     def run(vmm, configuration, context="default", name=None, **kwargs):
         """Returns the status of the VM of the envionment."""
 
-        results = dict()
+        results = {}
 
         for domain in vmm.list_domains():
             if context and context != domain.context:
