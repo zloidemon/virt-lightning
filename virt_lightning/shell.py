@@ -3,6 +3,7 @@
 import argparse
 import logging
 import pathlib
+import sys
 from urllib.parse import urlparse
 
 import yaml
@@ -34,6 +35,19 @@ ch = logging.StreamHandler()
 logger.addHandler(ch)
 
 
+class CLIBuilder:
+    def __init__(self, action_subparsers, parent_parser, context_args):
+        self.action_subparsers = action_subparsers
+        self.parent_parser = parent_parser
+        self.context_args = context_args
+
+    def add_command(self, cmd, *args, **kwargs):
+        cmd(self.action_subparsers, self.parent_parser).context(
+            self.context_args
+        ).arguments(*args, **kwargs)
+        return self
+
+
 def list_from_yaml_file(value):
     file_path = pathlib.PosixPath(value)
     if not file_path.exists():
@@ -46,8 +60,6 @@ def list_from_yaml_file(value):
 
 
 def main():
-    title = "Virt-Lightning"
-
     usage = """
 usage: vl [--debug DEBUG] [--config CONFIG] COMMAND
 
@@ -113,27 +125,26 @@ Commands:
 
     action_subparsers = main_parser.add_subparsers(title="action", dest="action")
 
-    CLIDown(action_subparsers, parent_parser).context(context_args)
-    CLIStart(action_subparsers, parent_parser).context(context_args).arguments()
-    CLIssh(action_subparsers, parent_parser).arguments()
-    CLIViewer(action_subparsers, parent_parser).arguments()
-    CLIConsole(action_subparsers, parent_parser).arguments()
-    CLIStop(action_subparsers, parent_parser).arguments()
-    CLIPull(action_subparsers, parent_parser).arguments()
-    CLIAnsible(action_subparsers, parent_parser).context(context_args)
-    CLIConfig(action_subparsers, parent_parser).context(context_args)
-    CLIps(action_subparsers, parent_parser).context(context_args)
-    CLIup(action_subparsers, parent_parser).context(context_args).arguments(
-        vl_lightning_yaml_args
-    )
-    CLIImages(action_subparsers, parent_parser)
-    CLIStorage(action_subparsers, parent_parser).arguments()
+    cli_builder = CLIBuilder(action_subparsers, parent_parser, context_args)
+    cli_builder.add_command(CLIAnsible)
+    cli_builder.add_command(CLIConfig)
+    cli_builder.add_command(CLIConsole)
+    cli_builder.add_command(CLIDown)
+    cli_builder.add_command(CLIImages)
+    cli_builder.add_command(CLIPull)
+    cli_builder.add_command(CLIStart)
+    cli_builder.add_command(CLIStop)
+    cli_builder.add_command(CLIStorage)
+    cli_builder.add_command(CLIViewer)
+    cli_builder.add_command(CLIps)
+    cli_builder.add_command(CLIssh)
+    cli_builder.add_command(CLIup, vl_lightning_yaml_args)
 
     args = main_parser.parse_args()
+
     if not args.action:
-        print(title)  # noqa: T001
-        print(usage)  # noqa: T001
-        print(example)  # noqa: T001
+        sys.stdout.write(f"{usage}\n")
+        sys.stdout.write(f"{example}\n")
         exit(consts.ExitCode.FAIL.value)
 
     configuration = Configuration(args.config)

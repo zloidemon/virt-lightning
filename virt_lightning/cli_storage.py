@@ -1,9 +1,11 @@
 import logging
 
+from virt_lightning.icli import ICLIcmd
+
 logger = logging.getLogger("virt_lightning")
 
 
-class CLIStorage:
+class CLIStorage(ICLIcmd):
     def __init__(self, action_subparsers, parent_parser):
         self.parser = action_subparsers.add_parser(
             "storage", help="Print the storage directory", parents=[parent_parser]
@@ -17,6 +19,9 @@ class CLIStorage:
             dest="enable_console",
             default=True,
         )
+        return self
+
+    def context(self, args):
         return self
 
     @staticmethod

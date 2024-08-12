@@ -5,11 +5,12 @@ from concurrent.futures import ThreadPoolExecutor
 import libvirt
 
 from virt_lightning.domain_libvirt import LibvirtDomain
+from virt_lightning.icli import ICLIcmd
 
 logger = logging.getLogger("virt_lightning")
 
 
-class CLIup:
+class CLIup(ICLIcmd):
     def __init__(self, action_subparsers, parent_parser):
         self.parser = action_subparsers.add_parser(
             "up",
@@ -17,12 +18,12 @@ class CLIup:
             parents=[parent_parser],
         )
 
-    def context(self, args):
-        self.parser.add_argument("--context", **args)
-        return self
-
     def arguments(self, args):
         self.parser.add_argument("--virt-lightning-yaml", **args)
+        return self
+
+    def context(self, args):
+        self.parser.add_argument("--context", **args)
         return self
 
     @staticmethod

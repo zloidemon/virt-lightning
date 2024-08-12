@@ -13,6 +13,9 @@ class CLIPull:
         self.parser.add_argument("distro", help="Name of the VM image", type=str)
         return self
 
+    def context(self, args):
+        return self
+
     @staticmethod
     def run(vmm, configuration, args):
         try:

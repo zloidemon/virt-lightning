@@ -2,9 +2,10 @@ import collections
 import sys
 
 from virt_lightning.consts import DEFAULT_VL_COMMAND
+from virt_lightning.icli import ICLIcmd
 
 
-class CLIAnsible:
+class CLIAnsible(ICLIcmd):
     def __init__(self, action_subparsers, parent_parser):
         self.parser = action_subparsers.add_parser(
             "ansible",
@@ -17,6 +18,9 @@ class CLIAnsible:
         self.inventory_parser = self.sub_parser.add_parser(
             "inventory", help="Generate inventory"
         )
+
+    def arguments(self):
+        return self
 
     def context(self, args):
         self.parser.add_argument("--context", **args)
