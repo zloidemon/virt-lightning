@@ -13,7 +13,7 @@ Storage
     storage_pool:             {configuration.storage_pool}
 User
     ssh_key_file:             {configuration.ssh_key_file}
-    root_password:            {'*' * 8}
+    root_password:            {root_password}
 """
 
 
@@ -32,5 +32,8 @@ class CLIConfig(ICLIcmd):
 
     @staticmethod
     def run(configuration):
-        msg = _CONFIGURATION_MESSAGE.format(configuration=configuration)
+        msg = _CONFIGURATION_MESSAGE.format(
+            configuration=configuration,
+            root_password='*' * 8,
+        )
         sys.stdout.write(f"{msg}\n")
