@@ -22,6 +22,7 @@ from virt_lightning.cli_start import CLIStart
 from virt_lightning.cli_stop import CLIStop
 from virt_lightning.cli_storage import CLIStorage
 from virt_lightning.cli_up import CLIup
+from virt_lightning.cli_help import CLIHelp
 from virt_lightning.cli_viewer import CLIViewer
 from virt_lightning.configuration import ProxyLegacyConfiguration as Configuration
 from virt_lightning.network_system import NetworkSystem
@@ -33,31 +34,6 @@ logger = logging.getLogger("virt_lightning")
 logger.setLevel(logging.INFO)
 ch = logging.StreamHandler()
 logger.addHandler(ch)
-
-
-def get_local_libvirt_group():
-    for entry in grp.getgrall():
-        if entry.gr_name == consts.DEFAULT_LIBVIRT_GROUP:
-            return (entry.gr_name, entry.gr_gid)
-
-
-def how_to_fix_auth_error():
-    import getpass
-
-    libvirt_group = get_local_libvirt_group()
-    if not libvirt_group:
-        return
-    group, gid = libvirt_group
-    if gid not in os.getgroups():
-        print("Virt-Lightning cannot access the local libvirt service.")  # noqa: T001
-        print(  # noqa: T001
-            f"Your user should probably be in the {group} group. "
-            f"You can add the user {getpass. getuser()} in the group {group} with the "
-            "following command:"
-        )
-        print(  # noqa: T001
-            f"    sudo usermod --append --groups libvirt {getpass.getuser()}"
-        )
 
 
 def list_from_yaml_file(value):
@@ -200,5 +176,5 @@ Commands:
         case "up":
             CLIup.run(vmm, args.virt_lightning_yaml, configuration=configuration)
         case _:
-            how_to_fix_auth_error()
+            CLIHelp.run()
             raise NotImplementedError(f"command: {args.action}")
