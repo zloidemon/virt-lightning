@@ -8,7 +8,6 @@ from urllib.parse import urlparse
 
 import yaml
 
-import virt_lightning.consts as consts
 from virt_lightning.cli_ansible import CLIAnsible
 from virt_lightning.cli_config import CLIConfig
 from virt_lightning.cli_console import CLIConsole
@@ -24,6 +23,7 @@ from virt_lightning.cli_storage import CLIStorage
 from virt_lightning.cli_up import CLIup
 from virt_lightning.cli_viewer import CLIViewer
 from virt_lightning.configuration import ProxyLegacyConfiguration as Configuration
+from virt_lightning.consts import DEFAULT_CONFIGFILE, ExitCode
 from virt_lightning.network_system import NetworkSystem
 from virt_lightning.storage_system import StorageSystem
 from virt_lightning.vmm_builder import VMMBuilder
@@ -119,7 +119,7 @@ Commands:
         "--config",
         help="path to configuration file",
         required=False,
-        default=consts.DEFAULT_CONFIGFILE,
+        default=DEFAULT_CONFIGFILE,
         type=urlparse,
     )
 
@@ -145,7 +145,7 @@ Commands:
     if not args.action:
         sys.stdout.write(f"{usage}\n")
         sys.stdout.write(f"{example}\n")
-        exit(consts.ExitCode.FAIL.value)
+        exit(ExitCode.FAIL.value)
 
     configuration = Configuration(args.config)
     builder = VMMBuilder(configuration)
