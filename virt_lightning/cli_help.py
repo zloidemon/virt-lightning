@@ -1,4 +1,7 @@
+import grp
 import os
+
+from virt_lightning.consts import DEFAULT_LIBVIRT_GROUP
 
 
 class CLIHelp:
@@ -11,7 +14,7 @@ class CLIHelp:
 
         def get_local_libvirt_group():
             for entry in grp.getgrall():
-                if entry.gr_name == consts.DEFAULT_LIBVIRT_GROUP:
+                if entry.gr_name == DEFAULT_LIBVIRT_GROUP:
                     return (entry.gr_name, entry.gr_gid)
 
         libvirt_group = get_local_libvirt_group()
