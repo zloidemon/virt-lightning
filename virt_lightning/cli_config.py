@@ -34,6 +34,6 @@ class CLIConfig(ICLIcmd):
     def run(configuration):
         msg = _CONFIGURATION_MESSAGE.format(
             configuration=configuration,
-            root_password='*' * 8,
+            root_password="*" * 8,
         )
         sys.stdout.write(f"{msg}\n")
