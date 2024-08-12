@@ -1,7 +1,7 @@
 import curses
 import sys
 
-from virt_lightning.consts import DEFAULT_VL_COMMAND
+from virt_lightning.consts import CLI_MESSAGE_USAGE, DEFAULT_VL_COMMAND
 from virt_lightning.exceptions import VMNotFoundError
 from virt_lightning.execfile_connection_tools import ExecFileSSH
 from virt_lightning.icli import ICLIcmd
@@ -40,9 +40,7 @@ class CLIssh(ICLIcmd):
             case "config":
                 CLIssh.config(vmm, configuration, context="default")
             case _:
-                sys.stdout.write(
-                    f"use {DEFAULT_VL_COMMAND} --help to see available commands\n"
-                )
+                sys.stdout.write(CLI_MESSAGE_USAGE.format(cli=DEFAULT_VL_COMMAND))
 
     @staticmethod
     def config(vmm, configuration, context="default"):
