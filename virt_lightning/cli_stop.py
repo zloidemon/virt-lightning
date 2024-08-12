@@ -1,11 +1,12 @@
 import logging
 
 from virt_lightning.exceptions import VMNotFoundError
+from virt_lightning.icli import ICLIcmd
 
 logger = logging.getLogger("virt_lightning")
 
 
-class CLIStop:
+class CLIStop(ICLIcmd):
     def __init__(self, action_subparsers, parent_parser):
         self.parser = action_subparsers.add_parser(
             "stop", help="Stop and delete a VM", parents=[parent_parser]
@@ -13,6 +14,9 @@ class CLIStop:
 
     def arguments(self):
         self.parser.add_argument("name", help="Name of the VM", type=str)
+        return self
+
+    def context(self, args):
         return self
 
     @staticmethod

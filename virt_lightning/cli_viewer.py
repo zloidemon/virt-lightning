@@ -2,12 +2,13 @@ import curses
 import os
 import sys
 
-import virt_lightning.consts as consts
+from virt_lightning.consts import ExitCode
 from virt_lightning.execfile_connection_tools import ExecFileVirtViewer
+from virt_lightning.icli import ICLIcmd
 from virt_lightning.tui import VirtTUI
 
 
-class CLIViewer:
+class CLIViewer(ICLIcmd):
     def __init__(self, action_subparsers, parent_parser):
         self.parser = action_subparsers.add_parser(
             "viewer",
@@ -17,6 +18,9 @@ class CLIViewer:
 
     def arguments(self):
         self.parser.add_argument("name", help="Name of the host", type=str, nargs="?")
+        return self
+
+    def context(self, args):
         return self
 
     @staticmethod
@@ -33,7 +37,7 @@ class CLIViewer:
                     domain.name,
                 )
             else:
-                sys.exit(consts.ExitCode.OK.value)
+                sys.exit(ExitCode.OK.value)
 
         if name:
             go_viewer(vmm.get_domain_by_name(name))

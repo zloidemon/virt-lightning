@@ -3,6 +3,7 @@ import os
 import sys
 
 from virt_lightning.consts import DEFAULT_LIBVIRT_GROUP
+from virt_lightning.icli import ICLIcmd
 
 _HELP_MESSAGE = """
 Cannot access to VMM service. Your user should probably be in the "{groupname}"
@@ -13,9 +14,15 @@ following command:
 """
 
 
-class CLIHelp:
+class CLIHelp(ICLIcmd):
     def __init__(self, action_subparsers, parent_parser):
         pass
+
+    def arguments(self):
+        return self
+
+    def context(self, args):
+        return self
 
     @staticmethod
     def run():
