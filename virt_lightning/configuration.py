@@ -1,5 +1,6 @@
 import pathlib
-from configparser import ConfigParser
+
+import tomllib
 
 from virt_lightning import consts
 from virt_lightning.iconfiguration import (
@@ -53,7 +54,7 @@ class ConfigurationLoadFile(IConfigurationSource):
     def __init__(self, filename=None):
         self.__filename = filename
         self.__cached = None
-        self.__config = ConfigParser()
+        self.__config = {}
         self.__section = "main"
         self.__config[self.__section] = consts.DEFAULT_CONFIGURATION[self.__section]
 
@@ -65,16 +66,14 @@ class ConfigurationLoadFile(IConfigurationSource):
             self.__refresh()
 
     def __get(self, key):
-        return self.__config.get(self.__section, key)
-
-    def __get_bool(self, key):
-        return self.__config.getboolean(self.__section, key)
+        return self.__config[self.__section].get(key)
 
     def __refresh(self):
         if not self.__cached and self.__filename.expanduser().exists():
             self.__cached = self.__filename.expanduser().read_text()
-
-        self.__config.read_string(self.__cached)
+        if self.__cached:
+            config = tomllib.loads(self.__cached)
+            self.__config[self.__section].update(config[self.__section])
 
     @property
     def uri(self):
@@ -85,7 +84,7 @@ class ConfigurationLoadFile(IConfigurationSource):
         return ConfigurationTCPIP(
             self.__get("network_name"),
             self.__get("network_cidr"),
-            self.__get_bool("network_auto_clean_up"),
+            self.__get("network_auto_clean_up"),
         )
 
     @property
