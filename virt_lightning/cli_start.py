@@ -4,10 +4,11 @@ import sys
 
 import libvirt
 
+from virt_lightning.consts import DEFAULT_LOGGER
 from virt_lightning.domain_libvirt import LibvirtDomain
 from virt_lightning.icli import ICLIcmd
 
-logger = logging.getLogger("virt_lightning")
+logger = logging.getLogger(DEFAULT_LOGGER)
 
 
 class CLIStart(ICLIcmd):

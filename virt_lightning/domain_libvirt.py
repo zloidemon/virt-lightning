@@ -21,12 +21,12 @@ DISK_XML = """
 
 BRIDGE_XML = """
 <interface type='network'>
-  <source network='virt-lightning'/>
+  <source network='{network}'/>
   <model type='virtio'/>
 </interface>
 """
 
-logger = logging.getLogger("virt_lightning")
+logger = logging.getLogger(consts.DEFAULT_LOGGER)
 
 
 class LibvirtDomain:
@@ -246,7 +246,9 @@ class LibvirtDomain:
     ):
         if not nic_model:
             nic_model = self.default_nic_model
-        net_root = ElementTree.fromstring(BRIDGE_XML)
+        net_root = ElementTree.fromstring(
+            BRIDGE_XML.format(network=consts.DEFAULT_VL_NAME)
+        )
 
         if bridge:
             source_attrs = {"bridge": bridge}
