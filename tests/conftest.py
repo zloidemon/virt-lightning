@@ -11,7 +11,7 @@ from virt_lightning.disk_system import DiskSystem
 
 DEFAULT_INI = """
 [main]
-root_password=boby
+root_password="boby"
 """
 
 
