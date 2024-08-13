@@ -1,9 +1,10 @@
 import logging
 
+from virt_lightning.consts import DEFAULT_LOGGER
 from virt_lightning.exceptions import VMNotFoundError
 from virt_lightning.icli import ICLIcmd
 
-logger = logging.getLogger("virt_lightning")
+logger = logging.getLogger(DEFAULT_LOGGER)
 
 
 class CLIStop(ICLIcmd):

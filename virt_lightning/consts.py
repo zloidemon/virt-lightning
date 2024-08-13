@@ -15,10 +15,10 @@ class ExitCode(Enum):
 CLI_MESSAGE_HELP = """
 Example:
 
- We export the list of the distro in the virt-lightning.yaml file.
-   $ {cli} images > virt-lightning.yaml
+ We export the list of the distro in the {conf} file.
+   $ {cli} images > {conf}
 
- For each line of the virt-lightning.yaml, start a VM with the associated distro.
+ For each line of the {conf}, start a VM with the associated distro.
    $ {cli} up
 
  Once the VM are up, we can generate an Ansible inventory file:
@@ -28,8 +28,8 @@ Example:
    $ ansible all -m ping -i inventory
 
 Commands:
-    up                  Start VMs defined in virt-lightning.yaml
-    down                Delete all VMs created by virt-lightning
+    up                  Start VMs defined in {conf}
+    down                Delete all VMs created by app
     start               Start a new VM
     stop                Delete a VM
     images              Dump list of supported distros
@@ -46,17 +46,20 @@ usage: {cli} [--debug DEBUG] [--config CONFIG] COMMAND
 
 Run {cli} without a command to see list of accepted commands.
 """
+DEFAULT_VL_NAME = "virt-lightning"
 DEFAULT_VL_COMMAND = "vl"
+DEFAULT_LOGGER = DEFAULT_VL_NAME.replace("-", "_")
+DEFAULT_VL_CONFIGURATION_FILE = f"{DEFAULT_VL_NAME}.toml"
 DEFAULT_BASE_REGISTRY_URL = "http://localhost"
-DEFAULT_CONFIGFILE = "~/.config/virt-lightning/config.ini"
+DEFAULT_CONFIGFILE = f"~/.config/{DEFAULT_VL_NAME}/config.ini"
 DEFAULT_USER_USERNAME = "root"
 DEFAULT_USER_PASSWORD = "root"
 DEFAULT_CONFIGURATION = {
     "main": {
         "libvirt_uri": "qemu:///system",
         "root_password": DEFAULT_USER_PASSWORD,
-        "storage_pool": "virt-lightning",
-        "network_name": "virt-lightning",
+        "storage_pool": f"{DEFAULT_VL_NAME}",
+        "network_name": f"{DEFAULT_VL_NAME}",
         "network_cidr": "192.168.123.0/24",
         "network_auto_clean_up": True,
         "ssh_key_file": "~/.ssh/id_rsa.pub",
@@ -64,7 +67,7 @@ DEFAULT_CONFIGURATION = {
     }
 }
 DEFAULT_LIBVIRT_GROUP = "libvirt"
-DEFAULT_STORAGE_DIR = "/var/lib/virt-lightning/pool"
+DEFAULT_STORAGE_DIR = f"/var/lib/{DEFAULT_VL_NAME}/pool"
 EXEC_FILE_GENISOIMAGE = "genisoimage"
 EXEC_FILE_KVM = "kvm"
 EXEC_FILE_MKISOFS = "mkisofs"
