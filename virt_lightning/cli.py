@@ -6,7 +6,7 @@ import pathlib
 import sys
 from urllib.parse import urlparse
 
-import yaml
+import tomllib
 
 from virt_lightning.cli_ansible import CLIAnsible
 from virt_lightning.cli_config import CLIConfig
@@ -22,12 +22,14 @@ from virt_lightning.cli_stop import CLIStop
 from virt_lightning.cli_storage import CLIStorage
 from virt_lightning.cli_up import CLIup
 from virt_lightning.cli_viewer import CLIViewer
-from virt_lightning.configuration import ProxyLegacyConfiguration as Configuration
+from virt_lightning.configuration import ProxyLegacyConfiguration
 from virt_lightning.consts import (
     CLI_MESSAGE_HELP,
     CLI_MESSAGE_USAGE,
     DEFAULT_CONFIGFILE,
+    DEFAULT_LOGGER,
     DEFAULT_VL_COMMAND,
+    DEFAULT_VL_CONFIGURATION_FILE,
     ExitCode,
 )
 from virt_lightning.network_system import NetworkSystem
@@ -35,7 +37,7 @@ from virt_lightning.storage_system import StorageSystem
 from virt_lightning.vmm_builder import VMMBuilder
 from virt_lightning.vmm_libvirt import VMMLibvirt
 
-logger = logging.getLogger("virt_lightning")
+logger = logging.getLogger(DEFAULT_LOGGER)
 ch = logging.StreamHandler()
 logger.addHandler(ch)
 
@@ -87,23 +89,27 @@ class CLIBuilder:
 #
 #  FIXME: Сделать отдельный файл конфигурации и класс к нему
 #
-def list_from_yaml_file(value):
+def list_from_config_file(value):
     file_path = pathlib.PosixPath(value)
     if not file_path.exists():
         raise argparse.ArgumentTypeError(f"{value} does not exist.")
     with file_path.open(encoding="UTF-8") as fd:
-        content = yaml.safe_load(fd.read())
+        content = []
+        data = tomllib.loads(fd.read())
+        for k, v in data.items():
+            v["name"] = k
+            content.append(v)
         if not isinstance(content, list):
             raise argparse.ArgumentTypeError(f"{value} should be a YAML list.")
         return content
 
 
 def main():
-    vl_lightning_yaml_args = {
-        "default": "virt-lightning.yaml",
-        "help": "point on an alternative virt-lightning.yaml file (default: %(default)s)",
-        "type": list_from_yaml_file,
-        "dest": "virt_lightning_yaml",
+    vl_lightning_config_args = {
+        "default": DEFAULT_VL_CONFIGURATION_FILE,
+        "help": f"set another {DEFAULT_VL_CONFIGURATION_FILE} file (default: %(default)s)",
+        "type": list_from_config_file,
+        "dest": "virt_lightning_conf",
     }
     cli_builder = CLIBuilder.create()
 
@@ -119,7 +125,7 @@ def main():
     cli_builder.add_command(CLIViewer)
     cli_builder.add_command(CLIps)
     cli_builder.add_command(CLIssh)
-    cli_builder.add_command(CLIup, vl_lightning_yaml_args)
+    cli_builder.add_command(CLIup, vl_lightning_config_args)
 
     args = cli_builder.build()
 
@@ -129,12 +135,13 @@ def main():
         )
         example = CLI_MESSAGE_HELP.format(
             cli=DEFAULT_VL_COMMAND,
+            conf=DEFAULT_VL_CONFIGURATION_FILE,
         )
         sys.stdout.write(f"{usage}\n")
         sys.stdout.write(f"{example}\n")
         exit(ExitCode.FAIL.value)
 
-    configuration = Configuration(args.config)
+    configuration = ProxyLegacyConfiguration(args.config)
     vmm_builder = VMMBuilder(configuration)
 
     vmm_builder.set_storage(StorageSystem)
@@ -172,7 +179,7 @@ def main():
         case "start":
             CLIStart.run(vmm, configuration=configuration, **vars(args))
         case "up":
-            CLIup.run(vmm, args.virt_lightning_yaml, configuration=configuration)
+            CLIup.run(vmm, args.virt_lightning_conf, configuration=configuration)
         case _:
             CLIHelp.run()
             raise NotImplementedError(f"command: {args.action}")
