@@ -11,10 +11,10 @@ from xml.etree import ElementTree
 
 import libvirt
 
-import virt_lightning.consts as consts
+from virt_lightning.consts import DEFAULT_LOGGER, ExitCode
 from virt_lightning.execfile_virtualization_tools import ExecFileQemuIMG
 
-logger = logging.getLogger("virt_lightning")
+logger = logging.getLogger(DEFAULT_LOGGER)
 
 
 STORAGE_VOLUME_XML = """
@@ -93,5 +93,5 @@ class IDisk(metaclass=ABCMeta):
                     f"  sudo virsh vol-delete --pool "
                     f"{self.storage.storage_pool_obj.name()} {name}.qcow2"
                 )
-                sys.exit(consts.ExitCode.FAIL.value)
+                sys.exit(ExitCode.FAIL.value)
             raise

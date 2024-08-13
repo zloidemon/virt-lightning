@@ -8,7 +8,7 @@ from xml.etree import ElementTree
 
 import libvirt
 
-import virt_lightning.consts as consts
+from virt_lightning.consts import DEFAULT_LOGGER, DEFAULT_USER_PASSWORD, ExitCode
 from virt_lightning.disk_auxiliary_cloudinit import AuxiliaryCloudInitDisk
 from virt_lightning.disk_auxiliary_ignition import AuxiliaryIgnitionDisk
 from virt_lightning.disk_auxiliary_openstack import AuxiliaryOpenstackInitDisk
@@ -70,14 +70,14 @@ DOMAIN_XML = """
 </domain>
 """
 
-logger = logging.getLogger("virt_lightning")
+logger = logging.getLogger(DEFAULT_LOGGER)
 
 
 class VMMLibvirt:
     def __init__(self, conn):
         if conn is None:
             logger.error("Failed to open connection to libvirt")
-            exit(consts.ExitCode.FAIL.value)
+            exit(ExitCode.FAIL.value)
 
         self.conn = conn
         self.network = NetworkSystem(conn)
@@ -122,7 +122,7 @@ class VMMLibvirt:
             "groups": [],
             "memory": 768,
             "python_interpreter": "/usr/bin/python3",
-            "root_password": consts.DEFAULT_USER_PASSWORD,
+            "root_password": DEFAULT_USER_PASSWORD,
             "username": getpass.getuser(),
             "vcpus": 1,
             "default_nic_model": "virtio",
