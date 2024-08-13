@@ -1,0 +1,4 @@
+[main]
+bridge = "virbr0"
+root_password = "root"
+storage_pool = "default"
