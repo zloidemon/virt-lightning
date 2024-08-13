@@ -51,7 +51,7 @@ DEFAULT_VL_COMMAND = "vl"
 DEFAULT_LOGGER = DEFAULT_VL_NAME.replace("-", "_")
 DEFAULT_VL_CONFIGURATION_FILE = DEFAULT_VL_NAME + ".toml"
 DEFAULT_BASE_REGISTRY_URL = "http://localhost"
-DEFAULT_CONFIGFILE = "~/.config/{path}/config.ini".format(path=DEFAULT_VL_NAME)
+DEFAULT_CONFIGFILE = f"~/.config/{DEFAULT_VL_NAME}/config.ini"
 DEFAULT_USER_USERNAME = "root"
 DEFAULT_USER_PASSWORD = "root"
 DEFAULT_CONFIGURATION = {
@@ -67,7 +67,7 @@ DEFAULT_CONFIGURATION = {
     }
 }
 DEFAULT_LIBVIRT_GROUP = "libvirt"
-DEFAULT_STORAGE_DIR = "/var/lib/{path}/pool".format(path=DEFAULT_VL_NAME)
+DEFAULT_STORAGE_DIR = f"/var/lib/{DEFAULT_VL_NAME}/pool"
 EXEC_FILE_GENISOIMAGE = "genisoimage"
 EXEC_FILE_KVM = "kvm"
 EXEC_FILE_MKISOFS = "mkisofs"
