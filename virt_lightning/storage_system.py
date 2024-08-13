@@ -6,9 +6,12 @@ from xml.etree import ElementTree
 import libvirt
 import yaml
 
+#
+# NOTE: При запуске тестов consts меняется каталог по-умолчанию
+#
+import virt_lightning.consts as consts
 from virt_lightning.consts import (
     DEFAULT_LOGGER,
-    DEFAULT_STORAGE_DIR,
     DEFAULT_VL_NAME,
     QEMU_DIR,
     ExitCode,
@@ -71,7 +74,7 @@ class StorageSystem:
             if e.get_error_code() != libvirt.VIR_ERR_NO_STORAGE_POOL:
                 raise (e)
 
-        storage_dir = pathlib.PosixPath(DEFAULT_STORAGE_DIR)
+        storage_dir = pathlib.PosixPath(consts.DEFAULT_STORAGE_DIR)
         if not self.storage_pool_obj:
             self.storage_pool_obj = self.create_storage_pool(
                 name=storage_pool, directory=storage_dir
