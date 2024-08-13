@@ -4,22 +4,23 @@ from concurrent.futures import ThreadPoolExecutor
 
 import libvirt
 
+from virt_lightning.consts import DEFAULT_LOGGER, DEFAULT_VL_CONFIGURATION_FILE
 from virt_lightning.domain_libvirt import LibvirtDomain
 from virt_lightning.icli import ICLIcmd
 
-logger = logging.getLogger("virt_lightning")
+logger = logging.getLogger(DEFAULT_LOGGER)
 
 
 class CLIup(ICLIcmd):
     def __init__(self, action_subparsers, parent_parser):
         self.parser = action_subparsers.add_parser(
             "up",
-            help="Start the VM listed in the virt-lightning.yaml file",
+            help=f"Run from {DEFAULT_VL_CONFIGURATION_FILE} file",
             parents=[parent_parser],
         )
 
     def arguments(self, args):
-        self.parser.add_argument("--virt-lightning-yaml", **args)
+        self.parser.add_argument("--virt-lightning-conf", **args)
         return self
 
     def context(self, args):
@@ -27,7 +28,7 @@ class CLIup(ICLIcmd):
         return self
 
     @staticmethod
-    def run(vmm, virt_lightning_yaml, configuration, context="default"):
+    def run(vmm, virt_lightning_conf, configuration, context="default"):
         """Create a list of VM."""
 
         def _lifecycle_callback(conn, dom, state, reason, opaque):  # noqa: N802
@@ -36,7 +37,7 @@ class CLIup(ICLIcmd):
 
         loop = asyncio.get_event_loop()
 
-        for hosts in virt_lightning_yaml:
+        for hosts in virt_lightning_conf:
             vmm.storage.ensure_image_exists(configuration, hosts["distro"])
 
         vmm.conn.domainEventRegisterAny(
@@ -48,7 +49,7 @@ class CLIup(ICLIcmd):
 
         async def deploy():
             futures = []
-            for host in virt_lightning_yaml:
+            for host in virt_lightning_conf:
                 futures.append(
                     loop.run_in_executor(
                         ThreadPoolExecutor(max_workers=10),

@@ -2,10 +2,11 @@ import logging
 import pathlib
 import urllib.request
 
+from virt_lightning.consts import DEFAULT_LOGGER
 from virt_lightning.exceptions import ImageNotFoundUpstreamError
 from virt_lightning.idownloader import IDownloader
 
-logger = logging.getLogger("virt_lightning")
+logger = logging.getLogger(DEFAULT_LOGGER)
 
 
 class DownloaderNative(IDownloader):

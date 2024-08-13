@@ -6,7 +6,16 @@ from xml.etree import ElementTree
 import libvirt
 import yaml
 
+#
+# NOTE: При запуске тестов consts меняется каталог по-умолчанию
+#
 import virt_lightning.consts as consts
+from virt_lightning.consts import (
+    DEFAULT_LOGGER,
+    DEFAULT_VL_NAME,
+    QEMU_DIR,
+    ExitCode,
+)
 from virt_lightning.downloader_native import DownloaderNative
 from virt_lightning.exceptions import (
     ImageNotFoundLocallyError,
@@ -29,11 +38,11 @@ You need root privilege to create the storage pool, please do:
   sudo mkdir -p {storage_dir}/upstream
   sudo chown -R {qemu_user}:{qemu_group} {storage_dir}
   sudo chown -R {user} {storage_dir}/upstream
-  sudo chmod 775 /var/lib/virt-lightning
+  sudo chmod 775 /var/lib/{storage_name}
   sudo chmod 775 {storage_dir} {storage_dir}/upstream
 """
 
-logger = logging.getLogger("virt_lightning")
+logger = logging.getLogger(DEFAULT_LOGGER)
 
 
 class StorageSystem:
@@ -78,16 +87,17 @@ class StorageSystem:
             dir_exists = False
 
         if not dir_exists:
-            qemu_dir = pathlib.PosixPath(consts.QEMU_DIR)
+            qemu_dir = pathlib.PosixPath(QEMU_DIR)
             logger.error(
                 USER_CREATE_STORAGE_POOL_DIR.format(  # noqa: G001
-                    user=getpass.getuser(),
-                    qemu_user=qemu_dir.owner(),
                     qemu_group=qemu_dir.group(),
+                    qemu_user=qemu_dir.owner(),
                     storage_dir=self.storage_dir,
+                    storage_name=DEFAULT_VL_NAME,
+                    user=getpass.getuser(),
                 )
             )
-            exit(consts.ExitCode.FAIL.value)
+            exit(ExitCode.FAIL.value)
 
         if not self.storage_pool_obj.isActive():
             self.storage_pool_obj.create(0)
