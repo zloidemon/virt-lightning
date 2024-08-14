@@ -37,12 +37,12 @@ base = [
 url = "https://object-storage.public.mtl1.vexxhost.net/swift/v1/1dbafeefbd4f4c80864414a441e72dd2/bsd-cloud-image.org/images/netbsd/{tag}"
 file = "netbsd-{tag}.qcow2"
 base = [
-  {tag = "8.1"},
-  {tag = "8.2"},
-  {tag = "9.0"},
-  {tag = "9.1"},
-  {tag = "9.2", date = "2021-12-11", file = "{date}/netbsd-{tag}.qcow2"},
 #  {tag = "9.3"}, FIXME: not found
+  {tag = "9.2", date = "2021-12-11", file = "{date}/netbsd-{tag}.qcow2"},
+  {tag = "9.1"},
+  {tag = "9.0"},
+  {tag = "8.2"},
+  {tag = "8.1"},
 ]
 
 # OpenBSD
