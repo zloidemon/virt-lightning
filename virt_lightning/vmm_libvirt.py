@@ -131,6 +131,9 @@ class VMMLibvirt:
             "meta_data_media_type": "cdrom",
             "default_bus_type": "virtio",
         }
+        #
+        # NOTE: Перезапись конфигурации поставляемой к образу
+        #
         for k, v in self.storage.get_distro_configuration(domain.distro).items():
             if v:
                 config[k] = v
