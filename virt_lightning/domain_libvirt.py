@@ -179,19 +179,24 @@ class LibvirtDomain:
             self.blockdev.reverse()
         return f"vd{self.blockdev.pop()}"
 
-    def record_metadata(self, k, v):
-        meta = f"<{k} name='{v}' />"
+    #
+    # NOTE: Добавление переменных приложения в XML документ. Возможно стоит
+    #       перенсти куда-то в другое место.
+    #
+    def record_metadata(self, key, value):
+        meta = f"<{key} name='{value}' />"
+        app_prefix = "vl"
         self.dom.setMetadata(
             libvirt.VIR_DOMAIN_METADATA_ELEMENT,
             meta,
-            "vl",
-            k,
+            app_prefix,
+            key,
             libvirt.VIR_DOMAIN_AFFECT_CONFIG,
         )
 
-    def get_metadata(self, k):
+    def get_metadata(self, key):
         try:
-            xml = self.dom.metadata(libvirt.VIR_DOMAIN_METADATA_ELEMENT, k)
+            xml = self.dom.metadata(libvirt.VIR_DOMAIN_METADATA_ELEMENT, key)
         except libvirt.libvirtError as e:
             if e.get_error_code() == libvirt.VIR_ERR_NO_DOMAIN_METADATA:
                 return None
