@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-import getpass
 import logging
 import pathlib
 import uuid
@@ -8,7 +5,11 @@ from xml.etree import ElementTree
 
 import libvirt
 
-from virt_lightning.consts import DEFAULT_LOGGER, DEFAULT_USER_PASSWORD, ExitCode
+from virt_lightning.consts import (
+    DEFAULT_DOMAIN_CONFIGURATION,
+    DEFAULT_LOGGER,
+    ExitCode,
+)
 from virt_lightning.disk_auxiliary_cloudinit import AuxiliaryCloudInitDisk
 from virt_lightning.disk_auxiliary_ignition import AuxiliaryIgnitionDisk
 from virt_lightning.disk_auxiliary_openstack import AuxiliaryOpenstackInitDisk
@@ -118,19 +119,10 @@ class VMMLibvirt:
         return domain
 
     def configure_domain(self, domain, user_config):
-        config = {
-            "groups": [],
-            "memory": 768,
-            "python_interpreter": "/usr/bin/python3",
-            "root_password": DEFAULT_USER_PASSWORD,
-            "username": getpass.getuser(),
-            "vcpus": 1,
-            "default_nic_model": "virtio",
-            "bootcmd": [],
-            "runcmd": [],
-            "meta_data_media_type": "cdrom",
-            "default_bus_type": "virtio",
-        }
+        config = DEFAULT_DOMAIN_CONFIGURATION
+        #
+        # NOTE: Перезапись конфигурации поставляемой к образу
+        #
         for k, v in self.storage.get_distro_configuration(domain.distro).items():
             if v:
                 config[k] = v
@@ -140,7 +132,6 @@ class VMMLibvirt:
         domain.groups = config["groups"]
         domain.load_ssh_key_file(pathlib.Path(config["ssh_key_file"]))
         domain.memory = config["memory"]
-        domain.python_interpreter = config["python_interpreter"]
         domain.root_password = config["root_password"]
         domain.username = config["username"]
         domain.vcpus = config["vcpus"]

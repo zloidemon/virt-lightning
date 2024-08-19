@@ -1,3 +1,4 @@
+import getpass
 from enum import Enum, unique
 
 
@@ -65,6 +66,18 @@ DEFAULT_CONFIGURATION = {
         "ssh_key_file": "~/.ssh/id_rsa.pub",
         "registry_urls": "",
     }
+}
+DEFAULT_DOMAIN_CONFIGURATION = {
+    "groups": [],
+    "memory": 768,
+    "root_password": DEFAULT_USER_PASSWORD,
+    "username": getpass.getuser(),
+    "vcpus": 1,
+    "default_nic_model": "virtio",
+    "bootcmd": [],
+    "runcmd": [],
+    "meta_data_media_type": "cdrom",
+    "default_bus_type": "virtio",
 }
 DEFAULT_LIBVIRT_GROUP = "libvirt"
 DEFAULT_STORAGE_DIR = f"/var/lib/{DEFAULT_VL_NAME}/pool"
