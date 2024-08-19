@@ -1,10 +1,10 @@
 import getpass
+import json
 import logging
 import pathlib
 from xml.etree import ElementTree
 
 import libvirt
-import yaml
 
 #
 # NOTE: При запуске тестов consts меняется каталог по-умолчанию
@@ -120,11 +120,9 @@ class StorageSystem:
 
     def get_distro_configuration(self, distro):
         distro_configuration_file = pathlib.PosixPath(
-            f"{self.storage_dir}/upstream/{distro}.yaml"
+            f"{self.storage_dir}/upstream/{distro}.json"
         )
         if not distro_configuration_file.exists():
             return {}
-        config: dict = (
-            yaml.load(distro_configuration_file.open("r"), Loader=yaml.SafeLoader) or {}
-        )
-        return config
+
+        return json.load(distro_configuration_file.open("r")) or {}

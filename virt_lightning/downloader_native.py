@@ -69,11 +69,11 @@ class DownloaderNative(IDownloader):
                 self.__progress_callback(temp_file, fd.tell(), length)
         temp_file.rename(target_file)
         try:
-            r = urllib.request.urlopen(f"{parent_url}/{distro}.yaml")
+            r = urllib.request.urlopen(f"{parent_url}/{distro}.json")
         except urllib.error.HTTPError as e:
             if e.code == 404:
                 pass
-        with target_file.with_suffix(".yaml").open("wb") as fd:
+        with target_file.with_suffix(".json").open("wb") as fd:
             fd.write(r.read())
         logger.info(f"Image {distro} is ready!")
 
