@@ -21,7 +21,7 @@ class IExecFile(metaclass=ABCMeta):
         exe = shutil.which(self.name)
         if exe and pathlib.PosixPath(exe).exists():
             return exe
-        raise Exception(f"exec file not found: {self.name}")
+        return None
 
     @property
     def entrypoint(self):
