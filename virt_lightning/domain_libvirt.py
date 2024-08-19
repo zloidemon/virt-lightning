@@ -65,7 +65,11 @@ class LibvirtDomain:
 
     @ssh_key.setter
     def ssh_key(self, value):
-        self._ssh_key = value
+        #
+        # NOTE: Добавить поддержку множества ключей из файла. Необходимо делать
+        #       strip() на каждый так как читается с переносом строки.
+        #
+        self._ssh_key = value.strip()
 
     def load_ssh_key_file(self, ssh_key_file):
         doc_url = "https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/#generating-a-new-ssh-key"
@@ -89,14 +93,6 @@ class LibvirtDomain:
     @distro.setter
     def distro(self, distro):
         self.record_metadata("distro", distro)
-
-    @property
-    def python_interpreter(self):
-        return self.get_metadata("python_interpreter")
-
-    @python_interpreter.setter
-    def python_interpreter(self, value):
-        self.record_metadata("python_interpreter", value)
 
     @property
     def username(self):
@@ -179,19 +175,27 @@ class LibvirtDomain:
             self.blockdev.reverse()
         return f"vd{self.blockdev.pop()}"
 
-    def record_metadata(self, k, v):
-        meta = f"<{k} name='{v}' />"
+    #
+    # NOTE: Добавление переменных приложения в XML документ. Возможно стоит
+    #       перенсти куда-то в другое место.
+    #
+    def record_metadata(self, key, value, prefix=None):
+        meta = f"<{key} name='{value}' />"
+
+        if not prefix:
+            prefix = consts.DEFAULT_VL_COMMAND
+
         self.dom.setMetadata(
             libvirt.VIR_DOMAIN_METADATA_ELEMENT,
             meta,
-            "vl",
-            k,
+            prefix,
+            key,
             libvirt.VIR_DOMAIN_AFFECT_CONFIG,
         )
 
-    def get_metadata(self, k):
+    def get_metadata(self, key):
         try:
-            xml = self.dom.metadata(libvirt.VIR_DOMAIN_METADATA_ELEMENT, k)
+            xml = self.dom.metadata(libvirt.VIR_DOMAIN_METADATA_ELEMENT, key)
         except libvirt.libvirtError as e:
             if e.get_error_code() == libvirt.VIR_ERR_NO_DOMAIN_METADATA:
                 return None
@@ -374,7 +378,6 @@ class LibvirtDomain:
         user_config = {
             "groups": host.get("groups"),
             "memory": host.get("memory"),
-            "python_interpreter": host.get("python_interpreter"),
             "root_password": host.get("root_password", configuration.root_password),
             "ssh_key_file": host.get("ssh_key_file", configuration.ssh_key_file),
             "username": host.get("username"),
