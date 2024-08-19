@@ -223,11 +223,14 @@ class LibvirtDomain:
         self.record_metadata("groups", ",".join(value))
 
     def attach_disk(self, volume, device="disk", disk_type="qcow2"):
-        if device == "cdrom":  # noqa: SIM108
-            # virtio does not support ejectable media
-            bus = "ide"
-        else:
-            bus = self.default_bus_type or "virtio"
+        match device:
+            case "cdrom":
+                # virtio does not support ejectable media
+                bus = "ide"
+            case "disk":
+                bus = self.default_bus_type or "virtio"
+            case _:
+                raise Exception(f"{device} unsupported device")
 
         device_name = self.get_next_block_device()
         disk_root = ElementTree.fromstring(DISK_XML)

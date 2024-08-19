@@ -31,7 +31,7 @@ class CLIup(ICLIcmd):
     def run(vmm, virt_lightning_conf, configuration, context="default"):
         """Create a list of VM."""
 
-        def _lifecycle_callback(conn, dom, state, reason, opaque):  # noqa: N802
+        def _lifecycle_callback(conn, dom, state, reason, opaque):
             if state == 1:
                 logger.info("+ %s QEMU agent found", dom.name())
 
