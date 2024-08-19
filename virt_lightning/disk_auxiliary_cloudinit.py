@@ -1,10 +1,10 @@
+import json
 import pathlib
 import tempfile
 
-import yaml
-
 from virt_lightning.execfile_iso_tools import ExecFileISOTool
 from virt_lightning.idisk import IDisk
+from virt_lightning.jsonb import CloudInitJSONB
 
 # TODO
 META_DATA_ENI = """
@@ -62,11 +62,15 @@ class AuxiliaryCloudInitDisk(IDisk):
             temp_dir = pathlib.Path(base_temp_dir)
             cd_dir = temp_dir / "cd_dir"
             cd_dir.mkdir()
+
             user_data_file = cd_dir / "user-data"
+
             with user_data_file.open("w") as fd:
-                fd.write("#cloud-config\n")
-                fd.write(yaml.dump(domain.user_data, Dumper=yaml.Dumper))
+                fd.write("#cloud-config-jsonp\n")
+                fd.write(str(CloudInitJSONB().from_json(domain.user_data)))
+
             meta_data_file = cd_dir / "meta-data"
+
             with meta_data_file.open("w") as fd:
                 fd.write(
                     META_DATA_ENI.format(
@@ -76,9 +80,9 @@ class AuxiliaryCloudInitDisk(IDisk):
                         network=str(self.network),
                     )
                 )
-            network_config_file = cd_dir / "network-config"
+            network_config_file = cd_dir / "network-config.json"
             with network_config_file.open("w") as fd:
-                fd.write(yaml.dump(domain._network_meta, Dumper=yaml.Dumper))
+                fd.write(json.dumps(domain._network_meta))
 
             cidata_file = temp_dir / f"{domain.name}-cidata.iso"
             ExecFileISOTool().run_cmd(

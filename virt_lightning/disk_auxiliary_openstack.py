@@ -2,10 +2,9 @@ import json
 import pathlib
 import tempfile
 
-import yaml
-
 from virt_lightning.execfile_iso_tools import ExecFileISOTool
 from virt_lightning.idisk import IDisk
+from virt_lightning.jsonb import CloudInitJSONB
 
 
 class AuxiliaryOpenstackInitDisk(IDisk):
@@ -107,8 +106,8 @@ class AuxiliaryOpenstackInitDisk(IDisk):
 
             openstack_userdata_file = openstack_dir / "user_data"
             with openstack_userdata_file.open("w") as fd:
-                fd.write("#cloud-config\n")
-                fd.write(yaml.dump(domain.user_data, Dumper=yaml.Dumper))
+                fd.write("#cloud-config-jsonp\n")
+                fd.write(str(CloudInitJSONB().from_json(domain.user_data)))
 
             cidata_file = temp_dir / f"{domain.name}-cidata.iso"
             ExecFileISOTool().run_cmd(
