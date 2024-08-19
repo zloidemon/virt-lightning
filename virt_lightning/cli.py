@@ -4,9 +4,8 @@ import argparse
 import logging
 import pathlib
 import sys
-from urllib.parse import urlparse
-
 import tomllib
+from urllib.parse import urlparse
 
 from virt_lightning.cli_ansible import CLIAnsible
 from virt_lightning.cli_config import CLIConfig
