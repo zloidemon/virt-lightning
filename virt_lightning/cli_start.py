@@ -1,14 +1,17 @@
 import asyncio
-import logging
 import sys
 
 import libvirt
 
-from virt_lightning.consts import DEFAULT_LOGGER
 from virt_lightning.domain_libvirt import LibvirtDomain
 from virt_lightning.icli import ICLIcmd
 
-logger = logging.getLogger(DEFAULT_LOGGER)
+CLI_MESSAGE_START_HELP = """
+**** System is online ****
+To connect use:
+  vl console {domain} (virsh console)
+  vl ssh connect {domain}
+"""
 
 
 class CLIStart(ICLIcmd):
@@ -95,14 +98,5 @@ class CLIStart(ICLIcmd):
             await domain.reachable()
 
         loop.run_until_complete(deploy())
-        logger.info(  # noqa: T001
-            (
-                "\033[0m\n**** System is online ****\n"
-                "To connect use:\n"
-                "  vl console %s (virsh console)"
-                "  vl ssh %s"
-            ),
-            domain.name,
-            domain.name,
-        )
+        sys.stdout.write(CLI_MESSAGE_START_HELP.format(domain=domain.name))
         return domain

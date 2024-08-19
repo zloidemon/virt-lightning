@@ -1,3 +1,5 @@
+import sys
+
 from virt_lightning.icli import ICLIcmd
 
 
@@ -38,4 +40,4 @@ class CLIps(ICLIcmd):
 
         output_template = "+ {name:<13}   {username}@{ipv4:>5} [{distro}]"
         for _, v in sorted(results.items()):
-            print(output_template.format(**v))  # noqa: T001
+            sys.stdout.write(output_template.format(**v))
