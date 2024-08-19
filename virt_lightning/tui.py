@@ -54,10 +54,11 @@ class Menu:
             curses.doupdate()
 
             for index, item in enumerate(self.items):
-                if index == self.position:  # noqa: SIM108
-                    mode = curses.A_REVERSE
-                else:
-                    mode = curses.A_NORMAL
+                match index:
+                    case self.position:
+                        mode = curses.A_REVERSE
+                    case _:
+                        mode = curses.A_NORMAL
 
                 entry, _ = item
 
