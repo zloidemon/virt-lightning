@@ -1,5 +1,4 @@
 import pathlib
-
 import tomllib
 
 from virt_lightning import consts
