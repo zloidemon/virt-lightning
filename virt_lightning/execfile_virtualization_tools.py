@@ -24,10 +24,10 @@ class ExecFileVirtTool(IExecFile):
     def entrypoint(self):
         for binary in self.__binaries:
             self.__name = binary
-            try:
-                return self.which
-            except Exception:  # noqa: B902
+            if not self.which:
                 continue
+            else:
+                return self.which
 
         raise Exception("Failed to find the kvm binary")
 
