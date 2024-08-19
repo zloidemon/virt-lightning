@@ -63,7 +63,7 @@ class CLIAnsible(ICLIcmd):
                 username=domain.username,
                 ipv4=domain.ipv4.ip,
                 python_interpreter=domain.python_interpreter,
-            )  # noqa: T001
+            )
 
         for group_name, domains in groups.items():
             output += f"\n[{group_name}]\n"
