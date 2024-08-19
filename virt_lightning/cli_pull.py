@@ -1,6 +1,14 @@
+import sys
+
 import virt_lightning.consts as consts
 from virt_lightning.downloader_native import DownloaderNative
 from virt_lightning.exceptions import ImageNotFoundUpstreamError
+
+
+CLI_MESSAGE_NOTFOUND_IMAGE = """
+Distro {image} cannot be downloaded. Visit {base_url}/images/ or
+private image hub to get an up to date list.
+"""
 
 
 class CLIPull:
@@ -25,9 +33,10 @@ class CLIPull:
             )
             downloader.pull(**vars(args))
         except ImageNotFoundUpstreamError:
-            print(  # noqa: T001
-                f"Distro {args.distro} cannot be downloaded.\n"
-                f"  Visit {consts.BASE_URL}/images/ or private image hub"
-                "to get an up to date list."
+            sys.stdout.write(
+                CLI_MESSAGE_NOTFOUND_IMAGE.format(
+                    base_url=consts.BASE_URL,
+                    image=args.distro,
+                )
             )
             exit(consts.ExitCode.FAIL.value)
