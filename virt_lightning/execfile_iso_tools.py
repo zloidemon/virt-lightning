@@ -18,10 +18,10 @@ class ExecFileISOTool(IExecFile):
     def entrypoint(self):
         for binary in self.__binaries:
             self.__name = binary
-            try:
-                return self.which
-            except Exception:  # noqa: B902
+            if not self.which:
                 continue
+            else:
+                return self.which
 
         error_msg = (
             f"Failed to find in PATH: {','.join(self.__binaries)}"

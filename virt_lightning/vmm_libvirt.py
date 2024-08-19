@@ -159,9 +159,7 @@ class VMMLibvirt:
 
     def start(self, domain, metadata_format):
         cloud_init_iso, init_builder = None, None
-        if metadata_format.get("provider", "") == "nocloud":  # noqa: SIM114
-            init_builder = AuxiliaryCloudInitDisk
-        elif domain.distro.startswith("centos-6"):
+        if metadata_format.get("provider", "") == "nocloud" or domain.distro.startswith("centos-6"):
             init_builder = AuxiliaryCloudInitDisk
         elif domain.distro.startswith("coreos"):
             init_builder = AuxiliaryIgnitionDisk
