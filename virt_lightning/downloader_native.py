@@ -1,5 +1,6 @@
 import logging
 import pathlib
+import sys
 import urllib.request
 
 from virt_lightning.consts import DEFAULT_LOGGER
@@ -19,7 +20,7 @@ class DownloaderNative(IDownloader):
         done = int(cur / self.__to_mb(1))
         full = int(length / self.__to_mb(1))
         line = f"[{percent:06.2f}%] {done:6}MB/{full}MB {filename}\r"
-        print(line, end="")  # noqa: T001
+        sys.stdout.write(line, end="")
 
     def __to_mb(self, val):
         return 1024 * 1000 * val
