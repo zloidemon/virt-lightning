@@ -1,8 +1,6 @@
-import curses
-
 from virt_lightning.execfile_connection_tools import ExecFileVirsh
 from virt_lightning.icli import ICLIcmd
-from virt_lightning.tui import VirtTUI
+from virt_lightning.tui import menu
 
 
 class CLIConsole(ICLIcmd):
@@ -31,4 +29,4 @@ class CLIConsole(ICLIcmd):
         if name:
             go_console(vmm.get_domain_by_name(name))
 
-        curses.wrapper(VirtTUI, sorted(vmm.list_domains()), go_console)
+        menu(vmm.list_domains(), go_console)
