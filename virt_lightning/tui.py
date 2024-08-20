@@ -75,8 +75,11 @@ class Menu:
                 case curses.KEY_ENTER | curses.KEY_NEWLINE:
                     self.__restore_shell()
 
-                    item, callback = self.items[self.position]
-                    callback(item)
+                    if len(self.items) > 0 and self.position < len(self.items):
+                        item, callback = self.items[self.position]
+                        callback(item)
+                    else:
+                        break
                 case curses.KEY_Q:
                     break
                 case _:
@@ -95,5 +98,11 @@ class VirtTUI:
         curses.KEY_NEWLINE = ord("\n")
 
         menu_items = [(obj, callback) for obj in entries]
-        main_menu = Menu(menu_items, self.screen)
-        main_menu.loop()
+
+        if len(menu_items) > 0:
+            main_menu = Menu(menu_items, self.screen)
+            main_menu.loop()
+
+
+def menu(entries, callback):
+    curses.wrapper(VirtTUI, sorted(entries), callback)
