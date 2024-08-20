@@ -1,11 +1,10 @@
-import curses
 import sys
 
 from virt_lightning.consts import CLI_MESSAGE_USAGE, DEFAULT_VL_COMMAND
 from virt_lightning.exceptions import VMNotFoundError
 from virt_lightning.execfile_connection_tools import ExecFileSSH
 from virt_lightning.icli import ICLIcmd
-from virt_lightning.tui import VirtTUI
+from virt_lightning.tui import menu
 
 
 class CLIssh(ICLIcmd):
@@ -95,8 +94,4 @@ class CLIssh(ICLIcmd):
                 raise VMNotFoundError(name)
             go_ssh(domain)
 
-        curses.wrapper(
-            VirtTUI,
-            sorted(vmm.list_domains()),
-            go_ssh,
-        )
+        menu(vmm.list_domains(), go_ssh)

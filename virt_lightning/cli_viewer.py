@@ -1,11 +1,10 @@
-import curses
 import os
 import sys
 
 from virt_lightning.consts import ExitCode
 from virt_lightning.execfile_connection_tools import ExecFileVirtViewer
 from virt_lightning.icli import ICLIcmd
-from virt_lightning.tui import VirtTUI
+from virt_lightning.tui import menu
 
 
 class CLIViewer(ICLIcmd):
@@ -42,4 +41,4 @@ class CLIViewer(ICLIcmd):
         if name:
             go_viewer(vmm.get_domain_by_name(name))
 
-        curses.wrapper(VirtTUI, sorted(vmm.list_domains()), go_viewer)
+        menu(vmm.list_domains(), go_viewer)
