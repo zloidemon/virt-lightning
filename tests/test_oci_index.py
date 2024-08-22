@@ -1,7 +1,7 @@
 import unittest
 from pathlib import PosixPath
 
-from virt_lightning.image_oci import OCIIndex
+from virt_lightning.image_oci_index import OCIIndex
 
 
 class TestOCIIndex(unittest.TestCase):
