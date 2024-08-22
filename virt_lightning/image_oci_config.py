@@ -37,8 +37,8 @@ class OCIConfigConfig:
 
     @property
     def user(self):
-        if self.__data.get("user"):
-            return self.__data["user"]
+        if self.__data.get("User"):
+            return self.__data["User"]
         return None
 
     @property
@@ -49,8 +49,12 @@ class OCIConfigConfig:
 
     @property
     def env(self):
+        dicted = {}
         if self.__data.get("Env"):
-            return self.__data["Env"]
+            for field in self.__data["Env"]:
+                key, val = field.split("=")
+                dicted.update({key: val})
+            return dicted
         return None
 
     @property
@@ -72,16 +76,16 @@ class OCIConfigConfig:
         return None
 
     @property
-    def working_dir(self):
+    def workingdir(self):
         if self.__data.get("WorkingDir"):
             return self.__data["WorkingDir"]
         return None
 
     @property
     def labels(self):
-        if self.__data.get("labels"):
-            return self.__data["labels"]
-        return []
+        if self.__data.get("Labels"):
+            return self.__data["Labels"]
+        return {}
 
     @property
     def stop_signal(self):
