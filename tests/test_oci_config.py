@@ -2,7 +2,7 @@ import json
 import unittest
 from pathlib import PosixPath
 
-from virt_lightning.image_oci import OCIConfig
+from virt_lightning.image_oci_config import OCIConfig
 
 
 class TestOCIConfig(unittest.TestCase):
