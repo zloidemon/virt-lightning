@@ -1,6 +1,6 @@
 import unittest
 
-from virt_lightning.image_oci import OCIMediaType
+from virt_lightning.image_oci_media_type import OCIMediaType
 
 TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_CONTENT_DESCRIPTOR = "application/vnd.oci.descriptor.v1+json"
 TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_OCI_LAYOUT = "application/vnd.oci.layout.header.v1+json"
