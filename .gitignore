@@ -66,12 +66,11 @@ target/
 # maintain by setuptools-scm
 virt_lightning/version.py
 
-virt-lightning.yaml
+virt-lightning.toml
 
 .mypy_cache
 .pytest_cache
 
-ansible/roles/
-
-#IDE
-virt-lightning.code-workspace
+# Archives
+*.tar
+*.gz
