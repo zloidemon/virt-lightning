@@ -118,6 +118,26 @@ class OCIConfigConfig:
         return None
 
 
+class OCIConfigRootfs:
+    def __init__(self, data):
+        self.__data = data
+
+    @property
+    def type(self):  # noqa: A003
+        return self.__data["type"]
+
+    @property
+    def diff_ids(self):
+        data = []
+        for record in self.__data["diff_ids"]:
+            algo, hsum = record.split(":")
+            data.append((algo, hsum))
+        return data
+
+    def __str__(self):
+        return f"Config(type={self.type},diff_ids={len(self.diff_ids)})"
+
+
 class OCIConfig:
     def __init__(self, data):
         self.__data = data
@@ -157,16 +177,20 @@ class OCIConfig:
         return self.__data.get("variant")
 
     @property
-    def history(self):
-        if self.__data.get("history"):
-            return [OCIHistoryRecord(record) for record in self.__data["history"]]
-        return []
-
-    @property
     def config(self):
         if self.__data.get("config"):
             return OCIConfigConfig(self.__data["config"])
         return None
+
+    @property
+    def rootfs(self):
+        return OCIConfigRootfs(self.__data["rootfs"])
+
+    @property
+    def history(self):
+        if self.__data.get("history"):
+            return [OCIHistoryRecord(record) for record in self.__data["history"]]
+        return []
 
     def __str__(self):
         return f"Config(architecture={self.architecture},os={self.os})"

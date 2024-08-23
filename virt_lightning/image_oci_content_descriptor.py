@@ -1,7 +1,7 @@
 from virt_lightning.image_oci_media_type import OCIMediaType
 
 
-class OCIBasicDescription:
+class OCIContentDescriptor:
     def __init__(self, data):
         self.__data = data
 
@@ -17,6 +17,22 @@ class OCIBasicDescription:
     @property
     def size(self):
         return self.__data["size"]
+
+    @property
+    def urls(self):
+        return self.__data.get("urls", [])
+
+    @property
+    def annotations(self):
+        return self.__data.get("annotations", {})
+
+    @property
+    def data(self):
+        return self.__data.get("data", None)
+
+    @property
+    def artifact_type(self):
+        return self.__data.get("artifactType", None)
 
     def __str__(self):
         return f"Description(digest={self.size})"

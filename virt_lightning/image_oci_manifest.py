@@ -1,6 +1,6 @@
 import json
 
-from virt_lightning.image_oci_basic_description import OCIBasicDescription
+from virt_lightning.image_oci_content_descriptor import OCIContentDescriptor
 from virt_lightning.image_oci_media_type import OCIMediaType
 
 
@@ -13,16 +13,30 @@ class OCIManifest:
         return self.__data["schemaVersion"]
 
     @property
+    def media_type(self):
+        return OCIMediaType(self.__data["mediaType"])
+
+    @property
+    def artifact_type(self):
+        return self.__data.get("artifactType")
+
+    @property
     def config(self):
-        return OCIBasicDescription(self.__data["config"])
+        return OCIContentDescriptor(self.__data["config"])
 
     @property
     def layers(self):
-        return [OCIBasicDescription(layer) for layer in self.__data["layers"]]
+        return [OCIContentDescriptor(layer) for layer in self.__data["layers"]]
 
     @property
-    def media_type(self):
-        return OCIMediaType(self.__data["mediaType"])
+    def subject(self):
+        if self.__data.get("subject"):
+            return OCIContentDescriptor(self.__data["subject"])
+        return None
+
+    @property
+    def annotations(self):
+        return self.__data.get("annotations", {})
 
     def __str__(self):
         return f"Manifest(version={self.schema_version})"
