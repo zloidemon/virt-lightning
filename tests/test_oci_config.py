@@ -45,6 +45,15 @@ class TestOCIConfig(unittest.TestCase):
     def test_required_config(self):
         self.assertIsNone(self.config_req.config)
 
+    def test_required_rootfs(self):
+        self.assertIsNotNone(self.config_req.rootfs)
+        self.assertEqual(self.config_req.rootfs.type, "layers")
+        valid = [
+            ("sha256", "c6f988f4874bb0add23a778f753c65efe992244e148a1d2ec2a8b664fb66bbd1"),
+            ("sha256", "5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef"),
+        ]
+        self.assertListEqual(self.config_req.rootfs.diff_ids, valid)
+
     # NOTE: Опциональные поля из примера объекта в спецификации
 
     def test_optional_created(self):
@@ -108,6 +117,15 @@ class TestOCIConfig(unittest.TestCase):
             "com.example.project.git.url": "https://example.com/project.git",
         }
         self.assertDictEqual(self.config_opt.config.labels, valid)
+
+    def test_optional_rootfs(self):
+        self.assertIsNotNone(self.config_opt.rootfs)
+        self.assertEqual(self.config_opt.rootfs.type, "layers")
+        valid = [
+            ("sha256", "c6f988f4874bb0add23a778f753c65efe992244e148a1d2ec2a8b664fb66bbd1"),
+            ("sha256", "5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef"),
+        ]
+        self.assertListEqual(self.config_opt.rootfs.diff_ids, valid)
 
     #
     # FIXME: Добавить поддержку проверку даты создания через datetime
