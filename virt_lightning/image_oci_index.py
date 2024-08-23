@@ -1,6 +1,6 @@
 import json
 
-from virt_lightning.image_oci_blob_manifest import OCIBlobManifest
+from virt_lightning.image_oci_content_descriptor import OCIContentDescriptor
 from virt_lightning.image_oci_media_type import OCIMediaType
 
 
@@ -22,7 +22,7 @@ class OCIIndex:
 
     @property
     def manifests(self):
-        return [OCIBlobManifest(manifest) for manifest in self.__data["manifests"]]
+        return [OCIContentDescriptor(manifest) for manifest in self.__data["manifests"]]
 
     @property
     def subject(self):
