@@ -136,6 +136,11 @@ class TestOCIIndexAux(unittest.TestCase):
             "org.opencontainers.image.ref.name": "v1.0",
         }
         self.assertDictEqual(manifest.annotations, valid_annotations)
+        self.assertEqual(manifest.platform.architecture, "ppc64le")
+        self.assertEqual(manifest.platform.os, "linux")
+        self.assertIsNotNone(manifest.platform.os_features)
+        self.assertListEqual(manifest.platform.os_features, [])
+        self.assertIsNone(manifest.platform.variant)
 
     def test_subject(self):
         self.assertIsNone(self.index.subject)
