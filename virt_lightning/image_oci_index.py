@@ -2,6 +2,24 @@ import json
 
 from virt_lightning.image_oci_content_descriptor import OCIContentDescriptor
 from virt_lightning.image_oci_media_type import OCIMediaType
+from virt_lightning.image_oci_os import OCIOSDescription
+
+
+#
+#  NOTE: Расширенная реализация класса Descriptor, для Index. По документации
+#        надо иметь дополнительные поля.
+#
+class OCIIndexContentDescriptor(OCIContentDescriptor, OCIOSDescription):
+    def __init__(self, data):
+        self.__data = data
+        OCIContentDescriptor.__init__(self, data)
+        OCIOSDescription.__init__(self, data)
+
+    @property
+    def platform(self):
+        if self.__data.get("platform"):
+            return OCIOSDescription(self.__data["platform"])
+        return None
 
 
 class OCIIndex:
@@ -22,7 +40,9 @@ class OCIIndex:
 
     @property
     def manifests(self):
-        return [OCIContentDescriptor(manifest) for manifest in self.__data["manifests"]]
+        return [
+            OCIIndexContentDescriptor(manifest) for manifest in self.__data["manifests"]
+        ]
 
     @property
     def subject(self):
