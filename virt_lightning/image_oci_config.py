@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from virt_lightning.image_oci_os import OCIOSDescription
+
 
 class OCIHistoryRecord:
     def __init__(self, data):
@@ -138,9 +140,10 @@ class OCIConfigRootfs:
         return f"Config(type={self.type},diff_ids={len(self.diff_ids)})"
 
 
-class OCIConfig:
+class OCIConfig(OCIOSDescription):
     def __init__(self, data):
         self.__data = data
+        OCIOSDescription.__init__(self, data)
 
     @property
     def created(self):
@@ -153,28 +156,6 @@ class OCIConfig:
         if self.__data.get("author"):
             return self.__data["author"]
         return None
-
-    @property
-    def architecture(self):
-        return self.__data["architecture"]
-
-    @property
-    def os(self):
-        return self.__data["os"]
-
-    @property
-    def os_version(self):
-        return self.__data.get("os.version")
-
-    @property
-    def os_features(self):
-        if self.__data.get("os.features"):
-            return self.__data["os.features"]
-        return []
-
-    @property
-    def variant(self):
-        return self.__data.get("variant")
 
     @property
     def config(self):
