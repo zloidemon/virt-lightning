@@ -146,20 +146,23 @@ class TestOCIIndexAux(unittest.TestCase):
         manifest = self.index.manifests[2]
         self.assertEqual(str(manifest.media_type), "application/xml")
 
+        #
+        # NOTE: self.id не используется, нужно что бы обойти B018
+        #
         with self.assertRaises(IndexError):
-            manifest.media_type.provider
+            self.id(manifest.media_type.provider)
 
         with self.assertRaises(IndexError):
-            manifest.media_type.subject
+            self.id(manifest.media_type.subject)
 
         with self.assertRaises(IndexError):
-            manifest.media_type.entry
+            self.id(manifest.media_type.entry)
 
         with self.assertRaises(IndexError):
-            manifest.media_type.extension
+            self.id(manifest.media_type.extension)
 
         with self.assertRaises(IndexError):
-            manifest.media_type.version
+            self.assertIsNotNone(manifest.media_type.version)
 
         self.assertGreater(manifest.size, 0)
         self.assertEqual(manifest.size, 7143)
