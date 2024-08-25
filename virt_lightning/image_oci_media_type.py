@@ -50,9 +50,7 @@ class OCIMediaType:
         self.__parsed = path.split(".")
 
     def is_oci(self):
-        if self.__data not in OCI_MEDIA_TYPES:
-            return False
-        return True
+        return self.__data not in OCI_MEDIA_TYPES
 
     @property
     def provider(self):
