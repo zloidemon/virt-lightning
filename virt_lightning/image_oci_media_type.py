@@ -49,6 +49,9 @@ class OCIMediaType:
 
         self.__parsed = path.split(".")
 
+    def is_oci(self):
+        return self.__data not in OCI_MEDIA_TYPES
+
     @property
     def provider(self):
         return ImageEnumProvider(self.__parsed[1])
