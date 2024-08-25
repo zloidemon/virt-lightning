@@ -27,6 +27,18 @@ class TestOCIMediaType(unittest.TestCase):
         self.layer_zstd = OCIMediaType(TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_LAYER_ZSTD)
         self.empty = OCIMediaType(TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_EMPTY)
 
+    def is_oci(self):
+        self.assertIsTrue(self.content_descriptor.is_oci())
+        self.assertIsTrue(self.oci_layout.is_oci())
+        self.assertIsTrue(self.image_index.is_oci())
+        self.assertIsTrue(self.image_manifest.is_oci())
+        self.assertIsTrue(self.image_config.is_oci())
+        self.assertIsTrue(self.layer.is_oci())
+        self.assertIsTrue(self.layer_gzip.is_oci())
+        self.assertIsTrue(self.layer_zstd.is_oci())
+        self.assertIsTrue(self.layer_empty.is_oci())
+        self.assertIsFalse(OCIMediaType("application/xml").is_oci())
+
     def test_content_descriptor(self):
         self.assertEqual(self.content_descriptor.version, "v1")
         self.assertEqual(self.content_descriptor.provider.value, "oci")
