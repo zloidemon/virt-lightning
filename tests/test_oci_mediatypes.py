@@ -1,5 +1,7 @@
 import unittest
+from pathlib import PosixPath
 
+from virt_lightning.image_oci_index import OCIIndex
 from virt_lightning.image_oci_media_type import OCIMediaType
 
 TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_CONTENT_DESCRIPTOR = "application/vnd.oci.descriptor.v1+json"
@@ -87,3 +89,28 @@ class TestOCIMediaType(unittest.TestCase):
         self.assertEqual(self.empty.subject.value, "empty")
         self.assertIsNone(self.empty.entry)
         self.assertEqual(self.empty.extension, "json")
+
+
+class TestOCIMediaTypeCustom(unittest.TestCase):
+    def setUp(self):
+        with PosixPath("tests/oci_data/image_index_aux.json").open() as fh:
+            self.index = OCIIndex(fh.read())
+
+    def test_str(self):
+        manifest = self.index.manifests[0]
+        self.assertIsNotNone(manifest.media_type)
+        self.assertEqual(
+            str(manifest.media_type),
+            TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_IMAGE_INDEX,
+        )
+        manifest = self.index.manifests[1]
+        self.assertIsNotNone(manifest.media_type)
+        self.assertEqual(
+            str(manifest.media_type),
+            TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_IMAGE_MANIFEST,
+        )
+        manifest = self.index.manifests[2]
+        self.assertIsNotNone(manifest.media_type)
+        self.assertEqual(str(manifest.media_type), "application/xml")
+        self.assertGreater(manifest.size, 0)
+        self.assertEqual(manifest.size, 7143)
