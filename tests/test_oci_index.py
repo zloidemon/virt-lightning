@@ -142,6 +142,38 @@ class TestOCIIndexAux(unittest.TestCase):
         self.assertListEqual(manifest.platform.os_features, [])
         self.assertIsNone(manifest.platform.variant)
 
+    def test_manifest_2(self):
+        manifest = self.index.manifests[2]
+        self.assertEqual(str(manifest.media_type), "application/xml")
+
+        with self.assertRaises(IndexError):
+            manifest.media_type.provider
+
+        with self.assertRaises(IndexError):
+            manifest.media_type.subject
+
+        with self.assertRaises(IndexError):
+            manifest.media_type.entry
+
+        with self.assertRaises(IndexError):
+            manifest.media_type.extension
+
+        with self.assertRaises(IndexError):
+            manifest.media_type.version
+
+        self.assertGreater(manifest.size, 0)
+        self.assertEqual(manifest.size, 7143)
+        valid_digest = (
+            "sha256",
+            "b3d63d132d21c3ff4c35a061adf23cf43da8ae054247e32faa95494d904a007e",
+        )
+        self.assertTupleEqual(manifest.digest, valid_digest)
+        valid_annotations = {
+            "org.freedesktop.specifications.metainfo.version": "1.0",
+            "org.freedesktop.specifications.metainfo.type": "AppStream",
+        }
+        self.assertDictEqual(manifest.annotations, valid_annotations)
+
     def test_subject(self):
         self.assertIsNone(self.index.subject)
 
