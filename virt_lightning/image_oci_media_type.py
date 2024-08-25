@@ -24,9 +24,23 @@ class ImageEnumEntry(Enum):
     manifest = "manifest"
 
 
+OCI_MEDIA_TYPES = [
+    "application/vnd.oci.descriptor.v1+json",
+    "application/vnd.oci.layout.header.v1+json",
+    "application/vnd.oci.image.index.v1+json",
+    "application/vnd.oci.image.manifest.v1+json",
+    "application/vnd.oci.image.config.v1+json",
+    "application/vnd.oci.image.layer.v1.tar",
+    "application/vnd.oci.image.layer.v1.tar+gzip",
+    "application/vnd.oci.image.layer.v1.tar+zstd",
+    "application/vnd.oci.empty.v1+json",
+]
+
+
 class OCIMediaType:
     def __init__(self, data):
         self.__aux = None
+        self.__data = data
 
         _, path = data.split("/")
 
@@ -81,9 +95,4 @@ class OCIMediaType:
                 raise Exception(f"unsupported type: {self.subject.value}")
 
     def __str__(self):
-        return (
-            "MediaType("
-            f"version={self.version},provider={self.provider.value},"
-            f"subject={self.subject.value},type={self.type.value}"
-            ")"
-        )
+        return self.__data
