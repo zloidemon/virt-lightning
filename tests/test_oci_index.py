@@ -1,3 +1,4 @@
+import json
 import unittest
 from pathlib import PosixPath
 
@@ -7,7 +8,7 @@ from virt_lightning.image_oci_index import OCIIndex
 class TestOCIIndex(unittest.TestCase):
     def setUp(self):
         with PosixPath("tests/oci_data/image_index.json").open() as fh:
-            self.index = OCIIndex(fh.read())
+            self.index = OCIIndex(json.loads(fh.read()))
 
     def test_schema_version(self):
         self.assertEqual(self.index.schema_version, 2)
@@ -43,7 +44,7 @@ class TestOCIIndex(unittest.TestCase):
 class TestOCIIndexMultiple(unittest.TestCase):
     def setUp(self):
         with PosixPath("tests/oci_data/image_index_multiple.json").open() as fh:
-            self.index = OCIIndex(fh.read())
+            self.index = OCIIndex(json.loads(fh.read()))
 
     def test_schema_version(self):
         self.assertEqual(self.index.schema_version, 2)
@@ -79,7 +80,7 @@ class TestOCIIndexMultiple(unittest.TestCase):
 class TestOCIIndexAux(unittest.TestCase):
     def setUp(self):
         with PosixPath("tests/oci_data/image_index_aux.json").open() as fh:
-            self.index = OCIIndex(fh.read())
+            self.index = OCIIndex(json.loads(fh.read()))
 
     def test_schema_version(self):
         self.assertEqual(self.index.schema_version, 2)

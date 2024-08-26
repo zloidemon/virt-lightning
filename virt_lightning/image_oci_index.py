@@ -1,5 +1,3 @@
-import json
-
 from virt_lightning.image_oci_annotations import OCI_IMAGE_ANNOTATIONS
 from virt_lightning.image_oci_content_descriptor import OCIContentDescriptor
 from virt_lightning.image_oci_media_type import OCIMediaType
@@ -25,7 +23,7 @@ class OCIIndexContentDescriptor(OCIContentDescriptor, OCIOSDescription):
 
 class OCIIndex:
     def __init__(self, data):
-        self.__data = json.loads(data)
+        self.__data = data
 
     @property
     def schema_version(self):
