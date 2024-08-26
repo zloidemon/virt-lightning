@@ -1,3 +1,4 @@
+import json
 import unittest
 from pathlib import PosixPath
 
@@ -106,7 +107,7 @@ class TestOCIMediaType(unittest.TestCase):
 class TestOCIMediaTypeCustom(unittest.TestCase):
     def setUp(self):
         with PosixPath("tests/oci_data/image_index_aux.json").open() as fh:
-            self.index = OCIIndex(fh.read())
+            self.index = OCIIndex(json.loads(fh.read()))
 
     def test_str(self):
         manifest = self.index.manifests[0]
