@@ -1,14 +1,13 @@
 import json
-import unittest
 import shutil
-import json
-import tempfile
 import tarfile
-
+import tempfile
+import unittest
 from pathlib import PosixPath
+
 from virt_lightning.image_oci_index import OCIIndex
-from virt_lightning.image_oci_manifest import OCIManifest
 from virt_lightning.image_oci_layout import OCIImageLayout
+from virt_lightning.image_oci_manifest import OCIManifest
 
 
 class TestOCITarImage(unittest.TestCase):
