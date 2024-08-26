@@ -1,0 +1,16 @@
+OCI_IMAGE_ANNOTATIONS = [
+    "org.opencontainers.image.created",
+    "org.opencontainers.image.authors",
+    "org.opencontainers.image.url",
+    "org.opencontainers.image.documentation",
+    "org.opencontainers.image.source",
+    "org.opencontainers.image.version",
+    "org.opencontainers.image.revision",
+    "org.opencontainers.image.vendor",
+    "org.opencontainers.image.licenses",
+    "org.opencontainers.image.ref.name",
+    "org.opencontainers.image.title",
+    "org.opencontainers.image.description",
+    "org.opencontainers.image.base.digest",
+    "org.opencontainers.image.base.name",
+]
