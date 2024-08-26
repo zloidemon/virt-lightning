@@ -1,3 +1,4 @@
+import json
 import unittest
 from pathlib import PosixPath
 
@@ -7,7 +8,7 @@ from virt_lightning.image_oci_index import OCIIndex
 class TestOCIAnnotationsIndexWithManifests(unittest.TestCase):
     def setUp(self):
         with PosixPath("tests/oci_data/image_index_aux.json").open() as fh:
-            self.index = OCIIndex(fh.read())
+            self.index = OCIIndex(json.loads(fh.read()))
 
     def test_annotations_index(self):
         self.assertEqual(
@@ -43,7 +44,7 @@ class TestOCIAnnotationsIndexWithManifests(unittest.TestCase):
 class TestOCIAnnotationsIndexWithCustom(unittest.TestCase):
     def setUp(self):
         with PosixPath("tests/oci_data/image_index_multiple.json").open() as fh:
-            self.index = OCIIndex(fh.read())
+            self.index = OCIIndex(json.loads(fh.read()))
 
     def test_annotations_index_custom(self):
         self.assertEqual(self.index.annotations["com.example.key1"], "value1")
@@ -53,7 +54,7 @@ class TestOCIAnnotationsIndexWithCustom(unittest.TestCase):
 class TestOCIAnnotationsIndexWithWrong(unittest.TestCase):
     def setUp(self):
         with PosixPath("tests/oci_data/image_index_wrong_annotations.json").open() as fh:
-            self.index = OCIIndex(fh.read())
+            self.index = OCIIndex(json.loads(fh.read()))
 
     def test_annotations_index_custom(self):
         self.assertEqual(self.index.annotations["com.example.key2"], "value2")

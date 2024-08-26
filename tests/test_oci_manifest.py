@@ -1,3 +1,4 @@
+import json
 import unittest
 from pathlib import PosixPath
 
@@ -7,7 +8,7 @@ from virt_lightning.image_oci_manifest import OCIManifest
 class TestOCIManifest(unittest.TestCase):
     def setUp(self):
         with PosixPath("tests/oci_data/image_manifest.json").open() as fh:
-            self.manifest = OCIManifest(fh.read())
+            self.manifest = OCIManifest(json.loads(fh.read()))
 
     def test_schema_version(self):
         self.assertEqual(self.manifest.schema_version, 2)
