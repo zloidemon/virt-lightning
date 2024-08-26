@@ -1,5 +1,6 @@
 import json
 
+from virt_lightning.image_oci_annotations import OCI_IMAGE_ANNOTATIONS
 from virt_lightning.image_oci_content_descriptor import OCIContentDescriptor
 from virt_lightning.image_oci_media_type import OCIMediaType
 from virt_lightning.image_oci_os import OCIOSDescription
@@ -50,7 +51,20 @@ class OCIIndex:
 
     @property
     def annotations(self):
-        return self.__data.get("annotations")
+        annotations = {}
+
+        #
+        # NOTE: Удалем все что не по спецификации для org.opencontainers
+        #
+        if self.__data.get("annotations"):
+            for key, value in self.__data.get("annotations").items():
+                match (key.startswith("org.opencontainers")):
+                    case True if key not in OCI_IMAGE_ANNOTATIONS:
+                        continue
+                    case _:
+                        annotations.update({key: value})
+
+        return annotations
 
     def __str__(self):
         return f"Index(schemaVersion={self.schema_version},mediaType={self.media_type})"
