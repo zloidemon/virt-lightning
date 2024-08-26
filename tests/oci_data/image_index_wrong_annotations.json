@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 2,
+  "mediaType": "application/vnd.oci.image.index.v1+json",
+  "manifests": [
+    {
+      "mediaType": "application/vnd.oci.image.index.v1+json",
+      "size": 7682,
+      "digest": "sha256:601570aaff1b68a61eb9c85b8beca1644e698003e0cdb5bce960f193d265a8b7",
+      "annotations": {
+        "org.opencontainers.image.wrong1": "wrong",
+        "com.example.key1": "value1"
+      }
+    }
+  ],
+  "annotations": {
+    "org.opencontainers.image.wrong2": "wrong",
+    "com.example.key2": "value2"
+  }
+}
