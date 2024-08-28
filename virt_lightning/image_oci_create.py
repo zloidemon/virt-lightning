@@ -3,6 +3,7 @@ import json
 import tarfile
 from pathlib import PosixPath
 
+from virt_lightning.image_oci_config import OCIConfigConfig
 from virt_lightning.image_oci_index import OCIIndex
 from virt_lightning.image_oci_manifest import OCIManifest
 from virt_lightning.image_oci_media_type import ImageEnumEntry
@@ -45,12 +46,18 @@ class OCIImageAssembly:
             self.__index_file = OCIIndex(json.loads(_data))
         return self.__index_file
 
-    def __validate_config(self, config):
-        if config.media_type.entry == ImageEnumEntry.config:
-            _config_algo, hsum = config.digest
+    def __validate_config(self, configfile):
+        if not configfile.media_type.is_oci():
+            return False
+
+        if configfile.media_type.entry == ImageEnumEntry.config:
+            _config_algo, hsum = configfile.digest
             _config_blob = self.__src / "blobs" / _config_algo / hsum
 
-            if _config_blob.stat().st_size != config.size:
+            if not _config_blob.exists() or not _config_blob.is_file():
+                return False
+
+            if _config_blob.stat().st_size != configfile.size:
                 return False
 
             _hsum, _config_data = self.__load_file(_config_blob, _config_algo)
@@ -58,7 +65,7 @@ class OCIImageAssembly:
             if _hsum != hsum:
                 return False
 
-            OCIManifest(json.loads(_config_data))
+            OCIConfigConfig(json.loads(_config_data))
             return True
         return False
 
@@ -88,6 +95,15 @@ class OCIImageAssembly:
         return self.__validate_config(_manifest.config)
 
     def validate(self):
+        if not self.__index.media_type.is_oci():
+            return False
+
+        if self.__index.media_type.entry != ImageEnumEntry.index:
+            return False
+
+        if len(self.__index.manifests) < 1:
+            return False
+
         return all(
             self.__validate_manifest(manifest) for manifest in self.__index.manifests
         )
@@ -99,14 +115,16 @@ class OCIImageAssembly:
         if not self.__dst:
             raise FileNotFoundError("export location not defined")
 
-        if not self.validate():
-            raise ValueError("invalid data to pack")
-
         if not self.__dst.exists():
             raise FileNotFoundError("not found location")
 
-        if filename.is_file():
+        if not self.validate():
+            raise ValueError("invalid data to pack")
+
+        image = self.__dst / filename
+
+        if image.is_file():
             raise FileExistsError("image already exists")
 
-        with tarfile.open(self.__dst / filename, mode="w:gz") as tar:
+        with tarfile.open(image, mode="w:gz") as tar:
             tar.add(self.__src, "/")
