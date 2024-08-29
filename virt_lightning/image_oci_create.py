@@ -112,6 +112,9 @@ class OCIImageAssembly:
         return self.__index
 
     def make(self, filename):
+        if not filename:
+            raise ValueError("invalid filename")
+
         if not self.__dst:
             raise FileNotFoundError("export location not defined")
 
