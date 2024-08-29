@@ -8,6 +8,7 @@ import tomllib
 from urllib.parse import urlparse
 
 from virt_lightning.cli_ansible import CLIAnsible
+from virt_lightning.cli_build import CLIBuild
 from virt_lightning.cli_config import CLIConfig
 from virt_lightning.cli_console import CLIConsole
 from virt_lightning.cli_down import CLIDown
@@ -113,6 +114,7 @@ def main():
     cli_builder = CLIBuilder.create()
 
     cli_builder.add_command(CLIAnsible)
+    cli_builder.add_command(CLIBuild)
     cli_builder.add_command(CLIConfig)
     cli_builder.add_command(CLIConsole)
     cli_builder.add_command(CLIDown)
@@ -165,6 +167,8 @@ def main():
             CLIDown.run(vmm, configuration=configuration, **vars(args))
         case "ps":
             CLIps.run(vmm, configuration=configuration)
+        case "build":
+            CLIBuild.run(vmm, configuration, args)
         case "config":
             CLIConfig.run(configuration)
         case "console":
