@@ -19,6 +19,10 @@ class TestOCIAssemblyImageMake(unittest.TestCase):
         )
         self.image_file = PosixPath(self.image_name + ".tar.gz")
 
+    def test_none_filename(self):
+        with self.assertRaises(ValueError):
+            self.assembly.make(None)
+
     def test_duplicate_write(self):
         self.assembly.make(self.image_file)
         with self.assertRaises(FileExistsError):
