@@ -5,6 +5,7 @@ class OCIImageBuild:
     def __init__(self, name):
         self.__name = name
         self.__labels = {}
+        self.__env = {}
         self.__ports = set({})
 
     # --keep-git-dir
@@ -35,6 +36,17 @@ class OCIImageBuild:
         return self
 
     def env(self, key, value):
+        if not isinstance(key, str):
+            raise TypeError("key must be string")
+
+        if len(key) == 0 or key == "":
+            raise ValueError("key must be none zero string")
+
+        if not isinstance(value, str):
+            raise TypeError("value must be string")
+
+        self.__env[key] = value
+
         return self
 
     def expose(self, port, protocol="tcp"):
