@@ -73,4 +73,4 @@ class ConfigurationHealthcheck(IConfigurationHealthcheck):
             return False
         if self.start_interval != other.start_interval:
             return False
-        return self.retries != other.retries
+        return self.retries == other.retries
