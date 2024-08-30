@@ -17,6 +17,4 @@ class Healthcheck(IHealthcheck):
     def __eq__(self, other):
         if self.command != other.command:
             return False
-        if self.configuration != other.configuration:
-            return False
-        return True
+        return self.configuration != other.configuration

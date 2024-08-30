@@ -1,6 +1,8 @@
 from pathlib import PosixPath
 
+from virt_lightning.configuration_healthcheck import ConfigurationHealthcheck
 from virt_lightning.consts import NetworkProtocolTCPIP
+from virt_lightning.healthcheck import Healthcheck
 
 
 class OCIImageBuild:
@@ -10,6 +12,7 @@ class OCIImageBuild:
         self.__env = {}
         self.__ports = set({})
         self.__volumes = set({})
+        self.__healthcheck = None
 
     # --keep-git-dir
     # --checksum
@@ -74,12 +77,35 @@ class OCIImageBuild:
     # def from(self):
     #    return self
 
-    # --interval=DURATION (default: 30s)
-    # --timeout=DURATION (default: 30s)
-    # --start-period=DURATION (default: 0s)
-    # --start-interval=DURATION (default: 5s)
-    # --retries=N (default: 3)
-    def healthcheck(self):
+    def healthcheck(
+        self, cmd, interval=30, timeout=30, start_period=0, start_interval=5, retries=3
+    ):
+        if self.__healthcheck:
+            raise KeyError("healthcheck already defined")
+
+        if not isinstance(cmd, str):
+            raise TypeError("cmd must be string to executable file")
+
+        if len(cmd) < 1 or cmd == "":
+            raise ValueError("cmd can not be empty string")
+
+        for option in [interval, timeout, start_period, start_interval, retries]:
+            if not isinstance(option, int):
+                raise TypeError("options healthcheck must be integers")
+
+            if option < 0:
+                raise ValueError("options can not be negative")
+
+        configuration = ConfigurationHealthcheck()
+
+        configuration.interval = interval
+        configuration.timeout = timeout
+        configuration.start_period = start_period
+        configuration.start_interval = start_interval
+        configuration.retries = retries
+
+        self.__healthcheck = Healthcheck(cmd, configuration)
+
         return self
 
     def label(self, key, value):
