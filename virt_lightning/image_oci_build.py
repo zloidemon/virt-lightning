@@ -1,3 +1,5 @@
+from pathlib import PosixPath
+
 from virt_lightning.consts import NetworkProtocolTCPIP
 
 
@@ -7,6 +9,7 @@ class OCIImageBuild:
         self.__labels = {}
         self.__env = {}
         self.__ports = set({})
+        self.__volumes = set({})
 
     # --keep-git-dir
     # --checksum
@@ -114,6 +117,17 @@ class OCIImageBuild:
         return self
 
     def volume(self, *args):
+        if len(args) < 1:
+            raise KeyError("must have more volumes in arguments")
+
+        for volume in args:
+            if not isinstance(volume, PosixPath):
+                raise TypeError("volume must be PosixPath")
+
+            if len(self.__volumes & set({volume})):
+                raise KeyError(f"volume '{str(volume)}': already defined")
+            else:
+                self.__volumes.update({volume})
         return self
 
     def workdir(self, path):
