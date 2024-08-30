@@ -143,4 +143,12 @@ class IConfigurationHealthcheck(metaclass=ABCMeta):
         pass
 
     def __repr__(self):
-        return f"ConfigurationHealthcheck(interval={self.internal})"
+        return (
+            "ConfigurationHealthcheck("
+            f"interval={self.interval},"
+            f"timeout={self.timeout},"
+            f"start_period={self.start_period},"
+            f"start_interval={self.start_interval},"
+            f"retries={self.retries}"
+            ")"
+        )
