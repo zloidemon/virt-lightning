@@ -13,6 +13,12 @@ class ExitCode(Enum):
     FAIL = 1
 
 
+@unique
+class NetworkProtocolTCPIP(Enum):
+    TCP = "tcp"
+    UDP = "udp"
+
+
 CLI_MESSAGE_HELP = """
 Example:
 

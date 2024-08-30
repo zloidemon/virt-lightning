@@ -1,7 +1,11 @@
+from virt_lightning.consts import NetworkProtocolTCPIP
+
+
 class OCIImageBuild:
     def __init__(self, name):
         self.__name = name
         self.__labels = {}
+        self.__ports = set({})
 
     # --keep-git-dir
     # --checksum
@@ -33,7 +37,22 @@ class OCIImageBuild:
     def env(self, key, value):
         return self
 
-    def expose(self, port, protocol):
+    def expose(self, port, protocol="tcp"):
+        _protocol = NetworkProtocolTCPIP(protocol)
+
+        if not isinstance(port, int):
+            raise TypeError("port must be integer in range 0 .. 65535")
+
+        if port < 0 or port > 65535:
+            raise ValueError("port is out of range 0 .. 65535")
+
+        record = f"{port}/{_protocol.value}"
+
+        if len(self.__ports & set({record})):
+            raise KeyError(f"{record}: already allocated")
+        else:
+            self.__ports.update({record})
+
         return self
 
     # --platform
