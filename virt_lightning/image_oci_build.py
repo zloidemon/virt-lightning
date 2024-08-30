@@ -13,6 +13,7 @@ class OCIImageBuild:
         self.__ports = set({})
         self.__volumes = set({})
         self.__healthcheck = None
+        self.__workdir = None
 
     # --keep-git-dir
     # --checksum
@@ -157,4 +158,14 @@ class OCIImageBuild:
         return self
 
     def workdir(self, path):
+        if not isinstance(path, PosixPath):
+            raise TypeError("workdir must be PosixPath")
+        if self.__workdir:
+            self.__workdir = self.__workdir / path
+        else:
+            if path.root == "/":
+                self.__workdir = path
+            else:
+                raise ValueError("workdir must starts with '/'")
+
         return self
