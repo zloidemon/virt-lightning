@@ -1,6 +1,6 @@
 import unittest
-
 from pathlib import PosixPath
+
 from virt_lightning.image_oci_build import OCIImageBuild
 
 
