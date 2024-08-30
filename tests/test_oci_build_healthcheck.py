@@ -1,15 +1,15 @@
 import unittest
 
-from virt_lightning.image_oci_build import OCIImageBuild
 from virt_lightning.configuration_healthcheck import ConfigurationHealthcheck
 from virt_lightning.healthcheck import Healthcheck
+from virt_lightning.image_oci_build import OCIImageBuild
 
 
 class TestOCIBuildImageHealthcheck(unittest.TestCase):
     def setUp(self):
         self.image_name = "test"
         self.builder = OCIImageBuild(self.image_name)
-        self.default_config = ConfigurationHealthcheck(30, 30, 0, 5, 3)
+        self.default_config = ConfigurationHealthcheck()
 
     def test_valid(self):
         self.builder.healthcheck("true")
