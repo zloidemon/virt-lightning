@@ -95,11 +95,11 @@ class ConfigurationLoadFile(IConfigurationSource):
 
     @property
     def user(self):
-        return ConfigurationPosixUser(
-            consts.DEFAULT_USER_USERNAME,
-            self.__get("root_password"),
-            ConfigurationLoginSSH(self.__get("ssh_key_file")),
-        )
+        config_user = ConfigurationPosixUser()
+        config_user.username = consts.DEFAULT_USER_USERNAME
+        config_user.password = self.__get("root_password")
+        config_user.login = ConfigurationLoginSSH(self.__get("ssh_key_file"))
+        return config_user
 
     @property
     def registry(self):
