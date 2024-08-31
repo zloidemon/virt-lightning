@@ -16,7 +16,7 @@ class ConfigurationPosixUser(IConfigurationPosixUser):
 
     @property
     def uid(self):
-        if not self.__uid:
+        if self.__uid is None:
             raise TypeError("uid must be set integer value")
         return self.__uid
 
@@ -32,7 +32,7 @@ class ConfigurationPosixUser(IConfigurationPosixUser):
 
     @property
     def gid(self):
-        if not self.__gid:
+        if self.__gid is None:
             raise TypeError("gid must be set integer value")
         return self.__gid
 
@@ -48,24 +48,36 @@ class ConfigurationPosixUser(IConfigurationPosixUser):
 
     @property
     def username(self):
+        if self.__username is None:
+            raise TypeError("username must be set string value")
         return self.__username
 
     @username.setter
     def username(self, value):
         if not isinstance(value, str):
             raise TypeError("username must be string value")
+        if len(value) < 1 or value == "":
+            raise ValueError("username can not be empty")
         self.__username = value
 
     @property
     def password(self):
+        if self.__password is None:
+            raise TypeError("password must be set string value")
         return self.__password
 
     @password.setter
     def password(self, value):
         if not isinstance(value, str):
             raise TypeError("password must be string value")
+        if len(value) < 1 or value == "":
+            raise ValueError("password can not be empty")
         self.__password = value
 
+    #
+    # FIXME: Убрать login куда-то в другое место. Лучше использовать как один из
+    #        вариантов методов авторизации
+    #
     @property
     def login(self):
         return self.__login
