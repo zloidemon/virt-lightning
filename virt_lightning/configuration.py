@@ -7,9 +7,9 @@ from virt_lightning.iconfiguration import (
     IConfigurationBuilder,
     IConfigurationLogin,
     IConfigurationNetworkModel,
+    IConfigurationPosixUser,
     IConfigurationRegistry,
     IConfigurationSource,
-    IConfigurationUnixUser,
 )
 
 
@@ -95,7 +95,7 @@ class ConfigurationLoadFile(IConfigurationSource):
 
     @property
     def user(self):
-        return ConfigurationUnixUser(
+        return ConfigurationPosixUser(
             consts.DEFAULT_USER_USERNAME,
             self.__get("root_password"),
             ConfigurationLoginSSH(self.__get("ssh_key_file")),
@@ -133,7 +133,7 @@ class ConfigurationLoginSSH(IConfigurationLogin):
         return self.__filename
 
 
-class ConfigurationUnixUser(IConfigurationUnixUser):
+class ConfigurationPosixUser(IConfigurationPosixUser):
     #
     # NOTE: В login на самом деле стоит сделать не только SSH, а и другое
     #       либо несколько, используя список
@@ -142,6 +142,14 @@ class ConfigurationUnixUser(IConfigurationUnixUser):
         self.__username = username
         self.__password = password
         self.__login = login
+
+    @property
+    def uid(self):
+        return None
+
+    @property
+    def gid(self):
+        return None
 
     @property
     def username(self):

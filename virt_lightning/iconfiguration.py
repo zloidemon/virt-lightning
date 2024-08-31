@@ -47,9 +47,17 @@ class IConfigurationSource(metaclass=ABCMeta):
 
 
 #
-# Пользователь с параметрами для UNIX
+# Пользователь с параметрами для POSIX
 #
-class IConfigurationUnixUser(metaclass=ABCMeta):
+class IConfigurationPosixUser(metaclass=ABCMeta):
+    @abstractproperty
+    def uid(self):
+        pass
+
+    @abstractproperty
+    def gid(self):
+        pass
+
     @abstractproperty
     def username(self):
         pass
