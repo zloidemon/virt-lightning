@@ -7,8 +7,8 @@ from virt_lightning.healthcheck import Healthcheck
 
 
 class OCIImageBuild:
-    def __init__(self, name):
-        self.__name = name
+    def __init__(self, image):
+        self.__image = image
         self.__labels = {}
         self.__env = {}
         self.__ports = set({})
@@ -136,7 +136,8 @@ class OCIImageBuild:
             raise KeyError(f"'{key}' already exists with value: '{self.__labels[key]}'")
         return self
 
-    def onbuilt(self, callback):
+    def onbuilt(self, callback, *args):
+        callback(*args)
         return self
 
     # --mount
