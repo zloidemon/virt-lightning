@@ -18,7 +18,7 @@ class ConfigurationPosixUser(IConfigurationPosixUser):
     @property
     def uid(self):
         if self.__uid is None:
-            raise TypeError("uid must be set integer value")
+            raise AttributeError("uid must be set before use")
         return self.__uid
 
     @uid.setter
@@ -34,7 +34,7 @@ class ConfigurationPosixUser(IConfigurationPosixUser):
     @property
     def gid(self):
         if self.__gid is None:
-            raise TypeError("gid must be set integer value")
+            raise AttributeError("gid must be set before use")
         return self.__gid
 
     @gid.setter
@@ -50,7 +50,7 @@ class ConfigurationPosixUser(IConfigurationPosixUser):
     @property
     def username(self):
         if self.__username is None:
-            raise TypeError("username must be set string value")
+            raise AttributeError("username must be set before use")
         return self.__username
 
     @username.setter
@@ -64,7 +64,7 @@ class ConfigurationPosixUser(IConfigurationPosixUser):
     @property
     def groupname(self):
         if self.__groupname is None:
-            raise TypeError("groupname must be set string value")
+            raise AttributeError("groupname must be set before use")
         return self.__groupname
 
     @groupname.setter
@@ -78,7 +78,7 @@ class ConfigurationPosixUser(IConfigurationPosixUser):
     @property
     def password(self):
         if self.__password is None:
-            raise TypeError("password must be set string value")
+            raise AttributeError("password must be set before use")
         return self.__password
 
     @password.setter
@@ -100,3 +100,16 @@ class ConfigurationPosixUser(IConfigurationPosixUser):
     @login.setter
     def login(self, value):
         self.__login = value
+
+    def __eq__(self, other):
+        if self.__username != other.username:
+            return False
+        if self.__groupname != other.groupname:
+            return False
+        if self.__password != other.password:
+            return False
+        if self.__uid != other.uid:
+            return False
+        if self.__gid != other.gid:
+            return False
+        return self.__login == other.login
