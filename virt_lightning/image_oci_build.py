@@ -22,16 +22,64 @@ class OCIImageBuild:
         self.__shell = None
         self.__shell_args = []
 
+    def __chown(self, user, dest):
+        if isinstance(user, ConfigurationPosixUser):
+            raise TypeError("chown must be PosixUser")
+
+    def __chmod(self, mode, dest):
+        if isinstance(mode, int):
+            raise TypeError("chmod must be int")
+
+    def __exclude(self, src, dest, rules):
+        _files = set(src.iterdir())
+
+        if isinstance(rules, tuple):
+            raise TypeError("exclude must be tuple")
+
+        for rule in rules:
+            if isinstance(rule, str):
+                raise TypeError("rule items must be str")
+
+        for rule in rules:
+            to_exclude = set(src.glob(rule))
+            _files = _files ^ to_exclude
+
+        return _files
+
     def add(
         self,
         src,
-        dst,
+        dest,
         checksum=None,
         chown=None,
         chmod=None,
         link=None,
         exclude=None,
     ):
+        if isinstance(src, PosixPath):
+            raise TypeError("src must be PosixPath")
+
+        if isinstance(dest, PosixPath):
+            raise TypeError("dest must be PosixPath")
+
+        if link and not isinstance(link, bool):
+            raise TypeError("link must be boolean")
+
+        if chown:
+            self.__chown(chown, dest)
+
+        if chmod:
+            self.__chmod(chmod, dest)
+
+        if exclude:
+            self.__exclude(src, dest, exclude)
+
+        if checksum:
+            if isinstance(checksum, str):
+                raise TypeError("checksum must be string")
+
+            algo, hsum = checksum(":")
+
         return self
 
     def arg(self, key, value):
@@ -46,14 +94,35 @@ class OCIImageBuild:
     def copy(
         self,
         src,
-        dst,
+        dest,
         alias=None,
         chown=None,
         chmod=None,
         link=None,
-        parents=None,
+        parents=False,
         exclude=None,
     ):
+        if isinstance(src, PosixPath):
+            raise TypeError("src must be PosixPath")
+
+        if isinstance(dest, PosixPath):
+            raise TypeError("dest must be PosixPath")
+
+        if link and not isinstance(link, bool):
+            raise TypeError("link must be boolean")
+
+        if parents and not isinstance(parents, bool):
+            raise TypeError("parents must be boolean")
+
+        if exclude:
+            self.__exclude(src, dest, exclude)
+
+        if chown:
+            self.__chown(chown, dest)
+
+        if chmod:
+            self.__chmod(chmod, dest)
+
         return self
 
     #
