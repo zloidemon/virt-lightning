@@ -82,5 +82,5 @@ def config_file(tmp_path):
 
     config_file = d / "my_inifile.ini"
     config_file.write_text(DEFAULT_INI)
-    config_file.write(f"ssh_key_file={ssh_key}")
+    config_file.write_text(f"ssh_key_file={ssh_key}")
     return urlparse(config_file.absolute().as_posix())
