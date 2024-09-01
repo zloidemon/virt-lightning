@@ -13,7 +13,7 @@ def test_default(monkeypatch):
 
         if not config_file.exists():
             with config_file.open("w") as fh:
-                fh.write()
+                fh.write("empty")
 
         m.setattr(virt_lightning.consts, "DEFAULT_CONFIGFILE", urlparse("a"))
         config = virt_lightning.configuration.ProxyLegacyConfiguration(
