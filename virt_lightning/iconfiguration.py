@@ -63,6 +63,10 @@ class IConfigurationPosixUser(metaclass=ABCMeta):
         pass
 
     @abstractproperty
+    def groupname(self):
+        pass
+
+    @abstractproperty
     def password(self):
         pass
 
@@ -71,7 +75,12 @@ class IConfigurationPosixUser(metaclass=ABCMeta):
         pass
 
     def __repr__(self):
-        return f"ConfigurationUnixUser({self.username})"
+        return (
+            "ConfigurationUnixUser("
+            f"username={self.username},"
+            f"groupname={self.groupname}"
+            ")"
+        )
 
 
 #

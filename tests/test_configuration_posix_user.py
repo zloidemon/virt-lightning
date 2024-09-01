@@ -89,6 +89,30 @@ class TestConfigurationPosixUser(unittest.TestCase):
             self.config.username = 1.0
 
     #
+    # FIXME: groupname тесты на самом деле такие же как и для username, но могут
+    #        быть иными после добавления проверок передаваемых символов
+    #
+    def test_groupname_valid(self):
+        self.config.groupname = "hello"
+        self.assertEqual(self.config.groupname, self.config._ConfigurationPosixUser__groupname)
+
+    def test_groupname_get_empty(self):
+        with self.assertRaises(TypeError):
+            self.assertEqual(self.config.groupname, None)
+
+    def test_groupname_set_empty(self):
+        with self.assertRaises(ValueError):
+            self.config.groupname = ""
+
+    def test_groupname_wrong_type(self):
+        with self.assertRaises(TypeError):
+            self.config.groupname = None
+        with self.assertRaises(TypeError):
+            self.config.groupname = 1234
+        with self.assertRaises(TypeError):
+            self.config.groupname = 1.0
+
+    #
     # FIXME: password тесты на самом деле такие же как и для username, но могут
     #        быть иными после добавления проверок передаваемых символов
     #
