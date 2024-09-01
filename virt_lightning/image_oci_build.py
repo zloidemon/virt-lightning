@@ -214,7 +214,21 @@ class OCIImageBuild:
         callback(*args)
         return self
 
-    def run(self, command, mount=None, network=None, security=None):
+    def run(self, commands, mount=None, network=None, security=None):
+        if mount:
+            raise NotImplementedError("implement later")
+        if network:
+            raise NotImplementedError("implement later")
+        if security:
+            raise NotImplementedError("implement later")
+
+        if not isinstance(commands, tuple):
+            raise TypeError("commands must be tuple of commands")
+
+        for command in commands:
+            if not isinstance(command, str):
+                raise TypeError("command must be string")
+
         return self
 
     def shell(self, filename, *args):
