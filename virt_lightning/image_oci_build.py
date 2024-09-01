@@ -22,13 +22,16 @@ class OCIImageBuild:
         self.__shell = None
         self.__shell_args = []
 
-    # --keep-git-dir
-    # --checksum
-    # --chown
-    # --chmod
-    # --link
-    # --exclude
-    def add(self, src, dst):
+    def add(
+        self,
+        src,
+        dst,
+        checksum=None,
+        chown=None,
+        chmod=None,
+        link=None,
+        exclude=None,
+    ):
         return self
 
     def arg(self, key, value):
@@ -40,13 +43,17 @@ class OCIImageBuild:
     def cmd(self, *args):
         raise NotImplementedError("not known how it should work")
 
-    # --from
-    # --chown
-    # --chmod
-    # --link
-    # --parents
-    # --exclude
-    def copy(self, src, dst):
+    def copy(
+        self,
+        src,
+        dst,
+        alias=None,
+        chown=None,
+        chmod=None,
+        link=None,
+        parents=None,
+        exclude=None,
+    ):
         return self
 
     #
