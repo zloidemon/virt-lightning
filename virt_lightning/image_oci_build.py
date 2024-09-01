@@ -1,9 +1,9 @@
 from pathlib import PosixPath
 
 from virt_lightning.configuration_healthcheck import ConfigurationHealthcheck
+from virt_lightning.configuration_posix_user import ConfigurationPosixUser
 from virt_lightning.consts import NetworkProtocolTCPIP
 from virt_lightning.healthcheck import Healthcheck
-from virt_lightning.configuration_posix_user import ConfigurationPosixUser
 
 
 class OCIImageBuild:

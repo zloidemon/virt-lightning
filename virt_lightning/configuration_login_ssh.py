@@ -1,6 +1,6 @@
 from pathlib import PosixPath
-from virt_lightning import consts
 
+from virt_lightning import consts
 from virt_lightning.iconfiguration import IConfigurationLogin
 
 
