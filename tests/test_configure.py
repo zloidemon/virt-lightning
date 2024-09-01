@@ -12,6 +12,8 @@ def test_default(monkeypatch):
         ).expanduser()
 
         if not config_file.exists():
+            if not config_file.parents[0].exists():
+                config_file.parents[0].mkdir()
             config_file.touch()
 
         m.setattr(virt_lightning.consts, "DEFAULT_CONFIGFILE", urlparse("a"))
