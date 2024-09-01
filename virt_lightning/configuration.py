@@ -2,14 +2,14 @@ import pathlib
 import tomllib
 
 from virt_lightning import consts
+from virt_lightning.configuration_login_ssh import ConfigurationLoginSSH
+from virt_lightning.configuration_posix_user import ConfigurationPosixUser
 from virt_lightning.iconfiguration import (
     IConfigurationBackend,
     IConfigurationBuilder,
-    IConfigurationLogin,
     IConfigurationNetworkModel,
     IConfigurationRegistry,
     IConfigurationSource,
-    IConfigurationUnixUser,
 )
 
 
@@ -95,11 +95,15 @@ class ConfigurationLoadFile(IConfigurationSource):
 
     @property
     def user(self):
-        return ConfigurationUnixUser(
-            consts.DEFAULT_USER_USERNAME,
-            self.__get("root_password"),
-            ConfigurationLoginSSH(self.__get("ssh_key_file")),
-        )
+        ssh_login = ConfigurationLoginSSH()
+        ssh_login.key = pathlib.PosixPath(self.__get("ssh_key_file"))
+
+        config_user = ConfigurationPosixUser()
+        config_user.username = consts.DEFAULT_USER_USERNAME
+        config_user.password = self.__get("root_password")
+
+        config_user.login = ssh_login
+        return config_user
 
     @property
     def registry(self):
@@ -118,42 +122,6 @@ class ConfigurationLoadFile(IConfigurationSource):
         registries.append(ConfigurationRegistry(path))
 
         return registries
-
-
-class ConfigurationLoginSSH(IConfigurationLogin):
-    def __init__(self, filename):
-        self.__filename = filename
-
-    @property
-    def method(self):
-        return consts.LoginMethod.SSH
-
-    @property
-    def key(self):
-        return self.__filename
-
-
-class ConfigurationUnixUser(IConfigurationUnixUser):
-    #
-    # NOTE: В login на самом деле стоит сделать не только SSH, а и другое
-    #       либо несколько, используя список
-    #
-    def __init__(self, username, password, login):
-        self.__username = username
-        self.__password = password
-        self.__login = login
-
-    @property
-    def username(self):
-        return self.__username
-
-    @property
-    def password(self):
-        return self.__password
-
-    @property
-    def login(self):
-        return self.__login
 
 
 class ConfigurationRegistry(IConfigurationRegistry):

@@ -73,6 +73,13 @@ def storage_dir(tmp_path):
 def config_file(tmp_path):
     d = tmp_path / "sub"
     d.mkdir()
+
+    ssh_key = d / "id_rsa.pub"
+
+    if not ssh_key.is_file():
+        with ssh_key.open("w") as fh:
+            fh.write("empty")
+
     config_file = d / "my_inifile.ini"
-    config_file.write_text(DEFAULT_INI)
+    config_file.write_text(DEFAULT_INI + "\n" + f'ssh_key_file="{ssh_key}"')
     return urlparse(config_file.absolute().as_posix())
