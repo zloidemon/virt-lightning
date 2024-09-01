@@ -2,7 +2,7 @@ from pathlib import PosixPath
 
 from virt_lightning.configuration_healthcheck import ConfigurationHealthcheck
 from virt_lightning.configuration_posix_user import ConfigurationPosixUser
-from virt_lightning.consts import NetworkProtocolTCPIP
+from virt_lightning.consts import NetworkProtocolTCPIP, SignalShutdown
 from virt_lightning.healthcheck import Healthcheck
 
 
@@ -16,6 +16,7 @@ class OCIImageBuild:
         self.__healthcheck = None
         self.__workdir = None
         self.__user = None
+        self.__stopsignal = None
 
     # --keep-git-dir
     # --checksum
@@ -140,6 +141,14 @@ class OCIImageBuild:
         return self
 
     def stopsignal(self, signal):
+        if not isinstance(signal, SignalShutdown):
+            raise TypeError("stop signal must be SignalShutdown")
+
+        if self.__stopsignal:
+            raise KeyError(f"stop signal {self.__stopsignal.value} already defined")
+
+        self.__stopsignal = signal
+
         return self
 
     def user(self, user):
