@@ -7,8 +7,10 @@ from virt_lightning.healthcheck import Healthcheck
 
 
 class OCIImageBuild:
-    def __init__(self, image):
+    def __init__(self, image, platform=None, alias=None):
         self.__image = image
+        self.__platform = platform
+        self.__alias = alias
         self.__labels = {}
         self.__env = {}
         self.__ports = set({})
