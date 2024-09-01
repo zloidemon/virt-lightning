@@ -17,6 +17,8 @@ class OCIImageBuild:
         self.__workdir = None
         self.__user = None
         self.__stopsignal = None
+        self.__shell = None
+        self.__shell_args = []
 
     # --keep-git-dir
     # --checksum
@@ -144,6 +146,20 @@ class OCIImageBuild:
         return self
 
     def shell(self, filename, *args):
+        if not isinstance(filename, PosixPath):
+            raise TypeError("filename must be PosixPath")
+
+        self.__shell = filename
+
+        for arg in args:
+            if not isinstance(arg, str):
+                raise TypeError("arguments must be string")
+
+            if arg != "":
+                self.__shell_args.append(arg)
+            else:
+                continue
+
         return self
 
     def stopsignal(self, signal):
