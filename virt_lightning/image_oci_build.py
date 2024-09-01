@@ -30,8 +30,11 @@ class OCIImageBuild:
     def arg(self, key, value):
         return self
 
+    #
+    # FIXME: Подумать как это сделать, а может и не нужно
+    #
     def cmd(self, *args):
-        return self
+        raise NotImplementedError("not known how it should work")
 
     # --from
     # --chown
@@ -42,8 +45,11 @@ class OCIImageBuild:
     def copy(self, src, dst):
         return self
 
+    #
+    # FIXME: Подумать как это сделать, а может и не нужно
+    #
     def entrypoint(self, entry):
-        return self
+        raise NotImplementedError("not known how it should work")
 
     def env(self, key, value):
         if not isinstance(key, str):
