@@ -145,10 +145,7 @@ class OCIImageBuild:
         callback(*args)
         return self
 
-    # --mount
-    # --network
-    # --security
-    def run(self):
+    def run(self, command, mount=None, network=None, security=None):
         return self
 
     def shell(self, filename, *args):
