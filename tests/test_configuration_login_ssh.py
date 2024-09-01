@@ -1,11 +1,10 @@
-import unittest
-import tempfile
 import shutil
-
+import tempfile
+import unittest
 from pathlib import PosixPath
 
-from virt_lightning.consts import LoginMethod
 from virt_lightning.configuration_login_ssh import ConfigurationLoginSSH
+from virt_lightning.consts import LoginMethod
 
 
 class TestConfigurationLoginSSH(unittest.TestCase):

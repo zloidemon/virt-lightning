@@ -1,7 +1,7 @@
 import unittest
 
-from virt_lightning.image_oci_build import OCIImageBuild
 from virt_lightning.configuration_posix_user import ConfigurationPosixUser
+from virt_lightning.image_oci_build import OCIImageBuild
 
 
 class TestOCIBuildImageUser(unittest.TestCase):
