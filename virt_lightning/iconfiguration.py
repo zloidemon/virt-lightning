@@ -47,11 +47,23 @@ class IConfigurationSource(metaclass=ABCMeta):
 
 
 #
-# Пользователь с параметрами для UNIX
+# Пользователь с параметрами для POSIX
 #
-class IConfigurationUnixUser(metaclass=ABCMeta):
+class IConfigurationPosixUser(metaclass=ABCMeta):
+    @abstractproperty
+    def uid(self):
+        pass
+
+    @abstractproperty
+    def gid(self):
+        pass
+
     @abstractproperty
     def username(self):
+        pass
+
+    @abstractproperty
+    def groupname(self):
         pass
 
     @abstractproperty
@@ -63,7 +75,12 @@ class IConfigurationUnixUser(metaclass=ABCMeta):
         pass
 
     def __repr__(self):
-        return f"ConfigurationUnixUser({self.username})"
+        return (
+            "ConfigurationUnixUser("
+            f"username={self.username},"
+            f"groupname={self.groupname}"
+            ")"
+        )
 
 
 #
@@ -116,3 +133,39 @@ class IConfigurationRegistry(metaclass=ABCMeta):
 
     def __repr__(self):
         return f"ConfigurationRegistry({self.entrypoint})"
+
+
+#
+# Интерфейс конфигурации для проверок доступности
+#
+class IConfigurationHealthcheck(metaclass=ABCMeta):
+    @abstractproperty
+    def interval(self):
+        pass
+
+    @abstractproperty
+    def timeout(self):
+        pass
+
+    @abstractproperty
+    def start_period(self):
+        pass
+
+    @abstractproperty
+    def start_interval(self):
+        pass
+
+    @abstractproperty
+    def retries(self):
+        pass
+
+    def __repr__(self):
+        return (
+            "ConfigurationHealthcheck("
+            f"interval={self.interval},"
+            f"timeout={self.timeout},"
+            f"start_period={self.start_period},"
+            f"start_interval={self.start_interval},"
+            f"retries={self.retries}"
+            ")"
+        )

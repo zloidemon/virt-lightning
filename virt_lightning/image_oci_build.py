@@ -1,0 +1,295 @@
+from pathlib import PosixPath
+
+from virt_lightning.configuration_healthcheck import ConfigurationHealthcheck
+from virt_lightning.configuration_posix_user import ConfigurationPosixUser
+from virt_lightning.consts import NetworkProtocolTCPIP, SignalShutdown
+from virt_lightning.healthcheck import Healthcheck
+
+
+class OCIImageBuild:
+    def __init__(self, image, platform=None, alias=None):
+        self.__image = image
+        self.__platform = platform
+        self.__alias = alias
+        self.__labels = {}
+        self.__env = {}
+        self.__ports = set({})
+        self.__volumes = set({})
+        self.__healthcheck = None
+        self.__workdir = None
+        self.__user = None
+        self.__stopsignal = None
+        self.__shell = None
+        self.__shell_args = []
+
+    def __chown(self, user, dest):
+        if isinstance(user, ConfigurationPosixUser):
+            raise TypeError("chown must be PosixUser")
+
+    def __chmod(self, mode, dest):
+        if isinstance(mode, int):
+            raise TypeError("chmod must be int")
+
+    def __exclude(self, src, dest, rules):
+        _files = set(src.iterdir())
+
+        if isinstance(rules, tuple):
+            raise TypeError("exclude must be tuple")
+
+        for rule in rules:
+            if isinstance(rule, str):
+                raise TypeError("rule items must be str")
+
+        for rule in rules:
+            to_exclude = set(src.glob(rule))
+            _files = _files ^ to_exclude
+
+        return _files
+
+    def add(
+        self,
+        src,
+        dest,
+        checksum=None,
+        chown=None,
+        chmod=None,
+        link=None,
+        exclude=None,
+    ):
+        if isinstance(src, PosixPath):
+            raise TypeError("src must be PosixPath")
+
+        if isinstance(dest, PosixPath):
+            raise TypeError("dest must be PosixPath")
+
+        if link and not isinstance(link, bool):
+            raise TypeError("link must be boolean")
+
+        if chown:
+            self.__chown(chown, dest)
+
+        if chmod:
+            self.__chmod(chmod, dest)
+
+        if exclude:
+            self.__exclude(src, dest, exclude)
+
+        if checksum:
+            if isinstance(checksum, str):
+                raise TypeError("checksum must be string")
+
+            algo, hsum = checksum(":")
+
+        return self
+
+    def arg(self, key, value):
+        return self
+
+    #
+    # FIXME: Подумать как это сделать, а может и не нужно
+    #
+    def cmd(self, *args):
+        raise NotImplementedError("not known how it should work")
+
+    def copy(
+        self,
+        src,
+        dest,
+        alias=None,
+        chown=None,
+        chmod=None,
+        link=None,
+        parents=False,
+        exclude=None,
+    ):
+        if isinstance(src, PosixPath):
+            raise TypeError("src must be PosixPath")
+
+        if isinstance(dest, PosixPath):
+            raise TypeError("dest must be PosixPath")
+
+        if link and not isinstance(link, bool):
+            raise TypeError("link must be boolean")
+
+        if parents and not isinstance(parents, bool):
+            raise TypeError("parents must be boolean")
+
+        if exclude:
+            self.__exclude(src, dest, exclude)
+
+        if chown:
+            self.__chown(chown, dest)
+
+        if chmod:
+            self.__chmod(chmod, dest)
+
+        return self
+
+    #
+    # FIXME: Подумать как это сделать, а может и не нужно
+    #
+    def entrypoint(self, entry):
+        raise NotImplementedError("not known how it should work")
+
+    def env(self, key, value):
+        if not isinstance(key, str):
+            raise TypeError("key must be string")
+
+        if len(key) == 0 or key == "":
+            raise ValueError("key must be none zero string")
+
+        if not isinstance(value, str):
+            raise TypeError("value must be string")
+
+        self.__env[key] = value
+
+        return self
+
+    def expose(self, port, protocol="tcp"):
+        _protocol = NetworkProtocolTCPIP(protocol)
+
+        if not isinstance(port, int):
+            raise TypeError("port must be integer in range 0 .. 65535")
+
+        if port < 0 or port > 65535:
+            raise ValueError("port is out of range 0 .. 65535")
+
+        record = f"{port}/{_protocol.value}"
+
+        if len(self.__ports & set({record})):
+            raise KeyError(f"{record}: already allocated")
+        else:
+            self.__ports.update({record})
+
+        return self
+
+    def healthcheck(
+        self, cmd, interval=30, timeout=30, start_period=0, start_interval=5, retries=3
+    ):
+        if self.__healthcheck:
+            raise KeyError("healthcheck already defined")
+
+        if not isinstance(cmd, str):
+            raise TypeError("cmd must be string to executable file")
+
+        if len(cmd) < 1 or cmd == "":
+            raise ValueError("cmd can not be empty string")
+
+        for option in [interval, timeout, start_period, start_interval, retries]:
+            if not isinstance(option, int):
+                raise TypeError("options healthcheck must be integers")
+
+            if option < 0:
+                raise ValueError("options can not be negative")
+
+        configuration = ConfigurationHealthcheck()
+
+        configuration.interval = interval
+        configuration.timeout = timeout
+        configuration.start_period = start_period
+        configuration.start_interval = start_interval
+        configuration.retries = retries
+
+        self.__healthcheck = Healthcheck(cmd, configuration)
+
+        return self
+
+    def label(self, key, value):
+        if not isinstance(key, str):
+            raise TypeError("key must be string")
+
+        if len(key) == 0 or key == "":
+            raise ValueError("key must be none zero string")
+
+        if not isinstance(value, str):
+            raise TypeError("value must be string")
+
+        if not self.__labels.get(key, None):
+            self.__labels[key] = value
+        else:
+            raise KeyError(f"'{key}' already exists with value: '{self.__labels[key]}'")
+        return self
+
+    def onbuilt(self, callback, *args):
+        callback(*args)
+        return self
+
+    def run(self, commands, mount=None, network=None, security=None):
+        if mount:
+            raise NotImplementedError("implement later")
+        if network:
+            raise NotImplementedError("implement later")
+        if security:
+            raise NotImplementedError("implement later")
+
+        if not isinstance(commands, tuple):
+            raise TypeError("commands must be tuple of commands")
+
+        for command in commands:
+            if not isinstance(command, str):
+                raise TypeError("command must be string")
+
+        return self
+
+    def shell(self, filename, *args):
+        if not isinstance(filename, PosixPath):
+            raise TypeError("filename must be PosixPath")
+
+        self.__shell = filename
+
+        for arg in args:
+            if not isinstance(arg, str):
+                raise TypeError("arguments must be string")
+
+            if arg != "":
+                self.__shell_args.append(arg)
+            else:
+                continue
+
+        return self
+
+    def stopsignal(self, signal):
+        if not isinstance(signal, SignalShutdown):
+            raise TypeError("stop signal must be SignalShutdown")
+
+        if self.__stopsignal:
+            raise KeyError(f"stop signal {self.__stopsignal.value} already defined")
+
+        self.__stopsignal = signal
+
+        return self
+
+    def user(self, user):
+        if not isinstance(user, ConfigurationPosixUser):
+            raise TypeError("user must be ConfigurationPosixUser")
+
+        self.__user = user
+
+        return self
+
+    def volume(self, *args):
+        if len(args) < 1:
+            raise KeyError("must have more volumes in arguments")
+
+        for volume in args:
+            if not isinstance(volume, PosixPath):
+                raise TypeError("volume must be PosixPath")
+
+            if len(self.__volumes & set({volume})):
+                raise KeyError(f"volume '{str(volume)}': already defined")
+            else:
+                self.__volumes.update({volume})
+        return self
+
+    def workdir(self, path):
+        if not isinstance(path, PosixPath):
+            raise TypeError("workdir must be PosixPath")
+        if self.__workdir:
+            self.__workdir = self.__workdir / path
+        else:
+            if path.root == "/":
+                self.__workdir = path
+            else:
+                raise ValueError("workdir must starts with '/'")
+
+        return self
