@@ -3,6 +3,7 @@ from pathlib import PosixPath
 from virt_lightning.configuration_healthcheck import ConfigurationHealthcheck
 from virt_lightning.consts import NetworkProtocolTCPIP
 from virt_lightning.healthcheck import Healthcheck
+from virt_lightning.configuration_posix_user import ConfigurationPosixUser
 
 
 class OCIImageBuild:
@@ -14,6 +15,7 @@ class OCIImageBuild:
         self.__volumes = set({})
         self.__healthcheck = None
         self.__workdir = None
+        self.__user = None
 
     # --keep-git-dir
     # --checksum
@@ -140,7 +142,12 @@ class OCIImageBuild:
     def stopsignal(self, signal):
         return self
 
-    def user(self, uid, guid=None):
+    def user(self, user):
+        if not isinstance(user, ConfigurationPosixUser):
+            raise TypeError("user must be ConfigurationPosixUser")
+
+        self.__user = user
+
         return self
 
     def volume(self, *args):
