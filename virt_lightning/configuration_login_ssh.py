@@ -24,6 +24,8 @@ class ConfigurationLoginSSH(IConfigurationLogin):
         if not isinstance(value, PosixPath):
             raise TypeError("key must be PosixPath")
 
+        value = value.expanduser()
+
         if not value.exists():
             raise ValueError(f"key '{value}' not found")
 
