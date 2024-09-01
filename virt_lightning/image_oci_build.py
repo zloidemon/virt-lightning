@@ -87,10 +87,6 @@ class OCIImageBuild:
 
         return self
 
-    # --platform
-    # def from(self):
-    #    return self
-
     def healthcheck(
         self, cmd, interval=30, timeout=30, start_period=0, start_interval=5, retries=3
     ):
