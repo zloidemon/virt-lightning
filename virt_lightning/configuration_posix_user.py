@@ -9,6 +9,7 @@ class ConfigurationPosixUser(IConfigurationPosixUser):
     #
     def __init__(self):
         self.__username = None
+        self.__groupname = None
         self.__password = None
         self.__login = None
         self.__uid = None
@@ -59,6 +60,20 @@ class ConfigurationPosixUser(IConfigurationPosixUser):
         if len(value) < 1 or value == "":
             raise ValueError("username can not be empty")
         self.__username = value
+
+    @property
+    def groupname(self):
+        if self.__groupname is None:
+            raise TypeError("groupname must be set string value")
+        return self.__groupname
+
+    @groupname.setter
+    def groupname(self, value):
+        if not isinstance(value, str):
+            raise TypeError("groupname must be string value")
+        if len(value) < 1 or value == "":
+            raise ValueError("groupname can not be empty")
+        self.__groupname = value
 
     @property
     def password(self):
