@@ -96,7 +96,7 @@ class ConfigurationLoadFile(IConfigurationSource):
     @property
     def user(self):
         ssh_login = ConfigurationLoginSSH()
-        ssh_login.key = self.__get("ssh_key_file")
+        ssh_login.key = pathlib.PosixPath(self.__get("ssh_key_file"))
 
         config_user = ConfigurationPosixUser()
         config_user.username = consts.DEFAULT_USER_USERNAME
