@@ -6,33 +6,11 @@ from virt_lightning.configuration_backend import ConfigurationBackend
 from virt_lightning.configuration_login_ssh import ConfigurationLoginSSH
 from virt_lightning.configuration_posix_user import ConfigurationPosixUser
 from virt_lightning.configuration_registry import ConfigurationRegistry
+from virt_lightning.configuration_tcpip import ConfigurationTCPIP
 from virt_lightning.iconfiguration import (
     IConfigurationBuilder,
-    IConfigurationNetworkModel,
     IConfigurationSource,
 )
-
-
-class ConfigurationTCPIP(IConfigurationNetworkModel):
-    def __init__(self, name, cidr, clean):
-        self.__name = name
-        self.__cidr = cidr
-        self.__clean = clean
-
-    @property
-    def name(self):
-        return self.__name
-
-    @property
-    def cidr(self):
-        return self.__cidr
-
-    @property
-    def auto_cleanup(self):
-        return self.__clean
-
-    def __repr__(self):
-        return f"ConfigurationTCPIP({self.name},{self.cidr},{self.auto_cleanup})"
 
 
 class ConfigurationLoadFile(IConfigurationSource):
@@ -66,17 +44,19 @@ class ConfigurationLoadFile(IConfigurationSource):
 
     @property
     def network(self):
-        return ConfigurationTCPIP(
-            self.__get("network_name"),
-            self.__get("network_cidr"),
-            self.__get("network_auto_clean_up"),
-        )
+        tcpip = ConfigurationTCPIP()
+        tcpip.name = self.__get("network_name")
+        tcpip.cidr = self.__get("network_cidr")
+        tcpip.auto_cleanup = self.__get("network_auto_clean_up")
+
+        return tcpip
 
     @property
     def backend(self):
         config = ConfigurationBackend()
         config.entrypoint = self.__get("libvirt_uri")
         config.storage = self.__get("storage_pool")
+
         return config
 
     @property
