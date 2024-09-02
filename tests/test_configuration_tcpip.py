@@ -23,9 +23,9 @@ class TestConfigurationTCPIP(unittest.TestCase):
         with self.assertRaises(AttributeError):
             self.assertIsNone(self.config.name)
 
-    def test_empty_name(self):
+    def test_empty_cidr(self):
         with self.assertRaises(AttributeError):
-            self.assertIsNone(self.config.name)
+            self.assertIsNone(self.config.cidr)
 
     def test_valid_cidr(self):
         self.assertEqual(None, self.config._ConfigurationTCPIP__cidr)
@@ -39,9 +39,28 @@ class TestConfigurationTCPIP(unittest.TestCase):
         with self.assertRaises(TypeError):
             self.config.cidr = 123
 
-    def test_empty_cidr(self):
+    def test_valid_auto_cleanup(self):
+        self.assertIsNone(self.config._ConfigurationTCPIP__clean)
+        self.config.auto_cleanup = True
+        self.assertTrue(True, self.config._ConfigurationTCPIP__clean)
+        self.assertTrue(True, self.config.auto_cleanup)
+        self.config.auto_cleanup = False
+        self.assertFalse(self.config._ConfigurationTCPIP__clean)
+        self.assertFalse(self.config.auto_cleanup)
+
+    def test_invalid_auto_cleanup(self):
+        with self.assertRaises(TypeError):
+            self.config.auto_cleanup = None
+        with self.assertRaises(TypeError):
+            self.config.auto_cleanup = 123
+        with self.assertRaises(TypeError):
+            self.config.auto_cleanup = "True"
+        with self.assertRaises(TypeError):
+            self.config.auto_cleanup = "False"
+
+    def test_empty_auto_cleanup(self):
         with self.assertRaises(AttributeError):
-            self.assertIsNone(self.config.cidr)
+            self.assertIsNone(self.config.auto_cleanup)
 
     def test_eq_invalid_name(self):
         config = ConfigurationTCPIP()
