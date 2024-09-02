@@ -2,29 +2,15 @@ import pathlib
 import tomllib
 
 from virt_lightning import consts
+from virt_lightning.configuration_backend import ConfigurationBackend
 from virt_lightning.configuration_login_ssh import ConfigurationLoginSSH
 from virt_lightning.configuration_posix_user import ConfigurationPosixUser
 from virt_lightning.configuration_registry import ConfigurationRegistry
 from virt_lightning.iconfiguration import (
-    IConfigurationBackend,
     IConfigurationBuilder,
     IConfigurationNetworkModel,
     IConfigurationSource,
 )
-
-
-class ConfigurationBackend(IConfigurationBackend):
-    def __init__(self, uri, storage):
-        self.__entrypoint = uri
-        self.__storage = storage
-
-    @property
-    def entrypoint(self):
-        return self.__entrypoint
-
-    @property
-    def storage(self):
-        return self.__storage
 
 
 class ConfigurationTCPIP(IConfigurationNetworkModel):
@@ -88,10 +74,10 @@ class ConfigurationLoadFile(IConfigurationSource):
 
     @property
     def backend(self):
-        return ConfigurationBackend(
-            self.__get("libvirt_uri"),
-            self.__get("storage_pool"),
-        )
+        config = ConfigurationBackend()
+        config.entrypoint = self.__get("libvirt_uri")
+        config.storage = self.__get("storage_pool")
+        return config
 
     @property
     def user(self):
