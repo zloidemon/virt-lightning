@@ -7,6 +7,12 @@
 
 ![Logo](https://github.com/zloidemon/virt-lightning/blob/master/logo/logo_no_text.png)
 
+
+### Новая лицензия
+
+Все новые файлы будут использовать другую лицензию, после выбора наиболее подходящей файл лицензии обновится.
+
+
 You want to spawn local VM quickly.. Like... really quickly. You want them to be as generic as possible. Actually you would like to reuse some existing cloud images!
 
 This is the right tool for you.
