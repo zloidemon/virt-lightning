@@ -122,6 +122,14 @@ class IConfigurationBackend(metaclass=ABCMeta):
     def storage(self):
         pass
 
+    def __repr__(self):
+        return (
+            "ConfigurationBackend("
+            f"entrypoint={self.entrypoint},"
+            f"storage={self.storage}"
+            ")"
+        )
+
 
 #
 # Интерфейс источников образов

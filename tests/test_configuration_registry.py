@@ -29,7 +29,7 @@ class TestConfigurationRegistry(unittest.TestCase):
         with self.assertRaises(AttributeError):
             self.assertEqual(self.config, config)
 
-        config.entrypint = "example/path"
+        config.entrypoint = "example/path"
         with self.assertRaises(AttributeError):
             self.assertEqual(self.config, config)
 
