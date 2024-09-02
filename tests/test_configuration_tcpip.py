@@ -8,12 +8,14 @@ class TestConfigurationTCPIP(unittest.TestCase):
         self.config = ConfigurationTCPIP()
 
     def test_valid_name(self):
-        self.assertEqual(None, self.config._ConfigurationTCPIP__name)
+        self.assertIsNone(self.config._ConfigurationTCPIP__name)
         self.config.name = "network"
         self.assertEqual("network", self.config._ConfigurationTCPIP__name)
         self.assertEqual("network", self.config.name)
 
     def test_invalid_name(self):
+        with self.assertRaises(TypeError):
+            self.config.name = True
         with self.assertRaises(TypeError):
             self.config.name = None
         with self.assertRaises(TypeError):
@@ -28,12 +30,14 @@ class TestConfigurationTCPIP(unittest.TestCase):
             self.assertIsNone(self.config.cidr)
 
     def test_valid_cidr(self):
-        self.assertEqual(None, self.config._ConfigurationTCPIP__cidr)
+        self.assertIsNone(self.config._ConfigurationTCPIP__cidr)
         self.config.cidr = "192.168.123.0/24"
         self.assertEqual("192.168.123.0/24", self.config._ConfigurationTCPIP__cidr)
         self.assertEqual("192.168.123.0/24", self.config.cidr)
 
     def test_invalid_cidr(self):
+        with self.assertRaises(TypeError):
+            self.config.cidr = True
         with self.assertRaises(TypeError):
             self.config.cidr = None
         with self.assertRaises(TypeError):
