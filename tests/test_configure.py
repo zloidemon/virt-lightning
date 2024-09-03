@@ -1,7 +1,7 @@
 from pathlib import PosixPath
 from urllib.parse import urlparse
 
-import virt_lightning.configuration
+import virt_lightning.configuration_legacy
 import virt_lightning.consts
 
 
@@ -17,7 +17,7 @@ def test_default(monkeypatch):
             config_file.touch()
 
         m.setattr(virt_lightning.consts, "DEFAULT_CONFIGFILE", urlparse("a"))
-        config = virt_lightning.configuration.ProxyLegacyConfiguration.load(
+        config = virt_lightning.configuration_legacy.ProxyLegacyConfiguration.load(
             virt_lightning.consts.DEFAULT_CONFIGFILE)
         assert config.root_password == "root"
 
@@ -25,7 +25,7 @@ def test_default(monkeypatch):
 def test_load_file(monkeypatch, config_file):
     with monkeypatch.context() as m:
         m.setattr(virt_lightning.consts, "DEFAULT_CONFIGFILE", urlparse("a"))
-        config = virt_lightning.configuration.ProxyLegacyConfiguration.load(
+        config = virt_lightning.configuration_legacy.ProxyLegacyConfiguration.load(
             config_file)
         assert config.root_password == "boby"
 
@@ -33,6 +33,6 @@ def test_load_file(monkeypatch, config_file):
 def test_load_default_config_file(monkeypatch, config_file):
     with monkeypatch.context() as m:
         m.setattr(virt_lightning.consts, "DEFAULT_CONFIGFILE", config_file)
-        config = virt_lightning.configuration.ProxyLegacyConfiguration.load(
+        config = virt_lightning.configuration_legacy.ProxyLegacyConfiguration.load(
             virt_lightning.consts.DEFAULT_CONFIGFILE)
         assert config.root_password == "boby"
