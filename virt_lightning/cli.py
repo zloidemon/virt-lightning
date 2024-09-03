@@ -142,7 +142,7 @@ def main():
         sys.stdout.write(f"{example}\n")
         exit(ExitCode.FAIL.value)
 
-    configuration = ProxyLegacyConfiguration(args.config)
+    configuration = ProxyLegacyConfiguration.load(args.config)
     vmm_builder = VMMBuilder(configuration)
 
     vmm_builder.set_storage(StorageSystem)
