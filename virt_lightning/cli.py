@@ -22,7 +22,7 @@ from virt_lightning.cli_stop import CLIStop
 from virt_lightning.cli_storage import CLIStorage
 from virt_lightning.cli_up import CLIup
 from virt_lightning.cli_viewer import CLIViewer
-from virt_lightning.configuration import ProxyLegacyConfiguration
+from virt_lightning.configuration_legacy import ProxyLegacyConfiguration
 from virt_lightning.consts import (
     CLI_MESSAGE_HELP,
     CLI_MESSAGE_USAGE,
