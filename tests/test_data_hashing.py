@@ -96,6 +96,13 @@ class TestOCIAssemblyDataHashing(unittest.TestCase):
             hashed.calculate().hexdigest()
         )
 
+    def test_eq(self):
+        sha256_data_1 = DataHashing(HashingAlgorithm.SHA256, b"test")
+        sha256_data_2 = DataHashing(HashingAlgorithm.SHA256, b"test")
+
+        self.assertEqual(sha256_data_1, sha256_data_2)
+        self.assertEqual(sha256_data_2, sha256_data_1)
+
     def test_sha256_eq(self):
         self.check_algo_eq(HashingAlgorithm.SHA256)
 
@@ -110,11 +117,11 @@ class TestOCIAssemblyDataHashing(unittest.TestCase):
         self.assertNotEqual(sha512_data, sha256_data)
 
     def test_not_eq_length(self):
-        sha256_data = DataHashing(HashingAlgorithm.SHA256, b"test")
+        sha256_data_1 = DataHashing(HashingAlgorithm.SHA256, b"test")
         sha256_data_2 = DataHashing(HashingAlgorithm.SHA256, b"test2")
 
-        self.assertNotEqual(sha256_data, sha256_data_2)
-        self.assertNotEqual(sha256_data_2, sha256_data)
+        self.assertNotEqual(sha256_data_1, sha256_data_2)
+        self.assertNotEqual(sha256_data_2, sha256_data_1)
 
     def test_sha256_str(self):
         self.assertEqual(
@@ -127,4 +134,11 @@ class TestOCIAssemblyDataHashing(unittest.TestCase):
             str(DataHashing(HashingAlgorithm.SHA512, b"test")),
             "ee26b0dd4af7e749aa1a8ee3c10ae9923f618980772e473f8819a5d4940e0db2"
             "7ac185f8a0e1d5f84f88bc887fd67b143732c304cc5fa9ad8e6f57f50028a8ff"
+        )
+
+    def test_repr(self):
+        hashed = DataHashing(HashingAlgorithm.SHA256, b"test")
+        self.assertEqual(
+            f"HashingData(length={hashed.length},algorithm={hashed.algorithm.value})",
+            repr(hashed)
         )
