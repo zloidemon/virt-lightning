@@ -17,6 +17,13 @@ class SignalShutdown(Enum):
 
 
 @unique
+class HashingAlgorithm(Enum):
+    MD5 = "md5"
+    SHA256 = "sha256"
+    SHA512 = "sha512"
+
+
+@unique
 class LoginMethod(Enum):
     SSH = "ssh"
 
