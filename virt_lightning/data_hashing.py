@@ -46,7 +46,7 @@ class DataHashing:
         if self.length != other.length:
             return False
 
-        return str(self.calculate()) == str(other.calculate())
+        return str(self) == str(other)
 
     def __str__(self):
         return self.calculate().hexdigest()
