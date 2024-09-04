@@ -2,6 +2,7 @@ import json
 import unittest
 from pathlib import PosixPath
 
+from virt_lightning.consts import HashingAlgorithm
 from virt_lightning.image_oci_index import OCIIndex
 
 
@@ -110,7 +111,7 @@ class TestOCIIndexAux(unittest.TestCase):
         self.assertGreater(manifest.size, 0)
         self.assertEqual(manifest.size, 7143)
         valid_digest = (
-            "sha256",
+            HashingAlgorithm.SHA256,
             "0228f90e926ba6b96e4f39cf294b2586d38fbb5a1e385c05cd1ee40ea54fe7fd",
         )
         self.assertTupleEqual(manifest.digest, valid_digest)
@@ -129,7 +130,7 @@ class TestOCIIndexAux(unittest.TestCase):
         self.assertGreater(manifest.size, 0)
         self.assertEqual(manifest.size, 7143)
         valid_digest = (
-            "sha256",
+            HashingAlgorithm.SHA256,
             "e692418e4cbaf90ca69d05a66403747baa33ee08806650b51fab815ad7fc331f",
         )
         self.assertTupleEqual(manifest.digest, valid_digest)
@@ -168,7 +169,7 @@ class TestOCIIndexAux(unittest.TestCase):
         self.assertGreater(manifest.size, 0)
         self.assertEqual(manifest.size, 7143)
         valid_digest = (
-            "sha256",
+            HashingAlgorithm.SHA256,
             "b3d63d132d21c3ff4c35a061adf23cf43da8ae054247e32faa95494d904a007e",
         )
         self.assertTupleEqual(manifest.digest, valid_digest)
