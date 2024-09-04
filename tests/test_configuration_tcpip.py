@@ -124,6 +124,19 @@ class TestConfigurationTCPIP(unittest.TestCase):
 
         self.assertNotEqual(self.config, config)
 
+    def test_eq_invalid_cidr_compare(self):
+        config = ConfigurationTCPIP()
+
+        config.name = "network"
+        config.cidr = "192.168.123.0/24"
+        config.auto_cleanup = True
+
+        self.config.name = "network"
+        self.config.cidr = "192.168.122.0/24"
+        self.config.auto_cleanup = True
+
+        self.assertNotEqual(self.config, config)
+
     def test_eq_valid(self):
         config = ConfigurationTCPIP()
 
@@ -136,3 +149,14 @@ class TestConfigurationTCPIP(unittest.TestCase):
         self.config.auto_cleanup = True
 
         self.assertEqual(self.config, config)
+
+    def test_repr(self):
+        self.config.name = "network"
+        self.config.cidr = "192.168.123.0/24"
+        self.config.auto_cleanup = True
+
+        self.assertEqual(
+            "ConfigurationTCPIP(network,192.168.123.0/24,True)",
+            repr(self.config)
+        )
+
