@@ -139,6 +139,6 @@ class TestOCIAssemblyDataHashing(unittest.TestCase):
     def test_repr(self):
         hashed = DataHashing(HashingAlgorithm.SHA256, b"test")
         self.assertEqual(
-            f"HashingData(length={hashed.length},algorithm={hashed.algorithm.value})",
+            "HashingData(length=4,algorithm=sha256)",
             repr(hashed)
         )
