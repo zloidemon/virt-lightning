@@ -40,6 +40,12 @@ class TestOCIIndex(unittest.TestCase):
         self.assertIsNotNone(self.index.annotations)
         self.assertDictEqual(self.index.annotations, test_dict)
 
+    def test_str(self):
+        self.assertEqual(
+            "Index(schemaVersion=2,mediaType=application/vnd.oci.image.index.v1+json)",
+            str(self.index)
+        )
+
 
 
 class TestOCIIndexMultiple(unittest.TestCase):
@@ -75,6 +81,12 @@ class TestOCIIndexMultiple(unittest.TestCase):
         }
         self.assertIsNotNone(self.index.annotations)
         self.assertDictEqual(self.index.annotations, test_dict)
+
+    def test_str(self):
+        self.assertEqual(
+            "Index(schemaVersion=2,mediaType=application/vnd.oci.image.index.v1+json)",
+            str(self.index)
+        )
 
 
 
@@ -119,6 +131,7 @@ class TestOCIIndexAux(unittest.TestCase):
             "org.opencontainers.image.ref.name": "stable-release",
         }
         self.assertDictEqual(manifest.annotations, valid_annotations)
+        self.assertIsNone(manifest.platform)
 
     def test_manifest_1(self):
         manifest = self.index.manifests[1]
@@ -178,6 +191,7 @@ class TestOCIIndexAux(unittest.TestCase):
             "org.freedesktop.specifications.metainfo.type": "AppStream",
         }
         self.assertDictEqual(manifest.annotations, valid_annotations)
+        self.assertIsNone(manifest.platform)
 
     def test_subject(self):
         self.assertIsNone(self.index.subject)
@@ -188,3 +202,9 @@ class TestOCIIndexAux(unittest.TestCase):
         }
         self.assertIsNotNone(self.index.annotations)
         self.assertDictEqual(self.index.annotations, test_dict)
+
+    def test_str(self):
+        self.assertEqual(
+            "Index(schemaVersion=2,mediaType=application/vnd.oci.image.index.v1+json)",
+            str(self.index)
+        )
