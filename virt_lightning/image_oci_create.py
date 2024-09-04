@@ -1,8 +1,8 @@
-import hashlib
 import json
 import tarfile
 from pathlib import PosixPath
 
+from virt_lightning.data_hashing import DataHashing
 from virt_lightning.image_oci_config import OCIConfigConfig
 from virt_lightning.image_oci_index import OCIIndex
 from virt_lightning.image_oci_manifest import OCIManifest
@@ -15,18 +15,6 @@ class OCIImageAssembly:
         self.__dst = dst
         self.__index_file = None
 
-    def __calc_checksum(self, data, algo):
-        encoded_data = data.encode()
-
-        match algo:
-            case "sha256":
-                hsum = hashlib.sha256(encoded_data)
-            case "sha512":
-                hsum = hashlib.sha512(encoded_data)
-            case _:
-                raise NotImplementedError(algo)
-        return hsum.hexdigest()
-
     def __load_file(self, filename, algo=None):
         data = None
         hsum = None
@@ -35,7 +23,7 @@ class OCIImageAssembly:
             data = fh.read()
 
         if algo:
-            hsum = self.__calc_checksum(data, algo)
+            hsum = str(DataHashing(algo, data.encode()))
 
         return (hsum, data)
 
@@ -52,7 +40,7 @@ class OCIImageAssembly:
 
         if configfile.media_type.entry == ImageEnumEntry.config:
             _config_algo, hsum = configfile.digest
-            _config_blob = self.__src / "blobs" / _config_algo / hsum
+            _config_blob = self.__src / "blobs" / _config_algo.value / hsum
 
             if not _config_blob.exists() or not _config_blob.is_file():
                 return False
@@ -71,7 +59,7 @@ class OCIImageAssembly:
 
     def __validate_manifest(self, manifest):
         algo, hsum = manifest.digest
-        blob = self.__src / "blobs" / algo / hsum
+        blob = self.__src / "blobs" / algo.value / hsum
 
         if not manifest.media_type.is_oci():
             return False
