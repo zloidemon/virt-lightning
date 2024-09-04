@@ -13,6 +13,27 @@ class TestCommandHealthcheck(unittest.TestCase):
         self.assertEqual("true", self.healthcheck.command)
         self.assertEqual("true", self.healthcheck._Healthcheck__cmd)
 
+    def test_invalid_retires(self):
+        with self.assertRaises(ValueError):
+            self.config.retries = 0
+        with self.assertRaises(ValueError):
+            self.config.retries = -1
+        with self.assertRaises(ValueError):
+            self.config.retries = -10
+
+    def test_init_value_retries(self):
+        self.assertEqual(3, self.config._ConfigurationHealthcheck__retries)
+        self.assertEqual(3, self.config.retries)
+        self.assertEqual(
+            self.config._ConfigurationHealthcheck__retries,
+            self.config.retries
+        )
+
+    def test_valid_retries(self):
+        self.config.retries = 1
+        self.assertGreater(self.config._ConfigurationHealthcheck__retries, 0)
+        self.assertEqual(1, self.config._ConfigurationHealthcheck__retries)
+
     def test_eq_command(self):
         healthcheck = Healthcheck("true", self.config)
         self.assertEqual(self.healthcheck.command, healthcheck.command)
