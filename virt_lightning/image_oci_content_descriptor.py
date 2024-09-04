@@ -1,3 +1,4 @@
+from virt_lightning.consts import HashingAlgorithm
 from virt_lightning.image_oci_media_type import OCIMediaType
 
 
@@ -12,7 +13,7 @@ class OCIContentDescriptor:
     @property
     def digest(self):
         algo, hsum = self.__data["digest"].split(":")
-        return (algo, hsum)
+        return (HashingAlgorithm(algo), hsum)
 
     @property
     def size(self):
