@@ -20,6 +20,7 @@ class TestCommandHealthcheck(unittest.TestCase):
     def test_not_eq_command(self):
         healthcheck = Healthcheck("rtrue", self.config)
         self.assertNotEqual(self.healthcheck.command, healthcheck.command)
+        self.assertNotEqual(self.healthcheck, healthcheck)
 
     def test_eq_config(self):
         healthcheck = Healthcheck("true", self.config)
