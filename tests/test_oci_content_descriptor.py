@@ -27,7 +27,7 @@ class TestOCIContentDescriptorManifest(unittest.TestCase):
         self.assertEqual(7682, self.manifest.size)
 
     def test_repr(self):
-        self.assertEqual(repr(self.manifest), f"Description(digest={self.manifest.size})")
+        self.assertEqual(repr(self.manifest), "Description(digest=7682)")
 
 
 class TestOCIContentDescriptorManifestURL(TestOCIContentDescriptorManifest):
@@ -60,6 +60,9 @@ class TestOCIContentDescriptorManifestArtifact(TestOCIContentDescriptorManifest)
 
     def test_artifact_type(self):
         self.assertEqual("application/vnd.example.sbom.v1", self.manifest.artifact_type)
+
+    def test_repr(self):
+        self.assertEqual(repr(self.manifest), "Description(digest=123)")
 
 
 class TestOCIContentDescriptorManifestOptional(TestOCIContentDescriptorManifest):
