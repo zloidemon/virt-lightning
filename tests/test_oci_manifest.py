@@ -2,6 +2,7 @@ import json
 import unittest
 from pathlib import PosixPath
 
+from virt_lightning.consts import HashingAlgorithm
 from virt_lightning.image_oci_manifest import OCIManifest
 
 
@@ -33,7 +34,7 @@ class TestOCIManifest(unittest.TestCase):
         self.assertEqual(self.manifest.config.media_type.entry.value, "config")
         self.assertEqual(self.manifest.config.media_type.extension, "json")
         valid_config_hash = (
-            "sha256",
+            HashingAlgorithm.SHA256,
             "b5b2b2c507a0944348e0303114d8d93aaaa081732b86451d9bce1f432a537bc7",
         )
         self.assertTupleEqual(self.manifest.config.digest, valid_config_hash)
@@ -58,7 +59,7 @@ class TestOCIManifest(unittest.TestCase):
                     self.assertTupleEqual(
                         layer.digest,
                         (
-                            "sha256",
+                            HashingAlgorithm.SHA256,
                             "9834876dcfb05cb167a5c24953eba58c4ac89b1adf57f28f2f9d09af107ee8f0",
                         )
                     )
@@ -67,7 +68,7 @@ class TestOCIManifest(unittest.TestCase):
                     self.assertTupleEqual(
                         layer.digest,
                         (
-                            "sha256",
+                            HashingAlgorithm.SHA256,
                             "3c3a4604a545cdc127456d94e421cd355bca5b528f4a9c1905b15da2eb4a4c6b",
                         )
                     )
@@ -76,7 +77,7 @@ class TestOCIManifest(unittest.TestCase):
                     self.assertTupleEqual(
                         layer.digest,
                         (
-                            "sha256",
+                            HashingAlgorithm.SHA256,
                             "ec4b8955958665577945c89419d1af06b5f7636b4ac3da7f12184802ad867736",
                         )
                     )
