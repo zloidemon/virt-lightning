@@ -1,5 +1,6 @@
 import unittest
 
+from virt_lightning.consts import OperationSystem
 from virt_lightning.image_oci_os import OCIOSDescription
 
 
@@ -15,12 +16,12 @@ class TestOCIOSDescriptionRequired(unittest.TestCase):
 
     def test_os(self):
         platform = OCIOSDescription({"architecture": "e2k", "os": "linux"})
-        self.assertEqual(platform.os, "linux")
+        self.assertEqual(OperationSystem.LINUX, platform.os)
 
     def test_os_fail(self):
         platform = OCIOSDescription({"architecture": "e2k"})
         with self.assertRaises(KeyError):
-            self.assertEqual(platform.os, "linux")
+            self.assertEqual(OperationSystem.LINUX, platform.os)
 
     def test_features(self):
         platform = OCIOSDescription({"architecture": "e2k"})
@@ -40,20 +41,20 @@ class TestOCIOSDescriptionOptional(unittest.TestCase):
 
     def test_os_version_none(self):
         platform = OCIOSDescription({"os": "windows"})
-        self.assertEqual("windows", platform.os)
+        self.assertEqual(OperationSystem.WINDOWS, platform.os)
         self.assertIsNone(platform.os_version)
 
     def test_os_version(self):
         platform = OCIOSDescription({"os": "windows", "os.version": "10.0.14393.1066"})
-        self.assertEqual("windows", platform.os)
+        self.assertEqual(OperationSystem.WINDOWS, platform.os)
         self.assertEqual("10.0.14393.1066", platform.os_version)
 
     def test_os_features_none(self):
         platform = OCIOSDescription({"os": "windows"})
-        self.assertEqual("windows", platform.os)
+        self.assertEqual(OperationSystem.WINDOWS, platform.os)
         self.assertListEqual([], platform.os_features)
 
     def test_os_features(self):
         platform = OCIOSDescription({"os": "windows", "os.features": ["win32k.sys"]})
-        self.assertEqual("windows", platform.os)
+        self.assertEqual(OperationSystem.WINDOWS, platform.os)
         self.assertListEqual(["win32k.sys"], platform.os_features)
