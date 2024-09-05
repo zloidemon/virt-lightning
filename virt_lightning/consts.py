@@ -1,5 +1,5 @@
 import getpass
-from enum import Enum, unique
+from enum import Enum, IntEnum, unique
 
 
 #
@@ -38,6 +38,49 @@ class ExitCode(Enum):
 class NetworkProtocolTCPIP(Enum):
     TCP = "tcp"
     UDP = "udp"
+
+
+@unique
+class CPUISA(Enum):
+    ARM = "arm"
+    E2K = "e2k"
+    MIPS = "mips"
+    PPC = "ppc"
+    RISCV = "riscv"
+    S390 = "s390"
+    WASM = "wasm"
+    X86 = "x86"
+
+
+@unique
+class BytesOrder(Enum):
+    LE = "le"
+    BE = "be"
+
+
+@unique
+class BitWidths(IntEnum):
+    BITS32 = 32
+    BITS64 = 64
+
+
+@unique
+class OperationSystem(Enum):
+    AIX = "aix"
+    ANDROID = "android"
+    DARWIN = "darwin"
+    DRAGONFLYBSD = "dragonflybsd"
+    FREEBSD = "freebsd"
+    ILLUMOS = "illumos"
+    IOS = "ios"
+    JS = "js"
+    LINUX = "linux"
+    NETBSD = "netbsd"
+    OPENBSD = "openbsd"
+    PLAN9 = "plan9"
+    SOLARIS = "solaris"
+    WASIP1 = "wasip1"
+    WINDOWS = "windows"
 
 
 CLI_MESSAGE_HELP = """
