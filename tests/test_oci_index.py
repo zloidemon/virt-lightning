@@ -2,7 +2,10 @@ import json
 import unittest
 from pathlib import PosixPath
 
-from virt_lightning.consts import HashingAlgorithm
+from virt_lightning.consts import (
+    HashingAlgorithm,
+    OperationSystem,
+)
 from virt_lightning.image_oci_index import OCIIndex
 
 
@@ -152,7 +155,7 @@ class TestOCIIndexAux(unittest.TestCase):
         }
         self.assertDictEqual(manifest.annotations, valid_annotations)
         self.assertEqual(manifest.platform.architecture, "ppc64le")
-        self.assertEqual(manifest.platform.os, "linux")
+        self.assertEqual(manifest.platform.os, OperationSystem.LINUX)
         self.assertIsNotNone(manifest.platform.os_features)
         self.assertListEqual(manifest.platform.os_features, [])
         self.assertIsNone(manifest.platform.variant)

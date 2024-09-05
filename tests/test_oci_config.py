@@ -3,7 +3,10 @@ import unittest
 from datetime import datetime
 from pathlib import PosixPath
 
-from virt_lightning.consts import SignalShutdown
+from virt_lightning.consts import (
+    OperationSystem,
+    SignalShutdown,
+)
 from virt_lightning.image_oci_config import OCIConfig
 
 
@@ -26,7 +29,7 @@ class TestOCIConfig(unittest.TestCase):
 
     def test_required_os(self):
         self.assertIsNotNone(self.config_req.os)
-        self.assertEqual(self.config_req.os, "linux")
+        self.assertEqual(self.config_req.os, OperationSystem.LINUX)
 
     def test_required_os_version(self):
         self.assertIsNone(self.config_req.os_version)
@@ -73,7 +76,7 @@ class TestOCIConfig(unittest.TestCase):
 
     def test_optional_os(self):
         self.assertIsNotNone(self.config_opt.os)
-        self.assertEqual(self.config_opt.os, "linux")
+        self.assertEqual(self.config_opt.os, OperationSystem.LINUX)
 
     def test_optional_os_version(self):
         self.assertIsNone(self.config_opt.os_version)
