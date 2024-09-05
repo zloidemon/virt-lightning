@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from virt_lightning.consts import SignalShutdown
 from virt_lightning.image_oci_os import OCIOSDescription
 
 
@@ -30,7 +31,9 @@ class OCIHistoryRecord:
         return self.__data.get("created_by")
 
     def __str__(self):
-        return f"Record(created_by={self.created_by},empty_layer={self.empty_layer})"
+        return (
+            f"Record(created_by={len(self.created_by)},empty_layer={self.empty_layer})"
+        )
 
 
 class OCIConfigConfig:
@@ -69,7 +72,7 @@ class OCIConfigConfig:
     def cmd(self):
         if self.__data.get("Cmd"):
             return self.__data["Cmd"]
-        return None
+        return []
 
     @property
     def volumes(self):
@@ -92,24 +95,30 @@ class OCIConfigConfig:
     @property
     def stop_signal(self):
         if self.__data.get("StopSignal"):
-            return self.__data["StopSignal"]
+            return SignalShutdown(self.__data["StopSignal"])
         return None
 
     @property
     def memory(self):
-        if self.__data.get("Memory"):
+        if self.__data.get("Memory", None) is not None:
+            if self.__data["Memory"] < 1:
+                raise ValueError("memory must be greater than 0")
             return self.__data["Memory"]
         return None
 
     @property
     def memory_swap(self):
-        if self.__data.get("MemorySwap"):
+        if self.__data.get("MemorySwap", None) is not None:
+            if self.__data["MemorySwap"] < 1:
+                raise ValueError("memory_swap must be greater than 0")
             return self.__data["MemorySwap"]
         return None
 
     @property
     def cpu_shares(self):
-        if self.__data.get("CpuShares"):
+        if self.__data.get("CpuShares", None) is not None:
+            if self.__data["CpuShares"] < 1:
+                raise ValueError("cpu_shares must be greater than 0")
             return self.__data["CpuShares"]
         return None
 

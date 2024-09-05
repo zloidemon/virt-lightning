@@ -26,3 +26,7 @@ class OCIOSDescription:
     @property
     def variant(self):
         return self.__data.get("variant")
+
+    @property
+    def features(self):
+        raise NotImplementedError("RESERVED for future versions of the specification")

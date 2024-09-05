@@ -7,10 +7,11 @@ from virt_lightning.iconfiguration import IConfigurationLogin
 class ConfigurationLoginSSH(IConfigurationLogin):
     def __init__(self):
         self.__filename = None
+        self.__method = consts.LoginMethod.SSH
 
     @property
     def method(self):
-        return consts.LoginMethod.SSH
+        return self.__method
 
     @property
     def key(self):

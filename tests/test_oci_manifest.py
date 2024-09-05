@@ -90,6 +90,10 @@ class TestOCIManifest(unittest.TestCase):
         self.assertEqual(self.manifest.subject.media_type.entry.value, "manifest")
         self.assertEqual(self.manifest.subject.media_type.extension, "json")
 
+    def test_invalid_subject(self):
+        self.manifest._OCIManifest__data["subject"] = None
+        self.assertIsNone(self.manifest.subject)
+
     def test_annotations(self):
         self.assertIsNotNone(self.manifest.annotations)
         valid = {
@@ -97,3 +101,6 @@ class TestOCIManifest(unittest.TestCase):
             "com.example.key2": "value2",
         }
         self.assertDictEqual(self.manifest.annotations, valid)
+
+    def test_str(self):
+        self.assertEqual("Manifest(version=2)", str(self.manifest))
