@@ -2,6 +2,7 @@ import shutil
 import tempfile
 import unittest
 from pathlib import PosixPath
+from unittest.mock import Mock
 
 from virt_lightning.configuration_login_ssh import ConfigurationLoginSSH
 from virt_lightning.consts import LoginMethod
@@ -41,6 +42,11 @@ class TestConfigurationLoginSSH(unittest.TestCase):
     def test_key_not_found(self):
         with self.assertRaises(ValueError):
             self.config.key = PosixPath()
+
+        path_to_key = self.test_dir / PosixPath("not_found.pub")
+
+        with self.assertRaises(ValueError):
+            self.config.key = path_to_key
 
     def test_key_not_file(self):
         with self.assertRaises(ValueError):
@@ -89,6 +95,13 @@ class TestConfigurationLoginSSH(unittest.TestCase):
         test_config_0.key = path_to_key
         self.config.key = path_to_key
         self.assertEqual(test_config_0, self.config)
+
+    def test_not_eq_method(self):
+        test_config_0 = ConfigurationLoginSSH()
+
+        wrong_login_method = Mock(return_value=None)
+        self.config._ConfigurationLoginSSH__method = wrong_login_method
+        self.assertNotEqual(test_config_0, self.config)
 
     def test_eq_key_invalid(self):
         path_to_key_0 = self.test_dir / PosixPath("test.pub")
