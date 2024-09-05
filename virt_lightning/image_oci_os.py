@@ -1,3 +1,6 @@
+from virt_lightning.consts import OperationSystem
+
+
 #
 # NOTE: Общий класс с получением информации об ОС
 #
@@ -11,7 +14,7 @@ class OCIOSDescription:
 
     @property
     def os(self):
-        return self.__data["os"]
+        return OperationSystem(self.__data["os"])
 
     @property
     def os_version(self):
