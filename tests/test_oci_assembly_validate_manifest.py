@@ -33,6 +33,13 @@ class TestOCIAssemblyImageValidateManifest(unittest.TestCase):
         manifest_descriptor = OCIContentDescriptor(manifest_data)
         self.assertFalse(validate_manifest(manifest_descriptor))
 
+    def test_invalid_media_type_entry(self):
+        validate_manifest = self.assembly._OCIImageAssembly__validate_manifest
+        manifest_data = self.manifest_data
+        manifest_data["mediaType"] = "application/vnd.oci.image.config.v1+json"
+        manifest_descriptor = OCIContentDescriptor(manifest_data)
+        self.assertFalse(validate_manifest(manifest_descriptor))
+
     def test_invalid_not_found(self):
         validate_manifest = self.assembly._OCIImageAssembly__validate_manifest
         manifest_data = self.manifest_data
