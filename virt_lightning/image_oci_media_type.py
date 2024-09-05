@@ -94,8 +94,6 @@ class OCIMediaType:
                 return self.__parsed[4]
             case ImageEnumSubject.empty | ImageEnumSubject.descriptor:
                 return self.__parsed[3]
-            case _:
-                raise Exception(f"unsupported type: {self.subject.value}")
 
     def __str__(self):
         return self.__data
