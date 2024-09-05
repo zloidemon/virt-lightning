@@ -183,4 +183,4 @@ class OCIConfig(OCIOSDescription):
         return []
 
     def __str__(self):
-        return f"Config(architecture={self.architecture},os={self.os})"
+        return f"Config(architecture={self.architecture},os={self.os.value})"
