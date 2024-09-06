@@ -102,14 +102,31 @@ class ConfigurationPosixUser(IConfigurationPosixUser):
         self.__login = value
 
     def __eq__(self, other):
-        if self.__username != other.username:
+        try:
+            if self.username != other.username:
+                return False
+        except AttributeError:
             return False
-        if self.__groupname != other.groupname:
+
+        try:
+            if self.groupname != other.groupname:
+                return False
+        except AttributeError:
             return False
-        if self.__password != other.password:
+
+        try:
+            if self.uid != other.uid:
+                return False
+        except AttributeError:
             return False
-        if self.__uid != other.uid:
+
+        try:
+            if self.gid != other.gid:
+                return False
+        except AttributeError:
             return False
-        if self.__gid != other.gid:
+
+        try:
+            return self.password == other.password
+        except AttributeError:
             return False
-        return self.__login == other.login

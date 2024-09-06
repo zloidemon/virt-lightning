@@ -135,3 +135,134 @@ class TestConfigurationPosixUser(unittest.TestCase):
             self.config.password = 1234
         with self.assertRaises(TypeError):
             self.config.password = 1.0
+
+    def test_login(self):
+        self.assertIsNone(self.config.login)
+        self.config.login = True
+        self.assertTrue(self.config.login)
+
+
+class TestConfigurationPosixUserEqual(unittest.TestCase):
+    def setUp(self):
+        self.config = ConfigurationPosixUser()
+
+    def test_eq_wrong_username(self):
+        config = ConfigurationPosixUser()
+
+        self.config.username = "hello"
+        config.username = "olleh"
+
+        self.assertNotEqual(self.config, config)
+
+    def test_eq_worng_username_excp(self):
+        config = ConfigurationPosixUser()
+
+        self.assertNotEqual(self.config, config)
+
+    def test_eq_wrong_groupname(self):
+        config = ConfigurationPosixUser()
+
+        self.config.username = "hello"
+        self.config.groupname = "hello"
+
+        config.username = "hello"
+        config.groupname = "olleh"
+
+        self.assertNotEqual(self.config, config)
+
+    def test_eq_worng_groupname_excp(self):
+        config = ConfigurationPosixUser()
+
+        self.config.username = "hello"
+        self.config.groupname = "hello"
+
+        config.username = "hello"
+
+        self.assertNotEqual(self.config, config)
+
+    def test_eq_wrong_uid(self):
+        config = ConfigurationPosixUser()
+
+        self.config.username = "hello"
+        self.config.groupname = "hello"
+        self.config.uid = 100
+
+        config.username = "hello"
+        config.groupname = "hello"
+        config.uid = 1000
+
+        self.assertNotEqual(self.config, config)
+
+    def test_eq_worng_uid_excp(self):
+        config = ConfigurationPosixUser()
+
+        self.config.username = "hello"
+        self.config.groupname = "hello"
+        self.config.uid = 100
+
+        config.username = "hello"
+        config.groupname = "hello"
+
+        self.assertNotEqual(self.config, config)
+
+    def test_eq_wrong_gid(self):
+        config = ConfigurationPosixUser()
+
+        self.config.username = "hello"
+        self.config.groupname = "hello"
+        self.config.uid = 100
+        self.config.gid = 100
+
+        config.username = "hello"
+        config.groupname = "hello"
+        config.uid = 100
+        config.gid = 1000
+
+        self.assertNotEqual(self.config, config)
+
+    def test_eq_worng_gid_excp(self):
+        config = ConfigurationPosixUser()
+
+        self.config.username = "hello"
+        self.config.groupname = "hello"
+        self.config.uid = 100
+        self.config.gid = 100
+
+        config.username = "hello"
+        config.groupname = "hello"
+        config.uid = 100
+
+        self.assertNotEqual(self.config, config)
+
+    def test_eq_wrong_password(self):
+        config = ConfigurationPosixUser()
+
+        self.config.username = "hello"
+        self.config.groupname = "hello"
+        self.config.uid = 100
+        self.config.gid = 100
+        self.config.password = "password"
+
+        config.username = "hello"
+        config.groupname = "hello"
+        config.uid = 100
+        config.gid = 100
+        config.password = "drowssap"
+
+        self.assertNotEqual(self.config, config)
+
+    def test_eq_worng_password_excp(self):
+        config = ConfigurationPosixUser()
+
+        self.config.username = "hello"
+        self.config.groupname = "hello"
+        self.config.uid = 100
+        self.config.gid = 100
+        self.config.password = "password"
+
+        config.username = "hello"
+        config.groupname = "hello"
+        config.uid = 100
+        config.gid = 100
+
+        self.assertNotEqual(self.config, config)
