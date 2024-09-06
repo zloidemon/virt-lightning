@@ -17,7 +17,7 @@ class ConfigurationBuilder(IConfigurationBuilder):
         return self
 
     def build(self):
-        if not self.__source:
+        if self.__source is None:
             raise ValueError("source must be defined before build")
 
         return Configuration(
