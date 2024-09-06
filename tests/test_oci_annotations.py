@@ -2,6 +2,7 @@ import json
 import unittest
 from pathlib import PosixPath
 
+from virt_lightning.image_oci_annotations import OCI_IMAGE_ANNOTATIONS
 from virt_lightning.image_oci_index import OCIIndex
 
 
@@ -66,3 +67,10 @@ class TestOCIAnnotationsIndexWithWrong(unittest.TestCase):
             self.index.manifests[0].annotations["com.example.key1"],
             "value1"
         )
+
+
+class TestOCIAnnotationsConsts(unittest.TestCase):
+    def test(self):
+        for annotation in OCI_IMAGE_ANNOTATIONS:
+            self.assertTrue(annotation.startswith("org.opencontainers"))
+            self.assertTrue(annotation.startswith("org.opencontainers.image"))
