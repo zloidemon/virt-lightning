@@ -10,34 +10,40 @@ from virt_lightning.configuration_tcpip import ConfigurationTCPIP
 from virt_lightning.iconfiguration import IConfigurationSource
 
 
-class ConfigurationLegacyLoadFile(IConfigurationSource):
-    def __init__(self):
-        self.__filename = None
-        self.__cached = None
+class ConfigurationLoadFile:
+    def __init__(self, filename):
+        self.__filename = filename
+
+    def read(self):
+        if not isinstance(self.__filename, PosixPath):
+            raise TypeError("configuration file must be PosixPath")
+
+        full_path = self.__filename.expanduser()
+
+        if not full_path.exists():
+            raise FileNotFoundError(f"not found location: {full_path}")
+
+        if not full_path.is_file():
+            raise FileNotFoundError(f"file not found: {full_path}")
+
+        if self.__filename.suffix == "":
+            raise ValueError("unknown format of file")
+
+        return (
+            self.__filename.suffix.split(".")[-1],
+            self.__filename.expanduser().read_text(),
+        )
+
+
+class ParserConfigurationLegacy(IConfigurationSource):
+    def __init__(self, config):
         self.__config = {}
         self.__section = "main"
         self.__config[self.__section] = consts.DEFAULT_CONFIGURATION[self.__section]
+        self.__config[self.__section].update(config[self.__section])
 
     def __get(self, key):
         return self.__config[self.__section].get(key)
-
-    def __refresh(self):
-        if not self.__cached and self.__filename.expanduser().exists():
-            self.__cached = self.__filename.expanduser().read_text()
-        if self.__cached:
-            config = tomllib.loads(self.__cached)
-            self.__config[self.__section].update(config[self.__section])
-
-    def load_from(self, filename):
-        if not isinstance(filename, PosixPath):
-            raise TypeError("configuration file must be PosixPath")
-
-        self.__filename = filename
-        self.__refresh()
-
-    @property
-    def uri(self):
-        return self.__filename
 
     @property
     def network(self):
