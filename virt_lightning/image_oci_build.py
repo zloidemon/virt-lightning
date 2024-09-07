@@ -1,4 +1,5 @@
 from pathlib import PosixPath
+from urllib.parse import ParseResult
 
 from virt_lightning.configuration_healthcheck import ConfigurationHealthcheck
 from virt_lightning.configuration_posix_user import ConfigurationPosixUser
@@ -56,8 +57,8 @@ class OCIImageBuild:
         link=None,
         exclude=None,
     ):
-        if isinstance(src, PosixPath):
-            raise TypeError("src must be PosixPath")
+        if isinstance(src, ParseResult):
+            raise TypeError("src must be ParseResult from urllib")
 
         if isinstance(dest, PosixPath):
             raise TypeError("dest must be PosixPath")
