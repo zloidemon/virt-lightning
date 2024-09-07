@@ -1,35 +1,10 @@
 from pathlib import PosixPath
 from urllib.parse import ParseResult
 
-from virt_lightning.configuration_builder import ConfigurationBuilder
-from virt_lightning.configuration_load_file import ConfigurationLegacyLoadFile
-
 
 class ProxyLegacyConfiguration:
     def __init__(self, data):
         self.data = data
-
-    @classmethod
-    def load(cls, source=None):
-        builder = ConfigurationBuilder.create()
-        config = ConfigurationLegacyLoadFile()
-
-        #
-        # NOTE: Добавить поддержку загрузки конфигурации например по HTTP
-        #
-        if not source:
-            builder.set_source(config)
-        else:
-            if not isinstance(source, ParseResult):
-                raise TypeError("source must be ParseResult type")
-            match (source.scheme, source.netloc):
-                case "", "":
-                    config.load_from(PosixPath(source.geturl()))
-                    builder.set_source(config)
-                case _:
-                    raise NotImplementedError(f"source: {source.scheme} supported")
-
-        return cls(builder.build())
 
     @property
     def libvirt_uri(self):
