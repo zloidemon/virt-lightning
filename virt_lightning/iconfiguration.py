@@ -38,10 +38,6 @@ class IConfigurationSource(metaclass=ABCMeta):
     def registry(self):
         pass
 
-    @abstractproperty
-    def uri(self):
-        pass
-
     def __repr__(self):
         return f"ConfigurationSource({self.uri})"
 
@@ -98,6 +94,10 @@ class IConfigurationLogin(metaclass=ABCMeta):
 class IConfigurationBuilder(metaclass=ABCMeta):
     @abstractmethod
     def set_source(self, source):
+        pass
+
+    @abstractmethod
+    def set_configuration(self, obj):
         pass
 
     @classmethod
