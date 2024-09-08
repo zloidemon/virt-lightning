@@ -1,5 +1,6 @@
 import sys
 from pathlib import PosixPath
+from urllib.parse import urlparse
 
 from virt_lightning.consts import CLI_MESSAGE_USAGE, DEFAULT_VL_COMMAND
 from virt_lightning.icli import ICLIcmd
@@ -16,12 +17,23 @@ class CLIBuild(ICLIcmd):
         self.sub_parser = self.parser.add_subparsers(
             help="Build commands list", dest="command"
         )
-        self.image_parser = self.sub_parser.add_parser("image", help="Generate image")
+        self.build_assembly_parser = self.sub_parser.add_parser(
+            "assembly", help="Assembly image from prepared files"
+        )
+        self.build_config_parser = self.sub_parser.add_parser(
+            "config", help="Build image from configuration file"
+        )
 
     def arguments(self):
-        self.image_parser.add_argument("--output", help="Output path", type=str)
-        self.image_parser.add_argument("--input", help="Input path", type=str)
-        self.image_parser.add_argument("--filename", help="Filename", type=str)
+        self.build_assembly_parser.add_argument(
+            "--output", help="Output path", type=str
+        )
+        self.build_assembly_parser.add_argument("--input", help="Input path", type=str)
+        self.build_assembly_parser.add_argument("--filename", help="Filename", type=str)
+
+        self.build_config_parser.add_argument(
+            "--filename", help="Filename", type=urlparse
+        )
 
         return self
 
@@ -31,11 +43,17 @@ class CLIBuild(ICLIcmd):
     @staticmethod
     def run(vmm, configuration, args):
         match args.command:
-            case "image":
+            case "assembly":
                 CLIBuild.assembly(args.input, args.output, args.filename)
+            case "config":
+                CLIBuild.config(args.filename)
             case _:
                 sys.stdout.write(CLI_MESSAGE_USAGE.format(cli=DEFAULT_VL_COMMAND))
 
     @staticmethod
     def assembly(src, dst, name):
         OCIImageAssembly(PosixPath(src), PosixPath(dst)).make(name)
+
+    @staticmethod
+    def config(filename):
+        FileNotFoundError(str(filename))
