@@ -11,6 +11,7 @@ class ConfigurationBuilder(IConfigurationBuilder):
     def __init__(self):
         self.__parser = None
         self.__source = None
+        self.__default = None
 
     @classmethod
     def create(cls):
@@ -18,6 +19,12 @@ class ConfigurationBuilder(IConfigurationBuilder):
 
     def set_parser(self, parser):
         self.__parser = parser
+
+        return self
+
+    def set_default(self, default):
+        self.__default = default
+
         return self
 
     def set_source(self, source):
@@ -32,10 +39,10 @@ class ConfigurationBuilder(IConfigurationBuilder):
         match (source.scheme, source.netloc):
             case "", "":
                 path = PosixPath(source.geturl())
-                if path.expanduser().exists():
-                    self.__reader = ConfigurationLoadFile(path)
+                if not path.expanduser().exists() and self.__default is not None:
+                    self.__reader = ConfigurationLoadDict(self.__default)
                 else:
-                    self.__reader = ConfigurationLoadDict({})
+                    self.__reader = ConfigurationLoadFile(path)
             case "http" | "https", _:
                 raise NotImplementedError(f"HTTP: {source.scheme} not supported")
             case _:
