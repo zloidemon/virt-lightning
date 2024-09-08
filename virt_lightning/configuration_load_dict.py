@@ -6,4 +6,4 @@ class ConfigurationLoadDict:
         return (None, self.__data)
 
     def __repr__(self):
-        return f"ConfigurationLoadDict()"
+        return "ConfigurationLoadDict()"

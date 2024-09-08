@@ -1,7 +1,3 @@
-from pathlib import PosixPath
-from urllib.parse import ParseResult
-
-
 class ProxyLegacyConfiguration:
     def __init__(self, data):
         self.data = data
