@@ -61,9 +61,9 @@ class ConfigurationBuilder(IConfigurationBuilder):
 
         match self.__format:
             case "toml":
-                parsed_data = self.__parser(tomllib.loads(data))
+                parsed_data = self.__parser.parse(tomllib.loads(data))
             case None:
-                parsed_data = self.__parser(data)
+                parsed_data = self.__parser.parse(data)
             case _:
                 raise KeyError(f"unknown format: {self.__format}")
 

@@ -10,13 +10,21 @@ from virt_lightning.iconfiguration_parser import IConfigurationParser
 
 
 class ConfigurationParserLegacy(IConfigurationParser):
-    def __init__(self, config):
-        self.__config = {}
-        self.__section = "main"
-        self.__config[self.__section] = consts.DEFAULT_CONFIGURATION[self.__section]
+    def __init__(self, config, section):
+        self.__config = config
+        self.__section = section
 
-        if config.get(self.__section):
-            self.__config[self.__section].update(config[self.__section])
+    @classmethod
+    def parse(cls, config):
+        _section = "main"
+        _config = {
+            _section: consts.DEFAULT_CONFIGURATION[_section],
+        }
+
+        if config.get(_section):
+            _config[_section].update(config[_section])
+
+        return cls(_config, _section)
 
     def __get(self, key):
         return self.__config[self.__section].get(key)

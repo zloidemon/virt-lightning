@@ -10,7 +10,7 @@ from abc import (
 #
 class IConfigurationParser(metaclass=ABCMeta):
     @abstractmethod
-    def __init__(self, uri):
+    def __init__(self, config, section):
         pass
 
     @abstractproperty
@@ -27,6 +27,11 @@ class IConfigurationParser(metaclass=ABCMeta):
 
     @abstractproperty
     def registry(self):
+        pass
+
+    @classmethod
+    @abstractmethod
+    def parse(cls, config):
         pass
 
     def __repr__(self):
