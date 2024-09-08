@@ -93,6 +93,10 @@ class IConfigurationLogin(metaclass=ABCMeta):
 #
 class IConfigurationBuilder(metaclass=ABCMeta):
     @abstractmethod
+    def set_default(self, default):
+        pass
+
+    @abstractmethod
     def set_source(self, source):
         pass
 

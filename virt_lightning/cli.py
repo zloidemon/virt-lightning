@@ -145,6 +145,7 @@ def main():
         exit(ExitCode.FAIL.value)
 
     configuration_builder = ConfigurationBuilder.create()
+    configuration_builder.set_default(dict({}))
     configuration_builder.set_source(args.config)
     configuration_builder.set_parser(ParserConfigurationLegacy)
     configuration = configuration_builder.build(ProxyLegacyConfiguration)
