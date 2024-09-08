@@ -15,34 +15,6 @@ class IConfigurationNetworkModel(metaclass=ABCMeta):
 
 
 #
-# Интерфейс для получения конфигурации из различных источников
-#
-class IConfigurationSource(metaclass=ABCMeta):
-    @abstractmethod
-    def __init__(self, uri):
-        pass
-
-    @abstractproperty
-    def backend(self):
-        pass
-
-    @abstractproperty
-    def network(self):
-        pass
-
-    @abstractproperty
-    def user(self):
-        pass
-
-    @abstractproperty
-    def registry(self):
-        pass
-
-    def __repr__(self):
-        return f"ConfigurationSource({self.uri})"
-
-
-#
 # Пользователь с параметрами для POSIX
 #
 class IConfigurationPosixUser(metaclass=ABCMeta):
