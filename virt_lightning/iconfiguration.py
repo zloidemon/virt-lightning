@@ -110,7 +110,7 @@ class IConfigurationBuilder(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def build(self):
+    def build(self, config):
         pass
 
 
