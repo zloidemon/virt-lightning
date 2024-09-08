@@ -22,7 +22,9 @@ from virt_lightning.cli_stop import CLIStop
 from virt_lightning.cli_storage import CLIStorage
 from virt_lightning.cli_up import CLIup
 from virt_lightning.cli_viewer import CLIViewer
+from virt_lightning.configuration_builder import ConfigurationBuilder
 from virt_lightning.configuration_legacy import ProxyLegacyConfiguration
+from virt_lightning.configuration_load_file import ParserConfigurationLegacy
 from virt_lightning.consts import (
     CLI_MESSAGE_HELP,
     CLI_MESSAGE_USAGE,
@@ -142,7 +144,12 @@ def main():
         sys.stdout.write(f"{example}\n")
         exit(ExitCode.FAIL.value)
 
-    configuration = ProxyLegacyConfiguration.load(args.config)
+    configuration_builder = ConfigurationBuilder.create()
+    configuration_builder.set_default({})
+    configuration_builder.set_source(args.config)
+    configuration_builder.set_parser(ParserConfigurationLegacy)
+    configuration = configuration_builder.build(ProxyLegacyConfiguration)
+
     vmm_builder = VMMBuilder(configuration)
 
     vmm_builder.set_storage(StorageSystem)
