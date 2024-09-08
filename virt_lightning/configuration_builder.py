@@ -9,9 +9,7 @@ from virt_lightning.configuration_load_file import ConfigurationLoadFile
 class ConfigurationBuilder(IConfigurationBuilder):
     def __init__(self, parser):
         self.__parser = parser
-
         self.__source = None
-        self.__configuration = None
 
     @classmethod
     def create(cls, parser):
@@ -37,15 +35,11 @@ class ConfigurationBuilder(IConfigurationBuilder):
 
         return self
 
-    def set_configuration(self, obj):
-        self.__configuration = obj
-        return self
-
-    def build(self):
+    def build(self, config):
         if self.__source is None:
             raise ValueError("source must be defined before build")
 
-        if self.__configuration is None:
+        if config is None:
             raise ValueError("configuration class must be defined before build")
 
         self.__format, data = self.__reader.read()
@@ -56,7 +50,7 @@ class ConfigurationBuilder(IConfigurationBuilder):
             case _:
                 raise KeyError(f"unknown format: {self.__format}")
 
-        return self.__configuration(parsed_data)
+        return config(parsed_data)
 
 
 class Configuration:
