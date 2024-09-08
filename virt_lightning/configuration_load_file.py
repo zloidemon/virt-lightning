@@ -34,6 +34,9 @@ class ConfigurationLoadFile:
             self.__filename.expanduser().read_text(),
         )
 
+    def __repr__(self):
+        return f"ConfigurationLoadFile(filename={self.__filename})"
+
 
 class ParserConfigurationLegacy(IConfigurationSource):
     def __init__(self, config):
