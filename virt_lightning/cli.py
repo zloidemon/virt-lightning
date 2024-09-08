@@ -144,10 +144,10 @@ def main():
         sys.stdout.write(f"{example}\n")
         exit(ExitCode.FAIL.value)
 
-    configuration_builder = ConfigurationBuilder.create(ParserConfigurationLegacy)
-    configuration_builder.set_configuration(ProxyLegacyConfiguration)
+    configuration_builder = ConfigurationBuilder.create()
     configuration_builder.set_source(args.config)
-    configuration = configuration_builder.build()
+    configuration_builder.set_parser(ParserConfigurationLegacy)
+    configuration = configuration_builder.build(ProxyLegacyConfiguration)
 
     vmm_builder = VMMBuilder(configuration)
 
