@@ -2,6 +2,9 @@ import sys
 from pathlib import PosixPath
 from urllib.parse import urlparse
 
+from virt_lightning.configuration_builder import ConfigurationBuilder
+from virt_lightning.configuration_oci_build import ConfigurationOCIBuild
+from virt_lightning.configuration_parser_build import ConfigurationParserOCIBuild
 from virt_lightning.consts import CLI_MESSAGE_USAGE, DEFAULT_VL_COMMAND
 from virt_lightning.icli import ICLIcmd
 from virt_lightning.image_oci_create import OCIImageAssembly
@@ -56,4 +59,8 @@ class CLIBuild(ICLIcmd):
 
     @staticmethod
     def config(filename):
-        raise FileNotFoundError(str(filename))
+        configuration_builder = ConfigurationBuilder.create()
+        configuration_builder.set_source(filename)
+        configuration_builder.set_parser(ConfigurationParserOCIBuild)
+
+        configuration_builder.build(ConfigurationOCIBuild)
