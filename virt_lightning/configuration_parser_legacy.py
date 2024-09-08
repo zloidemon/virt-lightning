@@ -6,10 +6,10 @@ from virt_lightning.configuration_login_ssh import ConfigurationLoginSSH
 from virt_lightning.configuration_posix_user import ConfigurationPosixUser
 from virt_lightning.configuration_registry import ConfigurationRegistry
 from virt_lightning.configuration_tcpip import ConfigurationTCPIP
-from virt_lightning.iconfiguration import IConfigurationSource
+from virt_lightning.iconfiguration_parser import IConfigurationParser
 
 
-class ConfigurationParserLegacy(IConfigurationSource):
+class ConfigurationParserLegacy(IConfigurationParser):
     def __init__(self, config):
         self.__config = {}
         self.__section = "main"
