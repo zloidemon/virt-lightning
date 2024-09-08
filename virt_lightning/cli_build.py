@@ -56,4 +56,4 @@ class CLIBuild(ICLIcmd):
 
     @staticmethod
     def config(filename):
-        FileNotFoundError(str(filename))
+        raise FileNotFoundError(str(filename))
