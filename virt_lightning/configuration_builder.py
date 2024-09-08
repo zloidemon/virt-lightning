@@ -2,9 +2,9 @@ import tomllib
 from pathlib import PosixPath
 from urllib.parse import ParseResult
 
-from virt_lightning.iconfiguration import IConfigurationBuilder
 from virt_lightning.configuration_load_dict import ConfigurationLoadDict
 from virt_lightning.configuration_load_file import ConfigurationLoadFile
+from virt_lightning.iconfiguration import IConfigurationBuilder
 
 
 class ConfigurationBuilder(IConfigurationBuilder):
