@@ -3,6 +3,7 @@ from pathlib import PosixPath
 from urllib.parse import ParseResult
 
 from virt_lightning.iconfiguration import IConfigurationBuilder
+from virt_lightning.configuration_load_dict import ConfigurationLoadDict
 from virt_lightning.configuration_load_file import ConfigurationLoadFile
 
 
@@ -31,7 +32,10 @@ class ConfigurationBuilder(IConfigurationBuilder):
         match (source.scheme, source.netloc):
             case "", "":
                 path = PosixPath(source.geturl())
-                self.__reader = ConfigurationLoadFile(path)
+                if path.expanduser().exists():
+                    self.__reader = ConfigurationLoadFile(path)
+                else:
+                    self.__reader = ConfigurationLoadDict({})
             case "http" | "https", _:
                 raise NotImplementedError(f"HTTP: {source.scheme} not supported")
             case _:
@@ -51,6 +55,8 @@ class ConfigurationBuilder(IConfigurationBuilder):
         match self.__format:
             case "toml":
                 parsed_data = self.__parser(tomllib.loads(data))
+            case None:
+                parsed_data = self.__parser(data)
             case _:
                 raise KeyError(f"unknown format: {self.__format}")
 

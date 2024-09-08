@@ -20,9 +20,6 @@ class ConfigurationLoadFile:
 
         full_path = self.__filename.expanduser()
 
-        if not full_path.exists():
-            raise FileNotFoundError(f"not found location: {full_path}")
-
         if not full_path.is_file():
             raise FileNotFoundError(f"file not found: {full_path}")
 
@@ -43,7 +40,9 @@ class ParserConfigurationLegacy(IConfigurationSource):
         self.__config = {}
         self.__section = "main"
         self.__config[self.__section] = consts.DEFAULT_CONFIGURATION[self.__section]
-        self.__config[self.__section].update(config[self.__section])
+
+        if config.get(self.__section):
+            self.__config[self.__section].update(config[self.__section])
 
     def __get(self, key):
         return self.__config[self.__section].get(key)

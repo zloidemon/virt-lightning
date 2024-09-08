@@ -97,7 +97,7 @@ class IConfigurationBuilder(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def set_configuration(self, obj):
+    def set_parser(self, parser):
         pass
 
     @classmethod
