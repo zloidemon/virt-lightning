@@ -7,13 +7,17 @@ from virt_lightning.configuration_load_file import ConfigurationLoadFile
 
 
 class ConfigurationBuilder(IConfigurationBuilder):
-    def __init__(self, parser):
-        self.__parser = parser
+    def __init__(self):
+        self.__parser = None
         self.__source = None
 
     @classmethod
-    def create(cls, parser):
-        return cls(parser)
+    def create(cls):
+        return cls()
+
+    def set_parser(self, parser):
+        self.__parser = parser
+        return self
 
     def set_source(self, source):
         if self.__source:
