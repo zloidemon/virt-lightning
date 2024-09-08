@@ -3,7 +3,7 @@ from collections import namedtuple
 from urllib.parse import urlparse
 
 from virt_lightning.configuration_builder import Configuration, ConfigurationBuilder
-from virt_lightning.configuration_legacy import ProxyLegacyConfiguration
+from virt_lightning.configuration_legacy import LegacyConfiguration
 
 
 class TestConfigurationBuilder(unittest.TestCase):
@@ -33,7 +33,7 @@ class TestConfigurationBuilder(unittest.TestCase):
         self.assertIsNone(self.config._ConfigurationBuilder__source)
 
         with self.assertRaises(ValueError):
-            self.config.build(ProxyLegacyConfiguration)
+            self.config.build(LegacyConfiguration)
 
 
 #

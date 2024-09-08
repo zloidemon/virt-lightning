@@ -1,6 +1,7 @@
 from pathlib import PosixPath
 
 from virt_lightning import consts
+from virt_lightning.configuration_application import IConfigurationApplication
 from virt_lightning.configuration_backend import ConfigurationBackend
 from virt_lightning.configuration_login_ssh import ConfigurationLoginSSH
 from virt_lightning.configuration_posix_user import ConfigurationPosixUser
@@ -9,7 +10,7 @@ from virt_lightning.configuration_tcpip import ConfigurationTCPIP
 from virt_lightning.iconfiguration_parser import IConfigurationParser
 
 
-class ConfigurationParserLegacy(IConfigurationParser):
+class ConfigurationParserLegacy(IConfigurationParser, IConfigurationApplication):
     def __init__(self, config, section):
         self.__config = config
         self.__section = section

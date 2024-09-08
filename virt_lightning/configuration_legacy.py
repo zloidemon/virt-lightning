@@ -1,4 +1,7 @@
-class ProxyLegacyConfiguration:
+#
+# Класс для сохранения совместимости доступа к конфигурации для старого кода
+#
+class LegacyConfiguration:
     def __init__(self, data):
         self.data = data
 

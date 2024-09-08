@@ -23,7 +23,7 @@ from virt_lightning.cli_storage import CLIStorage
 from virt_lightning.cli_up import CLIup
 from virt_lightning.cli_viewer import CLIViewer
 from virt_lightning.configuration_builder import ConfigurationBuilder
-from virt_lightning.configuration_legacy import ProxyLegacyConfiguration
+from virt_lightning.configuration_legacy import LegacyConfiguration
 from virt_lightning.configuration_parser_legacy import ConfigurationParserLegacy
 from virt_lightning.consts import (
     CLI_MESSAGE_HELP,
@@ -148,7 +148,7 @@ def main():
     configuration_builder.set_default({})
     configuration_builder.set_source(args.config)
     configuration_builder.set_parser(ConfigurationParserLegacy)
-    configuration = configuration_builder.build(ProxyLegacyConfiguration)
+    configuration = configuration_builder.build(LegacyConfiguration)
 
     vmm_builder = VMMBuilder(configuration)
 
