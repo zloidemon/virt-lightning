@@ -27,7 +27,7 @@ class ConfigurationLoadFile:
             raise FileNotFoundError(f"file not found: {full_path}")
 
         if self.__filename.suffix == "":
-            raise ValueError("unknown format of file")
+            raise ValueError(f"unknown format of file: {self.__filename.suffix}")
 
         return (
             self.__filename.suffix.split(".")[-1],
