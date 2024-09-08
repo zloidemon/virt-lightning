@@ -1,7 +1,9 @@
 import unittest
 from collections import namedtuple
+from urllib.parse import urlparse
 
 from virt_lightning.configuration_builder import Configuration, ConfigurationBuilder
+from virt_lightning.configuration_legacy import ProxyLegacyConfiguration
 
 
 class TestConfigurationBuilder(unittest.TestCase):
@@ -14,31 +16,24 @@ class TestConfigurationBuilder(unittest.TestCase):
 
     def test_set_source(self):
         self.assertIsNone(self.config._ConfigurationBuilder__source)
-        self.config.set_source("FIXME: It should be right source")
+        source = urlparse("test")
+        self.config.set_source(source)
         self.assertIsNotNone(self.config._ConfigurationBuilder__source)
 
     def test_set_source_duplicate(self):
         self.assertIsNone(self.config._ConfigurationBuilder__source)
-        self.config.set_source("FIXME: It should be right source")
+        source = urlparse("test")
+        self.config.set_source(source)
         self.assertIsNotNone(self.config._ConfigurationBuilder__source)
 
         with self.assertRaises(KeyError):
-            self.config.set_source("FIXME: It should be right source")
+            self.config.set_source(source)
 
     def test_invalid_build(self):
         self.assertIsNone(self.config._ConfigurationBuilder__source)
 
         with self.assertRaises(ValueError):
-            self.config.build()
-
-    #
-    # FIXME: Переделать на использование реальных объектов с данными вместо
-    #        namedtuple.
-    #
-    def test_valid_build(self):
-        source = namedtuple("Source", ["backend", "user", "network", "registry"])
-        self.config.set_source(source(True, True, True, True))
-        self.assertIsNotNone(self.config.build())
+            self.config.build(ProxyLegacyConfiguration)
 
 
 #
@@ -46,7 +41,8 @@ class TestConfigurationBuilder(unittest.TestCase):
 #
 class TestConfigurationFromBuilder(unittest.TestCase):
     def setUp(self):
-        self.config = Configuration(True, True, True, True)
+        source = namedtuple("Source", ["backend", "user", "network", "registry"])
+        self.config = Configuration(source(True, True, True, True))
 
     def test_is_true(self):
         self.assertTrue(self.config.backend)
