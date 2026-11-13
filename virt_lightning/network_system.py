@@ -51,7 +51,17 @@ class NetworkSystem:
             "netmask": network.netmask.exploded,
         }
         xml = ElementTree.tostring(root).decode()
-        return self.conn.networkCreateXML(xml)
+
+        try:
+            return self.conn.networkCreateXML(xml)
+        except libvirt.libvirtError as e:
+            logger.error(
+                "Failed to create network '%s' (CIDR: %s): %s",
+                network_name,
+                network_cidr,
+                e,
+            )
+            exit(1)
 
     def reuse_mac_address(self, network_name, domain_name, ipv4):
         network_obj = self.__get_network_by_name(network_name)
