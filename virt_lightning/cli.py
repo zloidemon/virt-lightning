@@ -126,6 +126,7 @@ def main():
     cli_builder.add_command(CLIStop)
     cli_builder.add_command(CLIStorage)
     cli_builder.add_command(CLIViewer)
+    cli_builder.add_command(CLIVersion)
     cli_builder.add_command(CLIps)
     cli_builder.add_command(CLIssh)
     cli_builder.add_command(CLIup, vl_lightning_config_args)
@@ -190,6 +191,8 @@ def main():
             CLIStart.run(vmm, configuration=configuration, **vars(args))
         case "up":
             CLIup.run(vmm, args.virt_lightning_conf, configuration=configuration)
+        case "version":
+            CLIVersion.run()
         case _:
             CLIHelp.run()
             raise NotImplementedError(f"command: {args.action}")

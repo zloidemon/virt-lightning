@@ -4,26 +4,30 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "virt-lightning"
+version = "2.4.1"
 description = "Deploy your testing VM in a couple of seconds"
 readme = "README.md"
 authors = [{ name = "Gonéri Le Bouder", email="goneri@lebouder.net" }]
 requires-python = ">=3.11"
+license = "Apache-2.0"
 classifiers = [
     "Environment :: Console",
-    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
     "Operating System :: POSIX :: Linux",
 ]
-dynamic = ["dependencies", "version"]
 keywords = ["libvirt", "cloud", "qemu", "cloudinit"]
+dependencies = [
+    "libvirt-python>=11.10.0",
+    "pyyaml>=6.0.3",
+]
 
 [project.urls]
 Homepage = "https://virt-lightning.org/"
 Source = "https://github.com/virt-lightning/virt-lightning"
 
 [project.optional-dependencies]
-test = [
-    "tox",
+urwid = [
+    "urwid>=2.6.16",
 ]
 
 [project.scripts]
@@ -33,14 +37,8 @@ vl = "virt_lightning.cli:main"
 
 [tool]
 
-[tool.setuptools_scm]
-write_to = "virt_lightning/version.py"
-
 [tool.setuptools]
 packages = ["virt_lightning"]
-
-[tool.setuptools.dynamic]
-dependencies = {file = ["requirements.txt"]}
 
 [tool.ruff]
 line-length = 100
@@ -67,5 +65,11 @@ lint.ignore = ["N806"]
 
 [dependency-groups]
 dev = [
+    "black>=24.8.0",
+    "mypy>=1.14.1",
+    "pep8-naming>=0.14.1",
+    "pytest>=8.3.5",
+    "pytest-cov>=5.0.0",
+    "types-pyyaml>=6.0.12.20241230",
     "urllib3>=2.2.3",
 ]
