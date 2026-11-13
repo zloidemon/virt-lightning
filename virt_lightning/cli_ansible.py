@@ -63,7 +63,7 @@ class CLIAnsible(ICLIcmd):
                 name=domain.name,
                 username=domain.username,
                 ipv4=domain.ipv4.ip,
-                additional_nics=domain.additional_nics,
+                additional_nics=domain.additional_nics or "",
                 python_interpreter=domain.python_interpreter,
             )
 
