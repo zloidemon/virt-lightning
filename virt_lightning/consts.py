@@ -133,7 +133,7 @@ DEFAULT_CONFIGURATION = {
         "network_name": f"{DEFAULT_VL_NAME}",
         "network_cidr": "192.168.123.0/24",
         "network_auto_clean_up": True,
-        "ssh_key_file": "~/.ssh/id_rsa.pub",
+        "ssh_key_file": "",
         "registry_urls": "",
     }
 }
