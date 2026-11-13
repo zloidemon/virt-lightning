@@ -196,3 +196,6 @@ def main():
         case _:
             CLIHelp.run()
             raise NotImplementedError(f"command: {args.action}")
+
+if __name__ == "__main__":
+    main()
