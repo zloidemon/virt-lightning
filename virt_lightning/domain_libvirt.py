@@ -10,7 +10,6 @@ import libvirt
 
 import virt_lightning.consts as consts
 from virt_lightning.disk_system import DiskSystem
-from virt_lightning.exceptions import VMNotRunningError
 
 DISK_XML = """
     <disk type='file' device='disk'>
@@ -455,14 +454,9 @@ class LibvirtDomain:
             logger.info(f"Skipping {host['name']}, already here.")
             return None
         else:
-            logger.info(f"Skipping {host['name']}, already here but is not running.")
-            logger.info(
-                f"You can restart with: virsh -c {configuration.libvirt_uri} start {host['name']}"
-            )
-            logger.info(
-                f"You can also destroy the instance with: vl stop {host['name']}"
-            )
-            raise VMNotRunningError(host["name"])
+            logger.info(f"Start not running instance: {host['name']}")
+            domain.dom.create()
+            return None
 
         logger.info(f"^ {host['name']} ")
 
