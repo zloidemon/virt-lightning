@@ -26,4 +26,4 @@ class CLIVersion(ICLIcmd):
     @staticmethod
     def run():
         package_version = get_version("virt-lightning")
-        sys.stdout.write(f"{package_version}"}\n")
+        sys.stdout.write(f"{package_version}\n")

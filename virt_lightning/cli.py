@@ -21,6 +21,7 @@ from virt_lightning.cli_start import CLIStart
 from virt_lightning.cli_stop import CLIStop
 from virt_lightning.cli_storage import CLIStorage
 from virt_lightning.cli_up import CLIup
+from virt_lightning.cli_version import CLIVersion
 from virt_lightning.cli_viewer import CLIViewer
 from virt_lightning.configuration_builder import ConfigurationBuilder
 from virt_lightning.configuration_legacy import LegacyConfiguration
@@ -125,8 +126,8 @@ def main():
     cli_builder.add_command(CLIStart)
     cli_builder.add_command(CLIStop)
     cli_builder.add_command(CLIStorage)
-    cli_builder.add_command(CLIViewer)
     cli_builder.add_command(CLIVersion)
+    cli_builder.add_command(CLIViewer)
     cli_builder.add_command(CLIps)
     cli_builder.add_command(CLIssh)
     cli_builder.add_command(CLIup, vl_lightning_config_args)

@@ -22,7 +22,7 @@ def _register_aio_virt_impl(loop):
         except ImportError:
             libvirt.virEventRegisterDefaultImpl()
         _register_aio_virt_impl.aio_virt_bindinds[loop] = True
-	return loop
+    return loop
 
 
 _register_aio_virt_impl.__dict__["aio_virt_bindinds"] = {}
