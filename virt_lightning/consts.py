@@ -139,7 +139,7 @@ DEFAULT_CONFIGURATION = {
 }
 DEFAULT_DOMAIN_CONFIGURATION = {
     "groups": [],
-    "memory": 768,
+    "memory": 1024,
     "root_password": DEFAULT_USER_PASSWORD,
     "username": getpass.getuser(),
     "vcpus": 1,
