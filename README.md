@@ -78,8 +78,9 @@ python3 -m venv venv --system-site-packages
 ## Installation (Debian/Ubuntu)
 
 ```shell
-sudo apt install uv python3-venv pkg-config gcc libvirt-dev python3-dev
-uvx install virt-lightning
+sudo apt install python3-venv pkg-config gcc libvirt-dev python3-dev pipx
+pipx ensurepath
+pipx install virt-lightning
 ```
 
 ## Post Installation
@@ -149,7 +150,7 @@ List the VMs, their IP and if they are reachable.
 
 Export an inventory in the Ansible format.
 
-**Note:** Created VMs use various Python versions, which can cause compatibility issues with the Ansible version on the control node (host). In case of errors related to Python version compatibility, please consult the Ansible n[changelog](https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html) for details on supported Python versions.
+**Note:** Created VMs use various Python versions, which can cause compatibility issues with the Ansible version on the control node (host). In case of errors related to Python version compatibility, please consult the Ansible [changelog](https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html) for details on supported Python versions.
 
 In can you need a different Python version for a given image (`ansible_python_interpreter`), you can define it in a YAML file aside of the qcow2 image. E.g:
 
