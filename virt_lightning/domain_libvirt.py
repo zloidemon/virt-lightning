@@ -240,6 +240,59 @@ class LibvirtDomain:
     def groups(self, value):
         self.record_metadata("groups", ",".join(value))
 
+    @property
+    def video_model(self):
+        """Get the current video model from domain XML."""
+        xml = self.dom.XMLDesc(0)
+        root = ET.fromstring(xml)
+        video_model_elem = root.find("./devices/video/model")
+        if video_model_elem is not None:
+            return video_model_elem.attrib.get("type")
+        return None
+
+    @video_model.setter
+    def video_model(self, model):
+        """Set video model and update the domain XML.
+
+        Args:
+            model: Video model type (virtio, cirrus, qxl, vga, etc.)
+        """
+        # Only update if specified and different from current model
+        current_model = self.video_model
+        if model and model != current_model:
+            self.update_video(model)
+
+    def update_video(self, model):
+        """Update the video device model in domain XML.
+
+        Args:
+            model: Video model type (virtio, cirrus, qxl, vga, etc.)
+        """
+        # Get the current domain XML
+        xml = self.dom.XMLDesc(0)
+        root = ET.fromstring(xml)
+
+        # Find the video model element and replace it
+        video_model_elem = root.find("./devices/video/model")
+        if video_model_elem is not None:
+            # Clear all attributes to remove model-specific ones (e.g., ram for qxl)
+            video_model_elem.clear()
+            # Set basic attributes that work across all video models
+            video_model_elem.attrib["type"] = model
+            video_model_elem.attrib["vram"] = "16384"
+            video_model_elem.attrib["heads"] = "1"
+            video_model_elem.attrib["primary"] = "yes"
+
+        # Redefine the domain with updated XML
+        # defineXML() updates existing definitions atomically - no need to undefine()
+        conn = self.dom.connect()
+        new_xml = ET.tostring(root).decode()
+        new_dom = conn.defineXML(new_xml)
+
+        # Update the domain reference
+        self.dom = new_dom
+
+
     def attach_disk(self, volume, device="disk", disk_type="qcow2"):
         match device:
             case "cdrom":
@@ -420,6 +473,7 @@ class LibvirtDomain:
             "vcpus": host.get("vcpus"),
             "fqdn": host.get("fqdn"),
             "default_nic_mode": host.get("default_nic_model"),
+            "video_model": host.get("video_model"),
             "bootcmd": host.get("bootcmd"),
             "runcmd": host.get("runcmd"),
             "meta_data_media_type": host.get("meta_data_media_type"),

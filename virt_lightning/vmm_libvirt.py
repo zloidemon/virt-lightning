@@ -71,6 +71,12 @@ DOMAIN_XML = """
 </domain>
 """
 
+VIDEO_XML = """
+<video>
+  <model type='virtio' vram='16384' heads='1' primary='yes'/>
+</video>
+"""
+
 logger = logging.getLogger(DEFAULT_LOGGER)
 
 
@@ -113,6 +119,12 @@ class VMMLibvirt:
         root.find("./vcpu").text = str(self.conn.getInfo()[2])
         root.find("./devices/emulator").text = str(ExecFileVirtTool().entrypoint)
         root.find("./os/type").attrib["arch"] = self.arch
+
+        # Add default video device (virtio)
+        devices = root.find("./devices")
+        video_elem = ET.fromstring(VIDEO_XML)
+        devices.append(video_elem)
+
         dom = self.conn.defineXML(ElementTree.tostring(root).decode())
         domain = LibvirtDomain(dom)
         domain.distro = distro
@@ -136,6 +148,7 @@ class VMMLibvirt:
         domain.username = config["username"]
         domain.vcpus = config["vcpus"]
         domain.default_nic_model = config["default_nic_model"]
+        domain.video_model = config["video_model"]
         domain.bootcmd = config["bootcmd"]
         domain.runcmd = config["runcmd"]
         domain.meta_data_media_type = config["meta_data_media_type"]

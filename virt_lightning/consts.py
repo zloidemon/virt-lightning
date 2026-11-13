@@ -144,6 +144,7 @@ DEFAULT_DOMAIN_CONFIGURATION = {
     "username": getpass.getuser(),
     "vcpus": 1,
     "default_nic_model": "virtio",
+    "video_model": "virtio",
     "bootcmd": [],
     "runcmd": [],
     "meta_data_media_type": "cdrom",
