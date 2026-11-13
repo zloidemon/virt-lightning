@@ -75,22 +75,31 @@ class LibvirtDomain:
 
     def load_ssh_key_file(self, ssh_key_file):
         doc_url = "https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/#generating-a-new-ssh-key"
-        try:
-            self.ssh_key = ssh_key_file.expanduser().read_text()
-        except OSError:
-            logger.error(
-                f"Can not read {ssh_key_file}. If you don't have any SSH key, "
-                f"please follow the steps describe here:\n  {doc_url}"
-                "\n"
-                "If you're SSH key is not ~/.ssh/id_rsa.pub, you need to configure "
-                "the ~/.config/virt-lightning/config.ini file, e.g:\n"
-                "\n"
-                "[main]\n"
-                "ssh_key_file = ~/.ssh/id_ed25519.pub\n"
-            )
-            raise
+        if ssh_key_file is not None:
+            try:
+                self.ssh_key = pathlib.Path(ssh_key_file).expanduser().read_text()
+            except OSError:
+                logger.error(
+                    f"Can not read {ssh_key_file}. If you don't have any SSH key, "
+                    f"please follow the steps describe here:\n  {doc_url}"
+                    "\n"
+                    "If you're SSH key is not ~/.ssh/id_rsa.pub, you need to configure "
+                    "the ~/.config/virt-lightning/config.ini file, e.g:\n"
+                    "\n"
+                    "[main]\n"
+                    "ssh_key_file = ~/.ssh/id_ed25519.pub\n"
+                )
+                raise
+        else:
+            try:
+                self.ssh_key = subprocess.run(
+                    ["ssh-add", "-L"], capture_output=True, check=True, text=True
+                ).stdout
+            except subprocess.CalledProcessError:
+                logger.error("Failed loading SSH key(s) from `ssh-add -L`.")
+                raise
 
-        self.user_data["ssh_authorized_keys"] = [self.ssh_key]
+        self.user_data["ssh_authorized_keys"] = self.ssh_key.splitlines()
         if "users" in self.user_data:
             self.user_data["users"][0]["ssh_authorized_keys"] = [self.ssh_key]
 

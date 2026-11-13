@@ -130,7 +130,7 @@ class VMMLibvirt:
             if v:
                 config[k] = v
         domain.groups = config["groups"]
-        domain.load_ssh_key_file(pathlib.Path(config["ssh_key_file"]))
+        domain.load_ssh_key_file(config.get("ssh_key_file"))
         domain.memory = config["memory"]
         domain.root_password = config["root_password"]
         domain.username = config["username"]
