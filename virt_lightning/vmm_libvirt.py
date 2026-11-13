@@ -142,6 +142,10 @@ class VMMLibvirt:
         domain.default_bus_type = config["default_bus_type"]
         if "fqdn" in config:
             domain.fqdn = config["fqdn"]
+        if "packages" in config:
+            domain.user_data["packages"] = config["packages"]
+        if "write_files" in config:
+            domain.user_data["write_files"] = config["write_files"]
 
     def list_domains(self):
         for domain in self.conn.listAllDomains():

@@ -37,6 +37,8 @@ class LibvirtDomain:
             "disable_root": 0,
             "bootcmd": [],
             "runcmd": [],
+            "packages": [],
+            "write_files": [],
         }
         self._ssh_key = None
         self.default_nic_model = None

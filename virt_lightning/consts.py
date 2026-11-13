@@ -148,6 +148,8 @@ DEFAULT_DOMAIN_CONFIGURATION = {
     "runcmd": [],
     "meta_data_media_type": "cdrom",
     "default_bus_type": "virtio",
+    "packages": [],
+    "write_files": [],
 }
 DEFAULT_LIBVIRT_GROUP = "libvirt"
 DEFAULT_STORAGE_DIR = f"/var/lib/{DEFAULT_VL_NAME}/pool"
