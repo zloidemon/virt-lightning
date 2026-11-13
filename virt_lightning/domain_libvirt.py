@@ -3,6 +3,7 @@ import ipaddress
 import logging
 import re
 import string
+import subprocess
 from xml.etree import ElementTree
 
 import libvirt
@@ -77,7 +78,7 @@ class LibvirtDomain:
         doc_url = "https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/#generating-a-new-ssh-key"
         if ssh_key_file is not None:
             try:
-                self.ssh_key = pathlib.Path(ssh_key_file).expanduser().read_text()
+                self.ssh_key = ssh_key_file.expanduser().read_text()
             except OSError:
                 logger.error(
                     f"Can not read {ssh_key_file}. If you don't have any SSH key, "
@@ -91,6 +92,7 @@ class LibvirtDomain:
                 )
                 raise
         else:
+            # FIXME: Переделать этот кусок с subprocess.
             try:
                 self.ssh_key = subprocess.run(
                     ["ssh-add", "-L"], capture_output=True, check=True, text=True
@@ -244,7 +246,7 @@ class LibvirtDomain:
     def video_model(self):
         """Get the current video model from domain XML."""
         xml = self.dom.XMLDesc(0)
-        root = ET.fromstring(xml)
+        root = ElementTree.fromstring(xml)
         video_model_elem = root.find("./devices/video/model")
         if video_model_elem is not None:
             return video_model_elem.attrib.get("type")
@@ -270,7 +272,7 @@ class LibvirtDomain:
         """
         # Get the current domain XML
         xml = self.dom.XMLDesc(0)
-        root = ET.fromstring(xml)
+        root = ElementTree.fromstring(xml)
 
         # Find the video model element and replace it
         video_model_elem = root.find("./devices/video/model")
@@ -286,7 +288,7 @@ class LibvirtDomain:
         # Redefine the domain with updated XML
         # defineXML() updates existing definitions atomically - no need to undefine()
         conn = self.dom.connect()
-        new_xml = ET.tostring(root).decode()
+        new_xml = ElementTree.tostring(root).decode()
         new_dom = conn.defineXML(new_xml)
 
         # Update the domain reference

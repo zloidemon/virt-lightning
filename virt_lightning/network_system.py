@@ -1,7 +1,13 @@
 import ipaddress
+import logging
 from xml.etree import ElementTree
 
 import libvirt
+
+from virt_lightning.consts import DEFAULT_LOGGER, ExitCode
+
+logger = logging.getLogger(DEFAULT_LOGGER)
+
 
 NETWORK_DHCP_ENTRY = """
 <host />
@@ -61,7 +67,7 @@ class NetworkSystem:
                 network_cidr,
                 e,
             )
-            exit(1)
+            exit(ExitCode.FAIL)
 
     def reuse_mac_address(self, network_name, domain_name, ipv4):
         network_obj = self.__get_network_by_name(network_name)

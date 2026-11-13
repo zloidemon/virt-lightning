@@ -1,6 +1,5 @@
 import logging
 import sys
-
 from importlib.metadata import version as get_version
 
 from virt_lightning.consts import DEFAULT_LOGGER

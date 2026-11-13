@@ -122,7 +122,7 @@ class VMMLibvirt:
 
         # Add default video device (virtio)
         devices = root.find("./devices")
-        video_elem = ET.fromstring(VIDEO_XML)
+        video_elem = ElementTree.fromstring(VIDEO_XML)
         devices.append(video_elem)
 
         dom = self.conn.defineXML(ElementTree.tostring(root).decode())

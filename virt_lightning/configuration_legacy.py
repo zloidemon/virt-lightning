@@ -1,7 +1,3 @@
-import logging
-
-logger = logging.getLogger("virt_lightning")
-
 #
 # Класс для сохранения совместимости доступа к конфигурации для старого кода
 #
@@ -31,13 +27,7 @@ class LegacyConfiguration:
 
     @property
     def ssh_key_file(self):
-        if self.__get("ssh_key_file"):
-            return self.__get("ssh_key_file")
-
-        found = next((Path.home() / ".ssh").glob("id_*.pub"), None)
-        logger.debug(f"No SSH key defined in configuration, failing back on {found}")
-
-        return found
+        return self.data.user.login.key
 
     @property
     def storage_pool(self):

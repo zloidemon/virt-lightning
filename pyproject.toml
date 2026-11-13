@@ -25,11 +25,6 @@ dependencies = [
 Homepage = "https://virt-lightning.org/"
 Source = "https://github.com/virt-lightning/virt-lightning"
 
-[project.optional-dependencies]
-urwid = [
-    "urwid>=2.6.16",
-]
-
 [project.scripts]
 virt-lightning = "virt_lightning.cli:main"
 vl = "virt_lightning.cli:main"
