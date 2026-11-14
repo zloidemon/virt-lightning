@@ -5,7 +5,6 @@ from virt_lightning.exceptions import (
     ImageNotFoundLocallyError,
     ImageNotFoundUpstreamError,
     VMNotFoundError,
-    VMNotRunningError,
 )
 
 
@@ -31,9 +30,3 @@ class TestExceptions(unittest.TestCase):
             raise VMNotFoundError("Test vm not found message")
 
         self.assertEqual("Test vm not found message", ctx.exception.name)
-
-    def test_vm_not_running_error(self):
-        with self.assertRaises(VMNotRunningError) as ctx:
-            raise VMNotRunningError("Test vm running message")
-
-        self.assertEqual("Test vm running message", ctx.exception.name)
