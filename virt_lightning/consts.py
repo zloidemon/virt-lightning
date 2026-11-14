@@ -134,7 +134,7 @@ DEFAULT_CONFIGURATION = {
         "network_name": f"{DEFAULT_VL_NAME}",
         "network_cidr": "192.168.123.0/24",
         "network_auto_clean_up": True,
-        "ssh_key_file": "~/.ssh/id_rsa.pub", #FIXME: переделать на поиск
+        "ssh_key_file": "~/.ssh/id_rsa.pub",  # FIXME: переделать на поиск
         "registry_urls": "",
     }
 }
