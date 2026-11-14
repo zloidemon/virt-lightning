@@ -39,10 +39,21 @@ class Menu:
         panel.update_panels()
         curses.doupdate()
 
+    def __restore_curses(self):
+        curses.reset_prog_mode()
+        self.window.keypad(True)
+        curses.noecho()
+        curses.cbreak()
+        self.window.clear()
+        self.window.refresh()
+
     def __restore_shell(self):
         self.window.keypad(0)
         curses.echo()
         curses.nocbreak()
+        curses.def_prog_mode()
+        self.window.clear()
+        self.window.refresh()
         curses.endwin()
 
     def loop(self):
@@ -73,11 +84,12 @@ class Menu:
                 case curses.KEY_UP | curses.KEY_DOWN as key:
                     self.__move(key)
                 case curses.KEY_ENTER | curses.KEY_NEWLINE:
-                    self.__restore_shell()
 
                     if len(self.items) > 0 and self.position < len(self.items):
                         item, callback = self.items[self.position]
+                        self.__restore_shell()
                         callback(item)
+                        self.__restore_curses()
                     else:
                         break
                 case curses.KEY_Q:
@@ -105,4 +117,17 @@ class VirtTUI:
 
 
 def menu(entries, callback):
-    curses.wrapper(VirtTUI, sorted(entries), callback)
+    stdscr = curses.initscr()
+    try:
+        try:
+            curses.curs_set(1)
+            curses.start_color()
+        except curses.error:
+            pass
+        curses.noecho()
+        curses.cbreak()
+        stdscr.keypad(True)
+        VirtTUI(stdscr, sorted(entries), callback)
+    finally:
+        if not curses.isendwin():
+            curses.endwin()
