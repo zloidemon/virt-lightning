@@ -70,7 +70,9 @@ class TestConfigurationPosixUser(unittest.TestCase):
 
     def test_username_valid(self):
         self.config.username = "hello"
-        self.assertEqual(self.config.username, self.config._ConfigurationPosixUser__username)
+        self.assertEqual(
+            self.config.username, self.config._ConfigurationPosixUser__username
+        )
 
     def test_username_get_empty(self):
         with self.assertRaises(AttributeError):
@@ -94,7 +96,9 @@ class TestConfigurationPosixUser(unittest.TestCase):
     #
     def test_groupname_valid(self):
         self.config.groupname = "hello"
-        self.assertEqual(self.config.groupname, self.config._ConfigurationPosixUser__groupname)
+        self.assertEqual(
+            self.config.groupname, self.config._ConfigurationPosixUser__groupname
+        )
 
     def test_groupname_get_empty(self):
         with self.assertRaises(AttributeError):
@@ -118,7 +122,9 @@ class TestConfigurationPosixUser(unittest.TestCase):
     #
     def test_password_valid(self):
         self.config.password = "password"
-        self.assertEqual(self.config.password, self.config._ConfigurationPosixUser__password)
+        self.assertEqual(
+            self.config.password, self.config._ConfigurationPosixUser__password
+        )
 
     def test_password_get_empty(self):
         with self.assertRaises(AttributeError):

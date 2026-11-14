@@ -5,23 +5,37 @@ from pathlib import PosixPath
 from virt_lightning.image_oci_index import OCIIndex
 from virt_lightning.image_oci_media_type import OCIMediaType
 
-TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_CONTENT_DESCRIPTOR = "application/vnd.oci.descriptor.v1+json"
+TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_CONTENT_DESCRIPTOR = (
+    "application/vnd.oci.descriptor.v1+json"
+)
 TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_OCI_LAYOUT = "application/vnd.oci.layout.header.v1+json"
 TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_IMAGE_INDEX = "application/vnd.oci.image.index.v1+json"
-TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_IMAGE_MANIFEST = "application/vnd.oci.image.manifest.v1+json"
-TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_IMAGE_CONFIG = "application/vnd.oci.image.config.v1+json"
+TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_IMAGE_MANIFEST = (
+    "application/vnd.oci.image.manifest.v1+json"
+)
+TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_IMAGE_CONFIG = (
+    "application/vnd.oci.image.config.v1+json"
+)
 TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_LAYER = "application/vnd.oci.image.layer.v1.tar"
-TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_LAYER_GZIP = "application/vnd.oci.image.layer.v1.tar+gzip"
-TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_LAYER_ZSTD = "application/vnd.oci.image.layer.v1.tar+zstd"
+TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_LAYER_GZIP = (
+    "application/vnd.oci.image.layer.v1.tar+gzip"
+)
+TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_LAYER_ZSTD = (
+    "application/vnd.oci.image.layer.v1.tar+zstd"
+)
 TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_EMPTY = "application/vnd.oci.empty.v1+json"
 
 
 class TestOCIMediaType(unittest.TestCase):
     def setUp(self):
-        self.content_descriptor = OCIMediaType(TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_CONTENT_DESCRIPTOR)
+        self.content_descriptor = OCIMediaType(
+            TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_CONTENT_DESCRIPTOR
+        )
         self.oci_layout = OCIMediaType(TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_OCI_LAYOUT)
         self.image_index = OCIMediaType(TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_IMAGE_INDEX)
-        self.image_manifest = OCIMediaType(TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_IMAGE_MANIFEST)
+        self.image_manifest = OCIMediaType(
+            TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_IMAGE_MANIFEST
+        )
         self.image_config = OCIMediaType(TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_IMAGE_CONFIG)
         self.layer = OCIMediaType(TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_LAYER)
         self.layer_gzip = OCIMediaType(TEST_SUITE_OCI_IMAGE_MEDIA_TYPE_LAYER_GZIP)

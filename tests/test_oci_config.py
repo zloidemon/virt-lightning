@@ -54,8 +54,14 @@ class TestOCIConfig(unittest.TestCase):
         self.assertIsNotNone(self.config_req.rootfs)
         self.assertEqual(self.config_req.rootfs.type, "layers")
         valid = [
-            ("sha256", "c6f988f4874bb0add23a778f753c65efe992244e148a1d2ec2a8b664fb66bbd1"),
-            ("sha256", "5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef"),
+            (
+                "sha256",
+                "c6f988f4874bb0add23a778f753c65efe992244e148a1d2ec2a8b664fb66bbd1",
+            ),
+            (
+                "sha256",
+                "5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+            ),
         ]
         self.assertListEqual(self.config_req.rootfs.diff_ids, valid)
 
@@ -105,7 +111,7 @@ class TestOCIConfig(unittest.TestCase):
         valid = {
             "BAR": "well_written_spec",
             "FOO": "oci_is_a",
-            "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+            "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
         }
         self.assertDictEqual(self.config_opt.config.env, valid)
 
@@ -115,7 +121,7 @@ class TestOCIConfig(unittest.TestCase):
     def test_optional_config_cmd(self):
         self.assertListEqual(
             ["--foreground", "--config", "/etc/my-app.d/default.cfg"],
-            self.config_opt.config.cmd
+            self.config_opt.config.cmd,
         )
 
     def test_optional_config_volumes(self):
@@ -136,8 +142,14 @@ class TestOCIConfig(unittest.TestCase):
         self.assertIsNotNone(self.config_opt.rootfs)
         self.assertEqual(self.config_opt.rootfs.type, "layers")
         valid = [
-            ("sha256", "c6f988f4874bb0add23a778f753c65efe992244e148a1d2ec2a8b664fb66bbd1"),
-            ("sha256", "5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef"),
+            (
+                "sha256",
+                "c6f988f4874bb0add23a778f753c65efe992244e148a1d2ec2a8b664fb66bbd1",
+            ),
+            (
+                "sha256",
+                "5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+            ),
         ]
         self.assertListEqual(self.config_opt.rootfs.diff_ids, valid)
 
@@ -160,10 +172,7 @@ class TestOCIConfig(unittest.TestCase):
         self.assertEqual(self.config_opt.history[2].created_by, valid_2)
 
     def test_str(self):
-        self.assertEqual(
-            "Config(architecture=amd64,os=linux)",
-            str(self.config_req)
-        )
+        self.assertEqual("Config(architecture=amd64,os=linux)", str(self.config_req))
 
 
 #
@@ -179,7 +188,7 @@ class TestOCIConfigExtended(unittest.TestCase):
         self.config_opt.config._OCIConfigConfig__data["Volumes"] = None
         self.assertIsNone(self.config_opt.config.volumes)
 
-        del(self.config_opt.config._OCIConfigConfig__data["Volumes"])
+        del self.config_opt.config._OCIConfigConfig__data["Volumes"]
         self.assertIsNone(self.config_opt.config.volumes)
 
     def test_optional_config_memory(self):
@@ -231,42 +240,42 @@ class TestOCIConfigExtended(unittest.TestCase):
         self.config_opt.config._OCIConfigConfig__data["Entrypoint"] = None
         self.assertIsNone(self.config_opt.config.entrypoint)
 
-        del(self.config_opt.config._OCIConfigConfig__data["Entrypoint"])
+        del self.config_opt.config._OCIConfigConfig__data["Entrypoint"]
         self.assertIsNone(self.config_opt.config.entrypoint)
 
     def test_optional_config_user_none(self):
         self.config_opt.config._OCIConfigConfig__data["User"] = None
         self.assertIsNone(self.config_opt.config.user)
 
-        del(self.config_opt.config._OCIConfigConfig__data["User"])
+        del self.config_opt.config._OCIConfigConfig__data["User"]
         self.assertIsNone(self.config_opt.config.user)
 
     def test_optional_config_ports_none(self):
         self.config_opt.config._OCIConfigConfig__data["ExposedPorts"] = None
         self.assertIsNone(self.config_opt.config.exposed_ports)
 
-        del(self.config_opt.config._OCIConfigConfig__data["ExposedPorts"])
+        del self.config_opt.config._OCIConfigConfig__data["ExposedPorts"]
         self.assertIsNone(self.config_opt.config.exposed_ports)
 
     def test_optional_config_env_none(self):
         self.config_opt.config._OCIConfigConfig__data["Env"] = None
         self.assertIsNone(self.config_opt.config.env)
 
-        del(self.config_opt.config._OCIConfigConfig__data["Env"])
+        del self.config_opt.config._OCIConfigConfig__data["Env"]
         self.assertIsNone(self.config_opt.config.env)
 
     def test_optional_config_labels_none(self):
         self.config_opt.config._OCIConfigConfig__data["Labels"] = None
         self.assertDictEqual({}, self.config_opt.config.labels)
 
-        del(self.config_opt.config._OCIConfigConfig__data["Labels"])
+        del self.config_opt.config._OCIConfigConfig__data["Labels"]
         self.assertDictEqual({}, self.config_opt.config.labels)
 
     def test_optional_config_cmd_none(self):
         self.config_opt.config._OCIConfigConfig__data["Cmd"] = None
         self.assertListEqual([], self.config_opt.config.cmd)
 
-        del(self.config_opt.config._OCIConfigConfig__data["Cmd"])
+        del self.config_opt.config._OCIConfigConfig__data["Cmd"]
         self.assertEqual([], self.config_opt.config.cmd)
 
     #
@@ -285,16 +294,17 @@ class TestOCIConfigExtended(unittest.TestCase):
         self.assertIsNone(self.config_opt.config.stop_signal)
 
     def test_optional_config_stop_signal_acpi(self):
-        self.config_opt.config._OCIConfigConfig__data["StopSignal"] = SignalShutdown.ACPI
+        self.config_opt.config._OCIConfigConfig__data["StopSignal"] = (
+            SignalShutdown.ACPI
+        )
         self.assertEqual(SignalShutdown.ACPI, self.config_opt.config.stop_signal)
 
     def test_optional_config_workingdir_none(self):
         self.config_opt.config._OCIConfigConfig__data["WorkingDir"] = None
         self.assertIsNone(self.config_opt.config.workingdir)
 
-        del(self.config_opt.config._OCIConfigConfig__data["WorkingDir"])
+        del self.config_opt.config._OCIConfigConfig__data["WorkingDir"]
         self.assertIsNone(self.config_opt.config.workingdir)
-
 
     def test_optional_history_author(self):
         self.assertIsNone(self.config_opt.history[0].author)
@@ -312,52 +322,46 @@ class TestOCIConfigExtended(unittest.TestCase):
         self.assertIsNotNone(self.config_opt.history[2].created)
         self.assertEqual(
             datetime.fromisoformat("2015-10-31T22:22:54.690851953Z"),
-            self.config_opt.history[0].created
+            self.config_opt.history[0].created,
         )
         self.assertEqual(
             datetime.fromisoformat("2015-10-31T22:22:55.613815829Z"),
-            self.config_opt.history[1].created
+            self.config_opt.history[1].created,
         )
         self.assertEqual(
             datetime.fromisoformat("2015-10-31T22:22:56.329850019Z"),
-            self.config_opt.history[2].created
+            self.config_opt.history[2].created,
         )
 
     def test_optional_history_created_none(self):
         self.config_opt.history[0]._OCIHistoryRecord__data["created"] = None
         self.assertIsNone(self.config_opt.history[0].created)
 
-        del(self.config_opt.history[0]._OCIHistoryRecord__data["created"])
+        del self.config_opt.history[0]._OCIHistoryRecord__data["created"]
         self.assertIsNone(self.config_opt.history[0].created)
 
         self.config_opt.history[1]._OCIHistoryRecord__data["created"] = None
         self.assertIsNone(self.config_opt.history[1].created)
 
-        del(self.config_opt.history[1]._OCIHistoryRecord__data["created"])
+        del self.config_opt.history[1]._OCIHistoryRecord__data["created"]
         self.assertIsNone(self.config_opt.history[1].created)
 
         self.config_opt.history[2]._OCIHistoryRecord__data["created"] = None
         self.assertIsNone(self.config_opt.history[2].created)
 
-        del(self.config_opt.history[2]._OCIHistoryRecord__data["created"])
+        del self.config_opt.history[2]._OCIHistoryRecord__data["created"]
         self.assertIsNone(self.config_opt.history[2].created)
 
     def test_history_str(self):
         self.assertEqual(
-            "Record(created_by=96,empty_layer=False)",
-            str(self.config_opt.history[0])
+            "Record(created_by=96,empty_layer=False)", str(self.config_opt.history[0])
         )
         self.assertEqual(
-            "Record(created_by=28,empty_layer=True)",
-            str(self.config_opt.history[1])
+            "Record(created_by=28,empty_layer=True)", str(self.config_opt.history[1])
         )
         self.assertEqual(
-            "Record(created_by=23,empty_layer=False)",
-            str(self.config_opt.history[2])
+            "Record(created_by=23,empty_layer=False)", str(self.config_opt.history[2])
         )
 
     def test_str(self):
-        self.assertEqual(
-            "Config(architecture=amd64,os=linux)",
-            str(self.config_opt)
-        )
+        self.assertEqual("Config(architecture=amd64,os=linux)", str(self.config_opt))

@@ -10,7 +10,9 @@ class TestConfigurationRegistry(unittest.TestCase):
     def test_valid(self):
         self.assertEqual(None, self.config._ConfigurationRegistry__entrypoint)
         self.config.entrypoint = "path/to/registry"
-        self.assertEqual("path/to/registry", self.config._ConfigurationRegistry__entrypoint)
+        self.assertEqual(
+            "path/to/registry", self.config._ConfigurationRegistry__entrypoint
+        )
         self.assertEqual("path/to/registry", self.config.entrypoint)
 
     def test_invalid(self):

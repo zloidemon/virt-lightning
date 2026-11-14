@@ -74,10 +74,11 @@ def test_create_disk(disk):
     assert disk.path().endswith("/pool/foo.qcow2")
     assert isinstance(disk, libvirt.virStorageVol)
 
+
 #
 #  FIXME: Не очень понятный тест, надо разобраться как починить
 #
-#def test_create_disk_with_options(disk):
+# def test_create_disk_with_options(disk):
 #    disk = disk.create("foo_all", size=3, backing_on=True)
 #    assert isinstance(disk, libvirt.virStorageVol)
 

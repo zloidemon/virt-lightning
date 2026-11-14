@@ -293,7 +293,6 @@ class LibvirtDomain:
         # Update the domain reference
         self.dom = new_dom
 
-
     def attach_disk(self, volume, device="disk", disk_type="qcow2"):
         match device:
             case "cdrom":

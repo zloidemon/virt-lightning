@@ -10,9 +10,12 @@ def gen_angie_map(configuration):
             _url = image.get("url", url)
             _file = image.get("file", filename)
 
-            url_template = "/v2/library/{name}/blobs/{tag} " + "/".join([_url, _file]) + ";"
+            url_template = (
+                "/v2/library/{name}/blobs/{tag} " + "/".join([_url, _file]) + ";"
+            )
 
             print(url_template.format(name=name, **image))
+
 
 with Path.open("config.toml", mode="rb") as fh:
     configuration = tomllib.load(fh)

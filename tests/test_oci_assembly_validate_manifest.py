@@ -15,7 +15,7 @@ class TestOCIAssemblyImageValidateManifest(unittest.TestCase):
         self.manifest_data = {
             "mediaType": "application/vnd.oci.image.manifest.v1+json",
             "digest": "sha256:32a00402fcbc25e58e8f89ffa1197c1eed38f1e0171d3320a1d70bffeda2fda1",
-            "size": 288
+            "size": 288,
         }
 
     def test_valid_manifest(self):
@@ -43,10 +43,12 @@ class TestOCIAssemblyImageValidateManifest(unittest.TestCase):
     def test_invalid_not_found(self):
         validate_manifest = self.assembly._OCIImageAssembly__validate_manifest
         manifest_data = self.manifest_data
-        manifest_data["digest"] = ":".join([
-            "sha256",
-            "abc00402fcbc25e58e8f89ffa1197c1eed38f1e0171d3320a1d70bffeda2fda1",
-        ])
+        manifest_data["digest"] = ":".join(
+            [
+                "sha256",
+                "abc00402fcbc25e58e8f89ffa1197c1eed38f1e0171d3320a1d70bffeda2fda1",
+            ]
+        )
         manifest_descriptor = OCIContentDescriptor(manifest_data)
         self.assertFalse(validate_manifest(manifest_descriptor))
 
@@ -67,7 +69,9 @@ class TestOCIAssemblyImageValidateManifest(unittest.TestCase):
 
     def test_invalid_json_str(self):
         validate_manifest = self.assembly._OCIImageAssembly__validate_manifest
-        mock_checksum_file = Mock(return_value=(self.manifest_data["digest"].split(":")[1], "{"))
+        mock_checksum_file = Mock(
+            return_value=(self.manifest_data["digest"].split(":")[1], "{")
+        )
         self.assembly._OCIImageAssembly__load_file = mock_checksum_file
 
         manifest_descriptor = OCIContentDescriptor(self.manifest_data)

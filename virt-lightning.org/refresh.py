@@ -61,13 +61,11 @@ class Image:
         }
 
     def __repr__(self):
-        return dedent(
-            f"""
+        return dedent(f"""
         Image={self.name}
           url={self.qcow2_url}
           meta={self.meta}
-        """
-        )
+        """)
 
 
 class Images:
@@ -110,7 +108,9 @@ def get_ubuntu_images() -> list[Image]:
         for build in sorted(product["versions"], reverse=True):
             disk = product["versions"][build]["items"].get("disk1.img")
             if disk:
-                images.append(Image(f"ubuntu-{version}", urljoin(base_url, disk["path"])))
+                images.append(
+                    Image(f"ubuntu-{version}", urljoin(base_url, disk["path"]))
+                )
                 break
     return images
 
@@ -130,7 +130,9 @@ def get_alpine_images() -> list[Image]:
     def get(version) -> Image | None:
         base_url = f"https://dl-cdn.alpinelinux.org/alpine/v{version}/releases/cloud"
         resp = urllib3.request("GET", base_url, redirect=True, timeout=180.0)
-        m = re.findall(r"generic_alpine.*x86_64\-bios\-cloudinit-r0\.qcow2", resp.data.decode())
+        m = re.findall(
+            r"generic_alpine.*x86_64\-bios\-cloudinit-r0\.qcow2", resp.data.decode()
+        )
         if m:
             image = Image(f"alpine-{version}", f"{base_url}/{m[-1]}")
             image.meta["username"] = "alpine"
@@ -142,7 +144,10 @@ def get_alpine_images() -> list[Image]:
 def get_freebsd_images() -> list[Image]:
     def releases():
         resp = urllib3.request(
-            "GET", "https://download.freebsd.org/releases/VM-IMAGES/", redirect=True, timeout=30.0
+            "GET",
+            "https://download.freebsd.org/releases/VM-IMAGES/",
+            redirect=True,
+            timeout=30.0,
         )
         return re.findall(r'"(\d+\.\d-RELEASE)"', resp.data.decode())
 
@@ -162,7 +167,9 @@ def get_freebsd_images() -> list[Image]:
 
     for r in releases():
         for u in file_names(r):
-            m = re.match(r"FreeBSD-(\d+\.\d)-RELEASE-amd64-BASIC-CLOUDINIT-(ufs|zfs).qcow2.xz", u)
+            m = re.match(
+                r"FreeBSD-(\d+\.\d)-RELEASE-amd64-BASIC-CLOUDINIT-(ufs|zfs).qcow2.xz", u
+            )
             if m:
                 name = f"freebsd-{m.group(1)}-{m.group(2)}"
                 url = base_url(r) + u
@@ -233,9 +240,13 @@ for i in get_freebsd_images():
 index_md = ""
 images_redir = ""
 for image in sorted(images.as_list(), key=lambda i: i.name):
-    images_redir += f"    redir /images/{image.name}/{image.name}.qcow2 {image.qcow2_url}\n"
+    images_redir += (
+        f"    redir /images/{image.name}/{image.name}.qcow2 {image.qcow2_url}\n"
+    )
     if image.yaml_url:
-        images_redir += f"    redir /images/{image.name}/{image.name}.yaml {image.yaml_url}\n"
+        images_redir += (
+            f"    redir /images/{image.name}/{image.name}.yaml {image.yaml_url}\n"
+        )
     index_md += f"- {image.name}\n"
 
 
@@ -244,4 +255,6 @@ index_md_file.parent.mkdir(parents=True, exist_ok=True)
 index_md_file.write_text(index_md)
 
 images_json_file = Path("./virt-lightning.org/images.json")
-images_json_file.write_text(json.dumps([i.as_dict() for i in images.as_list()], indent=2))
+images_json_file.write_text(
+    json.dumps([i.as_dict() for i in images.as_list()], indent=2)
+)

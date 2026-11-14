@@ -50,6 +50,7 @@ def disk(hv):
     yield DiskSystem(None, hv.storage, None)
     clean_up()
 
+
 @pytest.fixture(autouse=True)
 def qemu_dir(tmp_path):
     qemu_dir = tmp_path / "kvm-dummy"

@@ -16,13 +16,15 @@ class TestOCIAssemblyImageValidateIndex(unittest.TestCase):
             "manifests": [
                 {
                     "mediaType": "application/vnd.oci.image.manifest.v1+json",
-                    "digest": ":".join([
-                        "sha256",
-                        "32a00402fcbc25e58e8f89ffa1197c1eed38f1e0171d3320a1d70bffeda2fda1"
-                    ]),
-                    "size": 288
+                    "digest": ":".join(
+                        [
+                            "sha256",
+                            "32a00402fcbc25e58e8f89ffa1197c1eed38f1e0171d3320a1d70bffeda2fda1",
+                        ]
+                    ),
+                    "size": 288,
                 }
-            ]
+            ],
         }
 
     def test_invalid_media_type_field(self):
