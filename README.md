@@ -1,11 +1,10 @@
 # 🗲 spawn Cloud instances on libvirt!🗲
 
 
-[![Build Status](https://travis-ci.org/virt-lightning/virt-lightning.svg?branch=master)](https://travis-ci.org/virt-lightning/virt-lightning)
 [![PyPI version](https://badge.fury.io/py/virt-lightning.svg)](https://badge.fury.io/py/virt-lightning)
 [![Documentation](https://shields.io/static/v1?message=Documentation&color=blue)](https://virt-lightning.org/)
 
-![Logo](https://github.com/zloidemon/virt-lightning/blob/master/logo/logo_no_text.png)
+![Logo](./logo/logo_no_text.png)
 
 You want to spawn local VM quickly.. Like... really quickly. You want them to be as generic as possible. Actually you would like to reuse some existing cloud images!
 
@@ -41,7 +40,7 @@ During this recording, we:
 
 ## Requirements
 - Python 3.8 or greater
-- The Python3 binding for libvirt, the package is probably called `python3-libvirt` or 'libvirt-python' according to pip.
+- The Python3 binding for libvirt, the package is probably called `python3-libvirt` or `libvirt-python` according to pip.
 - Libvirt must be running, most of the time you just need to run: `sudo systemctl start --now libvirtd`
 - Finally, be sure your user can access the system libvirt daemon, e.g with: `virsh -c qemu:///system`
 
@@ -50,13 +49,34 @@ During this recording, we:
 
 
 ## Installation (Fedora/RHEL)
+
 ```shell
-sudo dnf install libvirt-devel gcc python3-devel pipx
-pipx ensurepath
-pipx install virt-lightning
+sudo dnf install uv python3-libvirt libvirt-devel gcc python3-devel
+uvx virt-lightning
+```
+
+## Installation (Fedora Atomic, e.g Silverblue)
+
+Virt-Lightning won't work from toolbox or a container.
+
+
+``` shell
+rpm-ostree install genisoimage libvirt libvirt-client libvirt-daemon-kvm python3-libvirt
+systemctl reboot
+(...)
+sudo systemctl enable --now libvirtd
+sudo systemctl enable --now virtqemud.socket
+sudo systemctl enable --now virtnetworkd.socket
+sudo systemctl enable --now virtstoraged.socket
+
+# You can also layer pipx
+python3 -m venv venv --system-site-packages
+./venv/bin/pip install virt-lightning
+./venv/bin/vl
 ```
 
 ## Installation (Debian/Ubuntu)
+
 ```shell
 sudo apt install python3-venv pkg-config gcc libvirt-dev python3-dev pipx
 pipx ensurepath
@@ -73,13 +93,28 @@ echo "export PATH=$PATH:~/.local/bin/" >> ~/.bashrc
 source ~/.bashrc
 ```
 
+# List Remote Images
+
+Before you start your first VM, you need to list the images. To do so,
+you just use the `vl remote_images` command:
+
+```shell
+$ vl remote_images
+```
+
 # Fetch some images
 
 Before you start your first VM, you need to fetch the images. To do so,
-you just use the `vl fetch` command:
+you just use the `vl pull` command:
 
 ```shell
-$ vl fetch fedora-32
+$ vl pull fedora-32
+```
+
+You can also pull an image from Internet, as soon as it's a `.qcow2` or a `.qcow2.xz` (compress with `xz`):
+
+```shell
+$ vl pull freebsd-16-current --url https://download.freebsd.org/snapshots/VM-IMAGES/16.0-CURRENT/amd64/Latest/FreeBSD-16.0-CURRENT-amd64-BASIC-CLOUDINIT-ufs.qcow2.xz
 ```
 
 # Actions
@@ -87,9 +122,9 @@ $ vl fetch fedora-32
 `vl` is an alias for `virt-lightning`, you can use both. In the rest of the document
 we use the shortest version.
 
-## **vl distro_list**
+## **vl images**
 
-List the distro images that can be used. Its output is compatible with `vl up`. You can initialize a new configuration with: `vl distro_list > virt-lightning.yaml`.
+List the distro images that can be used. Its output is compatible with `vl up`. You can initialize a new configuration with: `vl images > virt-lightning.yaml`.
 
 ## **vl up**
 
@@ -115,6 +150,18 @@ List the VMs, their IP and if they are reachable.
 
 Export an inventory in the Ansible format.
 
+**Note:** Created VMs use various Python versions, which can cause compatibility issues with the Ansible version on the control node (host). In case of errors related to Python version compatibility, please consult the Ansible [changelog](https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html) for details on supported Python versions.
+
+In can you need a different Python version for a given image (`ansible_python_interpreter`), you can define it in a YAML file aside of the qcow2 image. E.g:
+
+```
+$ ls -l /var/lib/virt-lightning/pool/upstream/netbsd-10.0.qcow2
+-rw-r--r--. 1 qemu qemu 242483200 Nov  5 18:50 /var/lib/virt-lightning/pool/upstream/netbsd-10.0.qcow2
+$ cat /var/lib/virt-lightning/pool/upstream/netbsd-10.0.yaml
+python_interpreter: /usr/pkg/bin/python3.12
+
+```
+
 ## **vl ssh**
 
 Show up a menu to select a host and open a ssh connection.
@@ -132,9 +179,9 @@ Like `vl ssh` but with the serial console of the VM.
 
 Like `vl console` but with the SPICE console of the VM. Requires `virt-viewer`.
 
-## **vl fetch**
+## **vl pull**
 
-Fetch a VM image. [You can find here a list of the available images](https://virt-lightning.org/images/). You can also update the custom configuration to add a private image hub.
+Download a VM image. Use the `vl remote_images` to get a list of available images. You can also update the custom configuration to add a private image hub.
 
 # Configuration
 
@@ -160,7 +207,7 @@ ssh_key_file = ~/.ssh/id_rsa.pub
 
 **network_auto_clean_up**: if you want to automatically remove a network when running `virt-lightning down`
 
-**ssh_key_file**: if you want to use an alternative public key
+**ssh_key_file**: the path of the default public key for connecting to VMs. If unset, Virt-Lightning will pick the first key matching `~/.ssh/id_*.pub` or (if none found) all keys from `ssh-add -L`.
 
 **private_hub**: if you need to set additional url from where images should be retrieved, update the configuration file `~/.config/virt-lightning/config.ini` adding the following
 ```
@@ -177,12 +224,12 @@ A VM can be tuned at two different places with the following keys:
 - `memory`: the amount of memory to dedicate to the VM
 - `vcpus`: the number of vcpu to dedicate to the VM
 - `root_password`: the root password in clear text
-- `ssh_key_file`: the path of the public key for connecting to the VM
+- `ssh_key_file`: the path of the public key for connecting to the VM. If unset, and no global default present, Virt-Lightning will pick the first key matching `~/.ssh/id_*.pub` or (if none found) all keys from `ssh-add -L`.
 - `groups`: this list of groups will be used if you generate an Ansible inventory.
 - `disks`: a list of disks to create and attach to the VM. The first one is used as the root disk. Default to `[{"size": 15}]`
     - `size` the size of the disk in GB. Default is `1`.
 - `networks`: a list of network to attach to the VM. The default is: one virtio interface attached to `virt-lightning` network.
-    - `network`: the name of the libvirt network. Default is the key `network_name` from the configuration (`virt-lightning` by default). The key cannot be used with `bridge`.
+    - `network`: the name of the libvirt network. Default is the key `network_name` from the configuration (`virt-lightning` by default). The key cannot be used with `bridge`. A host variable is added to in the Ansible inventory, with the network name with suffix "_ipv4" as key and the IPv4 as value, e.g. "private_ipv4".
     - `ipv4`: a static IPv4. Default is a dynamic IPv4 address.
     - `nic_model`: the libvirt driver to use. Default is `virtio`
     - `mac`: an optional static MAC address, e.g: '52:54:00:71:b1:b6'
@@ -241,7 +288,34 @@ A VM can be tuned at two different places with the following keys:
       nic_model: virtio
 ```
 
+### Example: Addressing multiple interfaces
+```yaml
+- name: example
+  distro: fedora-40
+  networks:
+    - network: default
+      ipv4: 192.168.122.50
+    - network: management
+      ipv4: 192.168.123.50
+```
 
+The variable `management_ipv4` holds the IP address and netmask.
+```yaml
+- hosts: all
+  tasks:
+    - name: Default address
+      debug: msg="{{ ansible_host }}"
+      # "msg": "192.168.122.50"
+    - name: Management address
+      debug: msg="{{ management_ipv4 }}"
+      # "msg": "192.168.123.50/24"
+    - name: Management address
+      debug: msg="{{ management_ipv4 | ansible.utils.ipaddr('address') }}"
+      # "msg": "192.168.123.50"
+    - name: Management address
+      debug: msg="{{ management_ipv4 | ansible.utils.ipaddr('netmask') }}"
+      # "msg": "255.255.255.0"
+```
 
 ### You can also associate some parameters to the distro image itself
 
@@ -275,6 +349,7 @@ virsh snapshot-revert vm_name --snapshotname snapshot_1
 ```
 
 ### Development
+
 install libvirt-dev package:
 
 Debian/Ubuntu:
@@ -289,15 +364,13 @@ dnf install python3-devel gcc libvirt-devel
 
 You can run a development copy in a virtual env:
 ```shell
-python3 -m venv /tmp/vl-dev-venv
-. /tmp/vl-dev-venv/bin/activate
-pip3 install -r requirements.txt
-pip3 install -e /path/to/my-virt-lightning-copy
-vl
+uv run virt-lightning
 ```
 
-The changes that are introduce in /path/to/my-virt-lightning-copy should be visible when you run vl from within the virtual env.
-running test will require:
+### Add a new image or refresh the list
+
+You just need to adjust the `virt-lightning.org/refresh.py` script and call it with:
+
 ```shell
-pip3 install -r test-requirements.txt
+uv run virt-lightning.org/refresh.py
 ```

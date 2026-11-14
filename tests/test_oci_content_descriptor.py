@@ -19,7 +19,7 @@ class TestOCIContentDescriptorManifest(unittest.TestCase):
     def test_digest(self):
         valid_tuple = (
             HashingAlgorithm.SHA256,
-            "5b0bcabd1ed22e9fb1310cf6c2dec7cdef19f0ad69efa1f392e94a4333501270"
+            "5b0bcabd1ed22e9fb1310cf6c2dec7cdef19f0ad69efa1f392e94a4333501270",
         )
         self.assertTupleEqual(valid_tuple, self.manifest.digest)
 
@@ -32,16 +32,22 @@ class TestOCIContentDescriptorManifest(unittest.TestCase):
 
 class TestOCIContentDescriptorManifestURL(TestOCIContentDescriptorManifest):
     def setUp(self):
-        with PosixPath("tests/oci_data/content_descriptor_manifest_url.json").open() as fh:
+        with PosixPath(
+            "tests/oci_data/content_descriptor_manifest_url.json"
+        ).open() as fh:
             self.manifest = OCIContentDescriptor(json.loads(fh.read()))
 
     def test_urls(self):
-        self.assertListEqual(["https://example.com/example-manifest"], self.manifest.urls)
+        self.assertListEqual(
+            ["https://example.com/example-manifest"], self.manifest.urls
+        )
 
 
 class TestOCIContentDescriptorManifestArtifact(TestOCIContentDescriptorManifest):
     def setUp(self):
-        with PosixPath("tests/oci_data/content_descriptor_manifest_artifact.json").open() as fh:
+        with PosixPath(
+            "tests/oci_data/content_descriptor_manifest_artifact.json"
+        ).open() as fh:
             self.manifest = OCIContentDescriptor(json.loads(fh.read()))
 
     def test_media_type(self):
@@ -51,7 +57,7 @@ class TestOCIContentDescriptorManifestArtifact(TestOCIContentDescriptorManifest)
     def test_digest(self):
         valid_tuple = (
             HashingAlgorithm.SHA256,
-            "87923725d74f4bfb94c9e86d64170f7521aad8221a5de834851470ca142da630"
+            "87923725d74f4bfb94c9e86d64170f7521aad8221a5de834851470ca142da630",
         )
         self.assertTupleEqual(valid_tuple, self.manifest.digest)
 

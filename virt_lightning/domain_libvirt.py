@@ -3,13 +3,13 @@ import ipaddress
 import logging
 import re
 import string
+import subprocess
 from xml.etree import ElementTree
 
 import libvirt
 
 import virt_lightning.consts as consts
 from virt_lightning.disk_system import DiskSystem
-from virt_lightning.exceptions import VMNotRunningError
 
 DISK_XML = """
     <disk type='file' device='disk'>
@@ -37,6 +37,8 @@ class LibvirtDomain:
             "disable_root": 0,
             "bootcmd": [],
             "runcmd": [],
+            "packages": [],
+            "write_files": [],
         }
         self._ssh_key = None
         self.default_nic_model = None
@@ -73,16 +75,32 @@ class LibvirtDomain:
 
     def load_ssh_key_file(self, ssh_key_file):
         doc_url = "https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/#generating-a-new-ssh-key"
-        try:
-            self.ssh_key = ssh_key_file.expanduser().read_text()
-        except OSError:
-            logger.error(
-                f"Can not read {ssh_key_file}. If you don't have any SSH key, "
-                f"please follow the steps describe here:\n  {doc_url}"
-            )
-            raise
+        if ssh_key_file is not None:
+            try:
+                self.ssh_key = ssh_key_file.expanduser().read_text()
+            except OSError:
+                logger.error(
+                    f"Can not read {ssh_key_file}. If you don't have any SSH key, "
+                    f"please follow the steps describe here:\n  {doc_url}"
+                    "\n"
+                    "If you're SSH key is not ~/.ssh/id_rsa.pub, you need to configure "
+                    "the ~/.config/virt-lightning/config.ini file, e.g:\n"
+                    "\n"
+                    "[main]\n"
+                    "ssh_key_file = ~/.ssh/id_ed25519.pub\n"
+                )
+                raise
+        else:
+            # FIXME: Переделать этот кусок с subprocess.
+            try:
+                self.ssh_key = subprocess.run(
+                    ["ssh-add", "-L"], capture_output=True, check=True, text=True
+                ).stdout
+            except subprocess.CalledProcessError:
+                logger.error("Failed loading SSH key(s) from `ssh-add -L`.")
+                raise
 
-        self.user_data["ssh_authorized_keys"] = [self.ssh_key]
+        self.user_data["ssh_authorized_keys"] = self.ssh_key.splitlines()
         if "users" in self.user_data:
             self.user_data["users"][0]["ssh_authorized_keys"] = [self.ssh_key]
 
@@ -109,6 +127,7 @@ class LibvirtDomain:
                 "gecos": "virt-bootstrap user",
                 "sudo": "ALL=(ALL) NOPASSWD:ALL",
                 "ssh_authorized_keys": [self.ssh_key],
+                "groups": ["wheel"],
             }
         ]
 
@@ -222,6 +241,58 @@ class LibvirtDomain:
     def groups(self, value):
         self.record_metadata("groups", ",".join(value))
 
+    @property
+    def video_model(self):
+        """Get the current video model from domain XML."""
+        xml = self.dom.XMLDesc(0)
+        root = ElementTree.fromstring(xml)
+        video_model_elem = root.find("./devices/video/model")
+        if video_model_elem is not None:
+            return video_model_elem.attrib.get("type")
+        return None
+
+    @video_model.setter
+    def video_model(self, model):
+        """Set video model and update the domain XML.
+
+        Args:
+            model: Video model type (virtio, cirrus, qxl, vga, etc.)
+        """
+        # Only update if specified and different from current model
+        current_model = self.video_model
+        if model and model != current_model:
+            self.update_video(model)
+
+    def update_video(self, model):
+        """Update the video device model in domain XML.
+
+        Args:
+            model: Video model type (virtio, cirrus, qxl, vga, etc.)
+        """
+        # Get the current domain XML
+        xml = self.dom.XMLDesc(0)
+        root = ElementTree.fromstring(xml)
+
+        # Find the video model element and replace it
+        video_model_elem = root.find("./devices/video/model")
+        if video_model_elem is not None:
+            # Clear all attributes to remove model-specific ones (e.g., ram for qxl)
+            video_model_elem.clear()
+            # Set basic attributes that work across all video models
+            video_model_elem.attrib["type"] = model
+            video_model_elem.attrib["vram"] = "16384"
+            video_model_elem.attrib["heads"] = "1"
+            video_model_elem.attrib["primary"] = "yes"
+
+        # Redefine the domain with updated XML
+        # defineXML() updates existing definitions atomically - no need to undefine()
+        conn = self.dom.connect()
+        new_xml = ElementTree.tostring(root).decode()
+        new_dom = conn.defineXML(new_xml)
+
+        # Update the domain reference
+        self.dom = new_dom
+
     def attach_disk(self, volume, device="disk", disk_type="qcow2"):
         match device:
             case "cdrom":
@@ -284,6 +355,12 @@ class LibvirtDomain:
             ipv4_instance = ipaddress.IPv4Interface(ipv4)
         self.nics.append({"network": network, "ipv4": ipv4_instance})
 
+        # add metadata for the additional NICs
+        if len(self.nics) > 1:
+            add_nics = self.additional_nics or ""
+            add_nics += f"{network}_ipv4={ipv4_instance} "
+            self.additional_nics = add_nics
+
         self.ipv4 = self.nics[0]["ipv4"]
 
         xml = ElementTree.tostring(net_root).decode()
@@ -306,6 +383,15 @@ class LibvirtDomain:
     @ipv4.setter
     def ipv4(self, value):
         self.record_metadata("ipv4", value)
+
+    @property
+    def additional_nics(self):
+        if self.get_metadata("additional_nics"):
+            return self.get_metadata("additional_nics")
+
+    @additional_nics.setter
+    def additional_nics(self, value):
+        self.record_metadata("additional_nics", value)
 
     @property
     def bootcmd(self):
@@ -367,14 +453,9 @@ class LibvirtDomain:
             logger.info(f"Skipping {host['name']}, already here.")
             return None
         else:
-            logger.info(f"Skipping {host['name']}, already here but is not running.")
-            logger.info(
-                f"You can restart with: virsh -c {configuration.libvirt_uri} start {host['name']}"
-            )
-            logger.info(
-                f"You can also destroy the instance with: vl stop {host['name']}"
-            )
-            raise VMNotRunningError(host["name"])
+            logger.info(f"Start not running instance: {host['name']}")
+            domain.dom.create()
+            return None
 
         logger.info(f"^ {host['name']} ")
 
@@ -387,6 +468,7 @@ class LibvirtDomain:
             "vcpus": host.get("vcpus"),
             "fqdn": host.get("fqdn"),
             "default_nic_mode": host.get("default_nic_model"),
+            "video_model": host.get("video_model"),
             "bootcmd": host.get("bootcmd"),
             "runcmd": host.get("runcmd"),
             "meta_data_media_type": host.get("meta_data_media_type"),

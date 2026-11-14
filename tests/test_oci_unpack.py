@@ -15,10 +15,7 @@ class TestOCIAssemblyImageUnpack(unittest.TestCase):
         self.image_name = "test"
         self.source_path = PosixPath("tests/oci_data/" + self.image_name)
         self.test_dir = PosixPath(tempfile.mkdtemp())
-        self.assembly = OCIImageAssembly(
-            self.source_path,
-            self.test_dir
-        )
+        self.assembly = OCIImageAssembly(self.source_path, self.test_dir)
         self.image_file = PosixPath(self.image_name + ".tar.gz")
 
     def test_inspect(self):
@@ -38,7 +35,9 @@ class TestOCIAssemblyImageUnpack(unittest.TestCase):
         self.assertTrue(tarfile.is_tarfile(archive))
 
         with tarfile.open(archive, mode="r") as tar:
-            tar_layout = OCIImageLayout(json.loads(tar.extractfile("oci-layout").read()))
+            tar_layout = OCIImageLayout(
+                json.loads(tar.extractfile("oci-layout").read())
+            )
             tar_index = OCIIndex(json.loads(tar.extractfile("index.json").read()))
 
         self.assertEqual(tar_layout.version, "1.0.0")

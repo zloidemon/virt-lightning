@@ -18,20 +18,17 @@ class TestOCIAssemblyImageLoadFile(unittest.TestCase):
         self.assertIsNotNone(data)
 
         hsum, data = self.assembly._OCIImageAssembly__load_file(
-            index_file,
-            HashingAlgorithm.SHA256
+            index_file, HashingAlgorithm.SHA256
         )
         self.assertEqual(
-            hsum,
-            "d178553175a5e39c728fc2a215545b8dff875b6d68c21b992712a0e2023872f8"
+            hsum, "d178553175a5e39c728fc2a215545b8dff875b6d68c21b992712a0e2023872f8"
         )
 
         hsum, data = self.assembly._OCIImageAssembly__load_file(
-            index_file,
-            HashingAlgorithm.SHA512
+            index_file, HashingAlgorithm.SHA512
         )
         self.assertEqual(
             hsum,
             "966588d92cbed62c12a83742d6362b7e8c7a884e5b69d6125034bcb54678d24a"
-            "3ecc2afe4ab0f712ababe82612d99c99c71613748807d731a227838eeb46f9bf"
+            "3ecc2afe4ab0f712ababe82612d99c99c71613748807d731a227838eeb46f9bf",
         )

@@ -6,10 +6,14 @@ import libvirt
 from virt_lightning.exceptions import CannotConnectToLibvirtError
 
 
-def _register_aio_virt_impl(loop):
+def _register_aio_virt_impl(loop=None):
     # Ensure we may call shell.up() multiple times
     # from the same asyncio program.
-    loop = loop or asyncio.get_event_loop()
+    try:
+        loop = loop or asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
     if loop not in _register_aio_virt_impl.aio_virt_bindinds:
         try:
             import libvirtaio
@@ -18,6 +22,7 @@ def _register_aio_virt_impl(loop):
         except ImportError:
             libvirt.virEventRegisterDefaultImpl()
         _register_aio_virt_impl.aio_virt_bindinds[loop] = True
+    return loop
 
 
 _register_aio_virt_impl.__dict__["aio_virt_bindinds"] = {}
@@ -56,7 +61,7 @@ class VMMBuilder:
             libvirt.registerErrorHandler(f=libvirt_callback, ctx=None)
 
             if urlparse(uri).netloc == "":
-                _register_aio_virt_impl(loop=asyncio.get_event_loop())
+                _register_aio_virt_impl()
                 return libvirt.open(uri)
             else:
                 raise NotImplementedError("Only local access allowed")

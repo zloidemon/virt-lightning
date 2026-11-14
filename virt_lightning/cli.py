@@ -21,6 +21,7 @@ from virt_lightning.cli_start import CLIStart
 from virt_lightning.cli_stop import CLIStop
 from virt_lightning.cli_storage import CLIStorage
 from virt_lightning.cli_up import CLIup
+from virt_lightning.cli_version import CLIVersion
 from virt_lightning.cli_viewer import CLIViewer
 from virt_lightning.configuration_builder import ConfigurationBuilder
 from virt_lightning.configuration_legacy import LegacyConfiguration
@@ -125,6 +126,7 @@ def main():
     cli_builder.add_command(CLIStart)
     cli_builder.add_command(CLIStop)
     cli_builder.add_command(CLIStorage)
+    cli_builder.add_command(CLIVersion)
     cli_builder.add_command(CLIViewer)
     cli_builder.add_command(CLIps)
     cli_builder.add_command(CLIssh)
@@ -190,6 +192,12 @@ def main():
             CLIStart.run(vmm, configuration=configuration, **vars(args))
         case "up":
             CLIup.run(vmm, args.virt_lightning_conf, configuration=configuration)
+        case "version":
+            CLIVersion.run()
         case _:
             CLIHelp.run()
             raise NotImplementedError(f"command: {args.action}")
+
+
+if __name__ == "__main__":
+    main()

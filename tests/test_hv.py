@@ -20,6 +20,40 @@ def test_create_domain(hv):
     assert domain
 
 
+def test_create_domain_has_default_video(hv):
+    """Verify new domains have virtio video device by default."""
+    domain = hv.create_domain(name="video_test", distro="test")
+    xml = domain.dom.XMLDesc(0)
+    assert "<video>" in xml
+    assert "type='virtio'" in xml
+
+
+def test_video_model_property_reads_from_xml(hv):
+    """Verify video_model property reads current state from XML."""
+    domain = hv.create_domain(name="video_prop_test", distro="test")
+    # Should read virtio from the default video device
+    assert domain.video_model == "virtio"
+
+
+def test_set_custom_video_model(hv):
+    """Verify setting a custom video model updates the domain XML."""
+    domain = hv.create_domain(name="custom_video_test", distro="test")
+
+    # Change to qxl
+    domain.video_model = "qxl"
+    assert domain.video_model == "qxl"
+
+    # Verify XML was actually updated
+    xml = domain.dom.XMLDesc(0)
+    assert "type='qxl'" in xml
+
+    # Change to cirrus
+    domain.video_model = "cirrus"
+    assert domain.video_model == "cirrus"
+    xml = domain.dom.XMLDesc(0)
+    assert "type='cirrus'" in xml
+
+
 def test_distro_available(hv, tmpdir):
     hv.storage.storage_pool_obj = hv.storage.create_storage_pool("foo", tmpdir)
     assert hv.storage.distro_available() == []
@@ -40,10 +74,11 @@ def test_create_disk(disk):
     assert disk.path().endswith("/pool/foo.qcow2")
     assert isinstance(disk, libvirt.virStorageVol)
 
+
 #
 #  FIXME: Не очень понятный тест, надо разобраться как починить
 #
-#def test_create_disk_with_options(disk):
+# def test_create_disk_with_options(disk):
 #    disk = disk.create("foo_all", size=3, backing_on=True)
 #    assert isinstance(disk, libvirt.virStorageVol)
 

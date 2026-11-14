@@ -1,7 +1,13 @@
 import ipaddress
+import logging
 from xml.etree import ElementTree
 
 import libvirt
+
+from virt_lightning.consts import DEFAULT_LOGGER, ExitCode
+
+logger = logging.getLogger(DEFAULT_LOGGER)
+
 
 NETWORK_DHCP_ENTRY = """
 <host />
@@ -51,7 +57,17 @@ class NetworkSystem:
             "netmask": network.netmask.exploded,
         }
         xml = ElementTree.tostring(root).decode()
-        return self.conn.networkCreateXML(xml)
+
+        try:
+            return self.conn.networkCreateXML(xml)
+        except libvirt.libvirtError as e:
+            logger.error(
+                "Failed to create network '%s' (CIDR: %s): %s",
+                network_name,
+                network_cidr,
+                e,
+            )
+            exit(ExitCode.FAIL)
 
     def reuse_mac_address(self, network_name, domain_name, ipv4):
         network_obj = self.__get_network_by_name(network_name)

@@ -15,7 +15,9 @@ class TestOCIBuildImageExpose(unittest.TestCase):
         vol_2 = PosixPath("/")
 
         self.builder.volume(vol_0, vol_1, vol_2)
-        self.assertSetEqual(set({vol_0, vol_1, vol_2}), self.builder._OCIImageBuild__volumes)
+        self.assertSetEqual(
+            set({vol_0, vol_1, vol_2}), self.builder._OCIImageBuild__volumes
+        )
 
     def test_duplicate(self):
         self.builder.volume(PosixPath("/"))

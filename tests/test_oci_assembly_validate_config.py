@@ -14,11 +14,13 @@ class TestOCIAssemblyImageValidateConfig(unittest.TestCase):
         self.assembly = OCIImageAssembly(self.source_path)
         self.config_data = {
             "mediaType": "application/vnd.oci.image.config.v1+json",
-            "digest": ":".join([
-                "sha256",
-                "65b7ca76e09ec341a1c607b731cebc303e796d7a415ebca1509fdc1f3080614c",
-            ]),
-            "size": 482
+            "digest": ":".join(
+                [
+                    "sha256",
+                    "65b7ca76e09ec341a1c607b731cebc303e796d7a415ebca1509fdc1f3080614c",
+                ]
+            ),
+            "size": 482,
         }
 
     def test_valid_config(self):
@@ -68,7 +70,9 @@ class TestOCIAssemblyImageValidateConfig(unittest.TestCase):
 
     def test_invalid_json_str(self):
         validate_config = self.assembly._OCIImageAssembly__validate_config
-        mock_checksum_file = Mock(return_value=(self.config_data["digest"].split(":")[1], "{"))
+        mock_checksum_file = Mock(
+            return_value=(self.config_data["digest"].split(":")[1], "{")
+        )
         self.assembly._OCIImageAssembly__load_file = mock_checksum_file
 
         config_descriptor = OCIContentDescriptor(self.config_data)

@@ -20,7 +20,7 @@ class DownloaderNative(IDownloader):
         done = int(cur / self.__to_mb(1))
         full = int(length / self.__to_mb(1))
         line = f"[{percent:06.2f}%] {done:6}MB/{full}MB {filename}\r"
-        sys.stdout.write(line, end="")
+        sys.stdout.write(line)
 
     def __to_mb(self, val):
         return 1024 * 1000 * val

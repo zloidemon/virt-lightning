@@ -8,6 +8,7 @@ import pytest
 import virt_lightning.consts as consts
 import virt_lightning.vmm_libvirt as vl
 from virt_lightning.disk_system import DiskSystem
+from virt_lightning.execfile_virtualization_tools import ExecFileVirtTool
 
 DEFAULT_INI = """
 [main]
@@ -49,6 +50,21 @@ def domain(hv, scope="function"):
 def disk(hv):
     yield DiskSystem(None, hv.storage, None)
     clean_up()
+
+
+@pytest.fixture(autouse=True)
+def kvm_binaries(tmp_path, monkeypatch):
+    kvm_bin = tmp_path / "kvm-dummy"
+    kvm_bin.write_text("dummy")
+
+    consts.EXEC_FILE_KVM = str(kvm_bin)
+    consts.EXEC_FILE_QEMU_KVM = str(kvm_bin)
+    consts.EXEC_FILE_QEMU_SYSTEM_x86_64 = str(kvm_bin)
+
+    monkeypatch.setattr(
+        ExecFileVirtTool, "entrypoint", property(lambda self: str(kvm_bin))
+    )
+
 
 @pytest.fixture(autouse=True)
 def qemu_dir(tmp_path):

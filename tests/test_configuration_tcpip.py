@@ -156,7 +156,5 @@ class TestConfigurationTCPIP(unittest.TestCase):
         self.config.auto_cleanup = True
 
         self.assertEqual(
-            "ConfigurationTCPIP(network,192.168.123.0/24,True)",
-            repr(self.config)
+            "ConfigurationTCPIP(network,192.168.123.0/24,True)", repr(self.config)
         )
-

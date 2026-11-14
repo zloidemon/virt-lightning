@@ -21,8 +21,8 @@ from virt_lightning.storage_system import StorageSystem
 DOMAIN_XML = """
 <domain type='kvm'>
   <name></name>
-  <memory unit='KiB'>786432</memory>
-  <currentMemory unit='KiB'>786432</currentMemory>
+  <memory unit='KiB'>1048576</memory>
+  <currentMemory unit='KiB'>1048576</currentMemory>
   <vcpu>2</vcpu>
   <os>
     <type arch='x86_64' machine='pc'>hvm</type>
@@ -71,6 +71,12 @@ DOMAIN_XML = """
 </domain>
 """
 
+VIDEO_XML = """
+<video>
+  <model type='virtio' vram='16384' heads='1' primary='yes'/>
+</video>
+"""
+
 logger = logging.getLogger(DEFAULT_LOGGER)
 
 
@@ -113,6 +119,12 @@ class VMMLibvirt:
         root.find("./vcpu").text = str(self.conn.getInfo()[2])
         root.find("./devices/emulator").text = str(ExecFileVirtTool().entrypoint)
         root.find("./os/type").attrib["arch"] = self.arch
+
+        # Add default video device (virtio)
+        devices = root.find("./devices")
+        video_elem = ElementTree.fromstring(VIDEO_XML)
+        devices.append(video_elem)
+
         dom = self.conn.defineXML(ElementTree.tostring(root).decode())
         domain = LibvirtDomain(dom)
         domain.distro = distro
@@ -130,18 +142,23 @@ class VMMLibvirt:
             if v:
                 config[k] = v
         domain.groups = config["groups"]
-        domain.load_ssh_key_file(pathlib.Path(config["ssh_key_file"]))
+        domain.load_ssh_key_file(config.get("ssh_key_file"))
         domain.memory = config["memory"]
         domain.root_password = config["root_password"]
         domain.username = config["username"]
         domain.vcpus = config["vcpus"]
         domain.default_nic_model = config["default_nic_model"]
+        domain.video_model = config["video_model"]
         domain.bootcmd = config["bootcmd"]
         domain.runcmd = config["runcmd"]
         domain.meta_data_media_type = config["meta_data_media_type"]
         domain.default_bus_type = config["default_bus_type"]
         if "fqdn" in config:
             domain.fqdn = config["fqdn"]
+        if "packages" in config:
+            domain.user_data["packages"] = config["packages"]
+        if "write_files" in config:
+            domain.user_data["write_files"] = config["write_files"]
 
     def list_domains(self):
         for domain in self.conn.listAllDomains():

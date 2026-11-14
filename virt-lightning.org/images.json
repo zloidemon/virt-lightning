@@ -1,0 +1,700 @@
+[
+  {
+    "name": "debian-9",
+    "qcow2_url": "https://cdimage.debian.org/cdimage/openstack/current-9/debian-9-openstack-amd64.qcow2",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "debian-10",
+    "qcow2_url": "https://cdimage.debian.org/cdimage/openstack/current-10/debian-10-openstack-amd64.qcow2",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "debian-11",
+    "qcow2_url": "https://cdimage.debian.org/cdimage/cloud/bullseye/latest/debian-11-generic-amd64.qcow2",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "debian-12",
+    "qcow2_url": "https://cdimage.debian.org/cdimage/cloud/bookworm/latest/debian-12-generic-amd64.qcow2",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "debian-13",
+    "qcow2_url": "https://cloud.debian.org/images/cloud/trixie/daily/latest/debian-13-generic-amd64-daily.qcow2",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "debian-sid",
+    "qcow2_url": "https://cdimage.debian.org/cdimage/cloud/sid/daily/latest/debian-sid-generic-amd64-daily.qcow2",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "centos-7",
+    "qcow2_url": "http://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "centos-6",
+    "qcow2_url": "https://cloud.centos.org/centos/6/images/CentOS-6-x86_64-GenericCloud.qcow2",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "centos-8",
+    "qcow2_url": "https://cloud.centos.org/centos/8/x86_64/images/CentOS-8-GenericCloud-8.1.1911-20200113.3.x86_64.qcow2",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "centos-8-stream",
+    "qcow2_url": "https://cloud.centos.org/centos/8-stream/x86_64/images/CentOS-Stream-GenericCloud-8-latest.x86_64.qcow2",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "centos-9-stream",
+    "qcow2_url": "https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "centos-stream-8",
+    "qcow2_url": "https://cloud.centos.org/centos/8-stream/x86_64/images/CentOS-Stream-GenericCloud-8-latest.x86_64.qcow2",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "centos-stream-9",
+    "qcow2_url": "https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "almalinux-8",
+    "qcow2_url": "https://repo.almalinux.org/almalinux/8/cloud/x86_64/images/AlmaLinux-8-GenericCloud-latest.x86_64.qcow2",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "almalinux-9",
+    "qcow2_url": "https://repo.almalinux.org/almalinux/9/cloud/x86_64/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "rockylinux-8",
+    "qcow2_url": "https://download.rockylinux.org/pub/rocky/8/images/x86_64/Rocky-8-GenericCloud.latest.x86_64.qcow2",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "rockylinux-9",
+    "qcow2_url": "https://download.rockylinux.org/pub/rocky/9/images/x86_64/Rocky-9-GenericCloud.latest.x86_64.qcow2",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-14.04",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/trusty/release-20191107/ubuntu-14.04-server-cloudimg-amd64-disk1.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-16.04",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/xenial/release-20211001/ubuntu-16.04-server-cloudimg-amd64-disk1.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-18.04",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/bionic/release-20230607/ubuntu-18.04-server-cloudimg-amd64.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-20.04",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/focal/release-20250624/ubuntu-20.04-server-cloudimg-amd64.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-22.04",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/jammy/release-20261004/ubuntu-22.04-server-cloudimg-amd64.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-24.04",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/noble/release-20260926/ubuntu-24.04-server-cloudimg-amd64.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-26.04",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/resolute/release-20260927/ubuntu-26.04-server-cloudimg-amd64.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "cirros-0.4.0",
+    "qcow2_url": "http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "opensuse-leap-15.2",
+    "qcow2_url": "https://download.opensuse.org/repositories/Cloud:/Images:/Leap_15.2/images/openSUSE-Leap-15.2-OpenStack.x86_64.qcow2",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "gentoo-latest",
+    "qcow2_url": "http://gentoo.osuosl.org/experimental/amd64/openstack/gentoo-openstack-amd64-default-latest.qcow2",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "gentoo-systemd-latest",
+    "qcow2_url": "http://gentoo.osuosl.org/experimental/amd64/openstack/gentoo-openstack-amd64-systemd-latest.qcow2",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "amazon2-20210126.0",
+    "qcow2_url": "https://cdn.amazonlinux.com/os-images/2.0.20210126.0/kvm/amzn2-kvm-2.0.20210126.0-x86_64.xfs.gpt.qcow2",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "amazon2-20230320.0",
+    "qcow2_url": "https://cdn.amazonlinux.com/os-images/2.0.20230320.0/kvm/amzn2-kvm-2.0.20230320.0-x86_64.xfs.gpt.qcow2",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "fedora-41",
+    "qcow2_url": "https://download.fedoraproject.org/pub/fedora/linux/releases/41/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-41-1.4.x86_64.qcow2",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "fedora-42",
+    "qcow2_url": "https://download.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-42-1.1.x86_64.qcow2",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "fedora-43",
+    "qcow2_url": "https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-43-1.6.x86_64.qcow2",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "fedora-44",
+    "qcow2_url": "https://download.fedoraproject.org/pub/fedora/linux/releases/44/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-44-1.7.x86_64.qcow2",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "freebsd-13.4-ufs",
+    "qcow2_url": "https://s3.public.mtl1.vexxhost.net/bsd-cloud-image.org/images/freebsd/13.4/2024-10-28/ufs/freebsd-13.4-ufs-2024-10-28.qcow2",
+    "meta": {
+      "python_interpreter": "/usr/local/bin/python3"
+    },
+    "yaml_url": "https://s3.public.mtl1.vexxhost.net/bsd-cloud-image.org/images/freebsd/13.4/2024-10-28/ufs/freebsd-13.4-ufs-2024-10-28.yaml"
+  },
+  {
+    "name": "freebsd-13.4-zfs",
+    "qcow2_url": "https://s3.public.mtl1.vexxhost.net/bsd-cloud-image.org/images/freebsd/13.4/2024-10-28/zfs/freebsd-13.4-zfs-2024-10-28.qcow2",
+    "meta": {
+      "python_interpreter": "/usr/local/bin/python3"
+    },
+    "yaml_url": "https://s3.public.mtl1.vexxhost.net/bsd-cloud-image.org/images/freebsd/13.4/2024-10-28/zfs/freebsd-13.4-zfs-2024-10-28.yaml"
+  },
+  {
+    "name": "freebsd-14.1-ufs",
+    "qcow2_url": "https://s3.public.mtl1.vexxhost.net/bsd-cloud-image.org/images/freebsd/14.1/2024-10-28/ufs/freebsd-14.1-ufs-2024-10-28.qcow2",
+    "meta": {
+      "python_interpreter": "/usr/local/bin/python3"
+    },
+    "yaml_url": "https://s3.public.mtl1.vexxhost.net/bsd-cloud-image.org/images/freebsd/14.1/2024-10-28/ufs/freebsd-14.1-ufs-2024-10-28.yaml"
+  },
+  {
+    "name": "freebsd-14.1-zfs",
+    "qcow2_url": "https://s3.public.mtl1.vexxhost.net/bsd-cloud-image.org/images/freebsd/14.1/2024-10-28/zfs/freebsd-14.1-zfs-2024-10-28.qcow2",
+    "meta": {
+      "python_interpreter": "/usr/local/bin/python3"
+    },
+    "yaml_url": "https://s3.public.mtl1.vexxhost.net/bsd-cloud-image.org/images/freebsd/14.1/2024-10-28/zfs/freebsd-14.1-zfs-2024-10-28.yaml"
+  },
+  {
+    "name": "freebsd-14.2-ufs",
+    "qcow2_url": "https://s3.public.mtl1.vexxhost.net/bsd-cloud-image.org/images/freebsd/14.2/2024-12-08/ufs/freebsd-14.2-ufs-2024-12-08.qcow2",
+    "meta": {
+      "python_interpreter": "/usr/local/bin/python3"
+    },
+    "yaml_url": "https://s3.public.mtl1.vexxhost.net/bsd-cloud-image.org/images/freebsd/14.2/2024-12-08/ufs/freebsd-14.2-ufs-2024-12-08.yaml"
+  },
+  {
+    "name": "freebsd-14.2-zfs",
+    "qcow2_url": "https://s3.public.mtl1.vexxhost.net/bsd-cloud-image.org/images/freebsd/14.2/2024-12-08/zfs/freebsd-14.2-zfs-2024-12-08.qcow2",
+    "meta": {
+      "python_interpreter": "/usr/local/bin/python3"
+    },
+    "yaml_url": "https://s3.public.mtl1.vexxhost.net/bsd-cloud-image.org/images/freebsd/14.2/2024-12-08/zfs/freebsd-14.2-zfs-2024-12-08.yaml"
+  },
+  {
+    "name": "netbsd-9.4-ufs",
+    "qcow2_url": "https://s3.public.mtl1.vexxhost.net/bsd-cloud-image.org/images/netbsd/9.4/2024-11-02/ufs/netbsd-9.4-2024-11-02.qcow2",
+    "meta": {
+      "python_interpreter": "/usr/pkg/bin/python3.12"
+    },
+    "yaml_url": "https://s3.public.mtl1.vexxhost.net/bsd-cloud-image.org/images/netbsd/9.4/2024-11-02/ufs/netbsd-9.4-2024-11-02.yaml"
+  },
+  {
+    "name": "netbsd-10.0-ufs",
+    "qcow2_url": "https://s3.public.mtl1.vexxhost.net/bsd-cloud-image.org/images/netbsd/10.0/2024-11-05/ufs/netbsd-10.0-2024-11-05.qcow2",
+    "meta": {
+      "python_interpreter": "/usr/pkg/bin/python3.12"
+    },
+    "yaml_url": "https://s3.public.mtl1.vexxhost.net/bsd-cloud-image.org/images/netbsd/10.0/2024-11-05/ufs/netbsd-10.0-2024-11-05.yaml"
+  },
+  {
+    "name": "netbsd-10.1-ufs",
+    "qcow2_url": "https://s3.public.mtl1.vexxhost.net/bsd-cloud-image.org/images/netbsd/10.1/2025-02-15/ufs/netbsd-10.1-2025-02-15.qcow2",
+    "meta": {
+      "python_interpreter": "/usr/pkg/bin/python3.13"
+    },
+    "yaml_url": "https://s3.public.mtl1.vexxhost.net/bsd-cloud-image.org/images/netbsd/10.1/2025-02-15/ufs/netbsd-10.1-2025-02-15.yaml"
+  },
+  {
+    "name": "openbsd-7.7-ufs",
+    "qcow2_url": "https://github.com/hcartiaux/openbsd-cloud-image/releases/download/v7.7_2025-04-28-11-38/openbsd-min.qcow2",
+    "meta": {
+      "python_interpreter": "/usr/local/bin/python3"
+    },
+    "yaml_url": ""
+  },
+  {
+    "name": "openbsd-7.8-ufs",
+    "qcow2_url": "https://github.com/hcartiaux/openbsd-cloud-image/releases/download/v7.8_2025-10-22-09-25/openbsd-min.qcow2",
+    "meta": {
+      "python_interpreter": "/usr/local/bin/python3"
+    },
+    "yaml_url": ""
+  },
+  {
+    "name": "openbsd-7.9-ufs",
+    "qcow2_url": "https://github.com/hcartiaux/openbsd-cloud-image/releases/download/v7.9_2026-08-31-22-45/openbsd-min.qcow2",
+    "meta": {
+      "python_interpreter": "/usr/local/bin/python3"
+    },
+    "yaml_url": ""
+  },
+  {
+    "name": "dragonflybsd-6.2.2-ufs",
+    "qcow2_url": "https://s3.public.mtl1.vexxhost.net/bsd-cloud-image.org/images/dragonflybsd/6.2.2/2022-09-06/ufs/dragonflybsd-6.2.2-ufs-2022-09-06.qcow2",
+    "meta": {
+      "python_interpreter": "/usr/local/bin/python3.8"
+    },
+    "yaml_url": "https://s3.public.mtl1.vexxhost.net/bsd-cloud-image.org/images/dragonflybsd/6.2.2/2022-09-06/ufs/dragonflybsd-6.2.2-ufs-2022-09-06.yaml"
+  },
+  {
+    "name": "dragonflybsd-6.2.2-hammer2",
+    "qcow2_url": "https://s3.public.mtl1.vexxhost.net/bsd-cloud-image.org/images/dragonflybsd/6.2.2/2022-09-06/hammer2/dragonflybsd-6.2.2-hammer2-2022-09-06.qcow2",
+    "meta": {
+      "python_interpreter": "/usr/local/bin/python3.8"
+    },
+    "yaml_url": "https://s3.public.mtl1.vexxhost.net/bsd-cloud-image.org/images/dragonflybsd/6.2.2/2022-09-06/hammer2/dragonflybsd-6.2.2-hammer2-2022-09-06.yaml"
+  },
+  {
+    "name": "dragonflybsd-6.4.0-ufs",
+    "qcow2_url": "https://s3.public.mtl1.vexxhost.net/bsd-cloud-image.org/images/dragonflybsd/6.4.0/2023-04-23/ufs/dragonflybsd-6.4.0-ufs-2023-04-23.qcow2",
+    "meta": {
+      "python_interpreter": "/usr/local/bin/python3.9"
+    },
+    "yaml_url": "https://s3.public.mtl1.vexxhost.net/bsd-cloud-image.org/images/dragonflybsd/6.4.0/2023-04-23/ufs/dragonflybsd-6.4.0-ufs-2023-04-23.yaml"
+  },
+  {
+    "name": "dragonflybsd-6.4.0-hammer2",
+    "qcow2_url": "https://s3.public.mtl1.vexxhost.net/bsd-cloud-image.org/images/dragonflybsd/6.4.0/2023-04-23/hammer2/dragonflybsd-6.4.0-hammer2-2023-04-23.qcow2",
+    "meta": {
+      "python_interpreter": "/usr/local/bin/python3.9"
+    },
+    "yaml_url": "https://s3.public.mtl1.vexxhost.net/bsd-cloud-image.org/images/dragonflybsd/6.4.0/2023-04-23/hammer2/dragonflybsd-6.4.0-hammer2-2023-04-23.yaml"
+  },
+  {
+    "name": "alpine-3.20",
+    "qcow2_url": "https://dl-cdn.alpinelinux.org/alpine/v3.20/releases/cloud/generic_alpine-3.20.9-x86_64-bios-cloudinit-r0.qcow2",
+    "meta": {
+      "username": "alpine"
+    },
+    "yaml_url": ""
+  },
+  {
+    "name": "alpine-3.21",
+    "qcow2_url": "https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/cloud/generic_alpine-3.21.7-x86_64-bios-cloudinit-r0.qcow2",
+    "meta": {
+      "username": "alpine"
+    },
+    "yaml_url": ""
+  },
+  {
+    "name": "alpine-3.22",
+    "qcow2_url": "https://dl-cdn.alpinelinux.org/alpine/v3.22/releases/cloud/generic_alpine-3.22.5-x86_64-bios-cloudinit-r0.qcow2",
+    "meta": {
+      "username": "alpine"
+    },
+    "yaml_url": ""
+  },
+  {
+    "name": "alpine-3.23",
+    "qcow2_url": "https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/cloud/generic_alpine-3.23.5-x86_64-bios-cloudinit-r0.qcow2",
+    "meta": {
+      "username": "alpine"
+    },
+    "yaml_url": ""
+  },
+  {
+    "name": "alpine-3.24",
+    "qcow2_url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/releases/cloud/generic_alpine-3.24.1-x86_64-bios-cloudinit-r0.qcow2",
+    "meta": {
+      "username": "alpine"
+    },
+    "yaml_url": ""
+  },
+  {
+    "name": "freebsd-14.4-ufs",
+    "qcow2_url": "https://download.freebsd.org/releases/VM-IMAGES/14.4-RELEASE/amd64/Latest/FreeBSD-14.4-RELEASE-amd64-BASIC-CLOUDINIT-ufs.qcow2.xz",
+    "meta": {
+      "write_files": [
+        {
+          "content": "# Workaround for https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=292137\nnameserver 8.8.8.8\n",
+          "owner": "root:root",
+          "path": "/etc/resolv.conf",
+          "permissions": "0644",
+          "append": true
+        }
+      ],
+      "packages": [
+        "sudo"
+      ],
+      "groups": [
+        "wheel"
+      ]
+    },
+    "yaml_url": ""
+  },
+  {
+    "name": "freebsd-14.4-zfs",
+    "qcow2_url": "https://download.freebsd.org/releases/VM-IMAGES/14.4-RELEASE/amd64/Latest/FreeBSD-14.4-RELEASE-amd64-BASIC-CLOUDINIT-zfs.qcow2.xz",
+    "meta": {
+      "write_files": [
+        {
+          "content": "# Workaround for https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=292137\nnameserver 8.8.8.8\n",
+          "owner": "root:root",
+          "path": "/etc/resolv.conf",
+          "permissions": "0644",
+          "append": true
+        }
+      ],
+      "packages": [
+        "sudo"
+      ],
+      "groups": [
+        "wheel"
+      ]
+    },
+    "yaml_url": ""
+  },
+  {
+    "name": "freebsd-14.5-ufs",
+    "qcow2_url": "https://download.freebsd.org/releases/VM-IMAGES/14.5-RELEASE/amd64/Latest/FreeBSD-14.5-RELEASE-amd64-BASIC-CLOUDINIT-ufs.qcow2.xz",
+    "meta": {
+      "write_files": [
+        {
+          "content": "# Workaround for https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=292137\nnameserver 8.8.8.8\n",
+          "owner": "root:root",
+          "path": "/etc/resolv.conf",
+          "permissions": "0644",
+          "append": true
+        }
+      ],
+      "packages": [
+        "sudo"
+      ],
+      "groups": [
+        "wheel"
+      ]
+    },
+    "yaml_url": ""
+  },
+  {
+    "name": "freebsd-14.5-zfs",
+    "qcow2_url": "https://download.freebsd.org/releases/VM-IMAGES/14.5-RELEASE/amd64/Latest/FreeBSD-14.5-RELEASE-amd64-BASIC-CLOUDINIT-zfs.qcow2.xz",
+    "meta": {
+      "write_files": [
+        {
+          "content": "# Workaround for https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=292137\nnameserver 8.8.8.8\n",
+          "owner": "root:root",
+          "path": "/etc/resolv.conf",
+          "permissions": "0644",
+          "append": true
+        }
+      ],
+      "packages": [
+        "sudo"
+      ],
+      "groups": [
+        "wheel"
+      ]
+    },
+    "yaml_url": ""
+  },
+  {
+    "name": "freebsd-15.0-ufs",
+    "qcow2_url": "https://download.freebsd.org/releases/VM-IMAGES/15.0-RELEASE/amd64/Latest/FreeBSD-15.0-RELEASE-amd64-BASIC-CLOUDINIT-ufs.qcow2.xz",
+    "meta": {
+      "write_files": [
+        {
+          "content": "# Workaround for https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=292137\nnameserver 8.8.8.8\n",
+          "owner": "root:root",
+          "path": "/etc/resolv.conf",
+          "permissions": "0644",
+          "append": true
+        }
+      ],
+      "packages": [
+        "sudo"
+      ],
+      "groups": [
+        "wheel"
+      ]
+    },
+    "yaml_url": ""
+  },
+  {
+    "name": "freebsd-15.0-zfs",
+    "qcow2_url": "https://download.freebsd.org/releases/VM-IMAGES/15.0-RELEASE/amd64/Latest/FreeBSD-15.0-RELEASE-amd64-BASIC-CLOUDINIT-zfs.qcow2.xz",
+    "meta": {
+      "write_files": [
+        {
+          "content": "# Workaround for https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=292137\nnameserver 8.8.8.8\n",
+          "owner": "root:root",
+          "path": "/etc/resolv.conf",
+          "permissions": "0644",
+          "append": true
+        }
+      ],
+      "packages": [
+        "sudo"
+      ],
+      "groups": [
+        "wheel"
+      ]
+    },
+    "yaml_url": ""
+  },
+  {
+    "name": "freebsd-15.1-ufs",
+    "qcow2_url": "https://download.freebsd.org/releases/VM-IMAGES/15.1-RELEASE/amd64/Latest/FreeBSD-15.1-RELEASE-amd64-BASIC-CLOUDINIT-ufs.qcow2.xz",
+    "meta": {
+      "write_files": [
+        {
+          "content": "# Workaround for https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=292137\nnameserver 8.8.8.8\n",
+          "owner": "root:root",
+          "path": "/etc/resolv.conf",
+          "permissions": "0644",
+          "append": true
+        }
+      ],
+      "packages": [
+        "sudo"
+      ],
+      "groups": [
+        "wheel"
+      ]
+    },
+    "yaml_url": ""
+  },
+  {
+    "name": "freebsd-15.1-zfs",
+    "qcow2_url": "https://download.freebsd.org/releases/VM-IMAGES/15.1-RELEASE/amd64/Latest/FreeBSD-15.1-RELEASE-amd64-BASIC-CLOUDINIT-zfs.qcow2.xz",
+    "meta": {
+      "write_files": [
+        {
+          "content": "# Workaround for https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=292137\nnameserver 8.8.8.8\n",
+          "owner": "root:root",
+          "path": "/etc/resolv.conf",
+          "permissions": "0644",
+          "append": true
+        }
+      ],
+      "packages": [
+        "sudo"
+      ],
+      "groups": [
+        "wheel"
+      ]
+    },
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-10.04",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/lucid/release-20150427/ubuntu-10.04-server-cloudimg-amd64-disk1.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-11.04",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/natty/release-20121028/ubuntu-11.04-server-cloudimg-amd64-disk1.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-11.10",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/oneiric/release-20130509/ubuntu-11.10-server-cloudimg-amd64-disk1.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-12.04",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/precise/release-20170502/ubuntu-12.04-server-cloudimg-amd64-disk1.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-12.10",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/quantal/release-20140409/ubuntu-12.10-server-cloudimg-amd64-disk1.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-13.04",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/raring/release-20140111/ubuntu-13.04-server-cloudimg-amd64-disk1.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-13.10",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/saucy/release-20140709/ubuntu-13.10-server-cloudimg-amd64-disk1.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-14.10",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/utopic/release-20150723/ubuntu-14.10-server-cloudimg-amd64-disk1.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-15.04",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/vivid/release-20160203/ubuntu-15.04-server-cloudimg-amd64-disk1.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-15.10",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/wily/release-20160715/ubuntu-15.10-server-cloudimg-amd64-disk1.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-16.10",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/yakkety/release-20170719/ubuntu-16.10-server-cloudimg-amd64.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-17.04",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/zesty/release-20171208/ubuntu-17.04-server-cloudimg-amd64.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-17.10",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/artful/release-20180706/ubuntu-17.10-server-cloudimg-amd64.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-18.10",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/cosmic/release-20190628/ubuntu-18.10-server-cloudimg-amd64.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-19.04",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/disco/release-20200109/ubuntu-19.04-server-cloudimg-amd64.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-19.10",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/eoan/release-20200717/ubuntu-19.10-server-cloudimg-amd64.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-20.10",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/groovy/release-20210720/ubuntu-20.10-server-cloudimg-amd64.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-21.04",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/hirsute/release-20220118/ubuntu-21.04-server-cloudimg-amd64.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-21.10",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/impish/release-20220708/ubuntu-21.10-server-cloudimg-amd64.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-22.10",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/kinetic/release-20230716/ubuntu-22.10-server-cloudimg-amd64.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-23.04",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/lunar/release-20240115/ubuntu-23.04-server-cloudimg-amd64.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-23.10",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/mantic/release-20240710/ubuntu-23.10-server-cloudimg-amd64.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-24.10",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/oracular/release-20250701/ubuntu-24.10-server-cloudimg-amd64.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-25.04",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/plucky/release-20260114/ubuntu-25.04-server-cloudimg-amd64.img",
+    "meta": {},
+    "yaml_url": ""
+  },
+  {
+    "name": "ubuntu-25.10",
+    "qcow2_url": "https://cloud-images.ubuntu.com/server/releases/questing/release-20260703/ubuntu-25.10-server-cloudimg-amd64.img",
+    "meta": {},
+    "yaml_url": ""
+  }
+]

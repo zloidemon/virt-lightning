@@ -30,7 +30,9 @@ class TestOCIBuildImageExpose(unittest.TestCase):
         self.builder.expose(5000, "tcp")
         self.builder.expose(5000, "udp")
 
-        self.assertSetEqual(set({"5000/tcp", "5000/udp"}), self.builder._OCIImageBuild__ports)
+        self.assertSetEqual(
+            set({"5000/tcp", "5000/udp"}), self.builder._OCIImageBuild__ports
+        )
 
     def test_valid_udp(self):
         self.builder.expose(5000, "udp")
@@ -65,4 +67,6 @@ class TestOCIBuildImageExpose(unittest.TestCase):
     def test_valid_range(self):
         self.builder.expose(0)
         self.builder.expose(65535)
-        self.assertSetEqual(set({"0/tcp", "65535/tcp"}), self.builder._OCIImageBuild__ports)
+        self.assertSetEqual(
+            set({"0/tcp", "65535/tcp"}), self.builder._OCIImageBuild__ports
+        )

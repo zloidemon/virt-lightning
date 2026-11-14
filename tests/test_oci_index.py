@@ -46,9 +46,8 @@ class TestOCIIndex(unittest.TestCase):
     def test_str(self):
         self.assertEqual(
             "Index(schemaVersion=2,mediaType=application/vnd.oci.image.index.v1+json)",
-            str(self.index)
+            str(self.index),
         )
-
 
 
 class TestOCIIndexMultiple(unittest.TestCase):
@@ -88,9 +87,8 @@ class TestOCIIndexMultiple(unittest.TestCase):
     def test_str(self):
         self.assertEqual(
             "Index(schemaVersion=2,mediaType=application/vnd.oci.image.index.v1+json)",
-            str(self.index)
+            str(self.index),
         )
-
 
 
 class TestOCIIndexAux(unittest.TestCase):
@@ -209,5 +207,5 @@ class TestOCIIndexAux(unittest.TestCase):
     def test_str(self):
         self.assertEqual(
             "Index(schemaVersion=2,mediaType=application/vnd.oci.image.index.v1+json)",
-            str(self.index)
+            str(self.index),
         )

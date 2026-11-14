@@ -104,6 +104,7 @@ Commands:
     start               Start a new VM
     stop                Delete a VM
     images              Dump list of supported distros
+    pull                Download image
     storage             Dump the VM image storage directory
     ansible             Ansible commands
     ssh                 SSH into VM
@@ -133,21 +134,24 @@ DEFAULT_CONFIGURATION = {
         "network_name": f"{DEFAULT_VL_NAME}",
         "network_cidr": "192.168.123.0/24",
         "network_auto_clean_up": True,
-        "ssh_key_file": "~/.ssh/id_rsa.pub",
+        "ssh_key_file": "~/.ssh/id_rsa.pub",  # FIXME: переделать на поиск
         "registry_urls": "",
     }
 }
 DEFAULT_DOMAIN_CONFIGURATION = {
     "groups": [],
-    "memory": 768,
+    "memory": 1024,
     "root_password": DEFAULT_USER_PASSWORD,
     "username": getpass.getuser(),
     "vcpus": 1,
     "default_nic_model": "virtio",
+    "video_model": "virtio",
     "bootcmd": [],
     "runcmd": [],
     "meta_data_media_type": "cdrom",
     "default_bus_type": "virtio",
+    "packages": [],
+    "write_files": [],
 }
 DEFAULT_LIBVIRT_GROUP = "libvirt"
 DEFAULT_STORAGE_DIR = f"/var/lib/{DEFAULT_VL_NAME}/pool"

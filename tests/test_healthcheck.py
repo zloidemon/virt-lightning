@@ -25,8 +25,7 @@ class TestCommandHealthcheck(unittest.TestCase):
         self.assertEqual(3, self.config._ConfigurationHealthcheck__retries)
         self.assertEqual(3, self.config.retries)
         self.assertEqual(
-            self.config._ConfigurationHealthcheck__retries,
-            self.config.retries
+            self.config._ConfigurationHealthcheck__retries, self.config.retries
         )
 
     def test_valid_retries(self):
