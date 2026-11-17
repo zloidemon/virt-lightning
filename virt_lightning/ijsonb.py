@@ -1,41 +1,15 @@
-import json
-from abc import (
-    ABCMeta,
-    abstractmethod,
-)
+"""
+Deprecated: use init_system.jsonb instead.
+
+The IJsonb interface is now the Jsonb protocol of the init_system package.
+"""
+
+from virt_lightning.init_system_compat import import_init_system_module
+
+__all__ = ["IJsonb"]  # noqa: F822
 
 
-#
-# Интерфейс для преобразования в jsonb
-#
-class IJsonb(metaclass=ABCMeta):
-    @abstractmethod
-    def __init__(self):
-        pass
-
-    @abstractmethod
-    def add(self, path, value):
-        pass
-
-    @abstractmethod
-    def remove(self, path):
-        pass
-
-    @abstractmethod
-    def replace(self, path, value):
-        pass
-
-    @abstractmethod
-    def copy(self, from_path, path):
-        pass
-
-    @abstractmethod
-    def move(self, from_path, path):
-        pass
-
-    @abstractmethod
-    def test(self, path, value):
-        pass
-
-    def __str__(self):
-        return json.dumps(self._operations)
+def __getattr__(name):
+    if name == "IJsonb":
+        return import_init_system_module("jsonb").Jsonb
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

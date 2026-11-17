@@ -21,6 +21,11 @@ dependencies = [
     "pyyaml>=6.0.3",
 ]
 
+[project.optional-dependencies]
+init = [
+    "init-system @ git+https://github.com/virt-lightning/init-system.git",
+]
+
 [project.urls]
 Homepage = "https://virt-lightning.org/"
 Source = "https://github.com/virt-lightning/virt-lightning"
@@ -61,6 +66,7 @@ lint.ignore = ["N806"]
 [dependency-groups]
 dev = [
     "black>=24.8.0",
+    "init-system @ git+https://github.com/virt-lightning/init-system.git",
     "mypy>=1.14.1",
     "pep8-naming>=0.14.1",
     "pytest>=8.3.5",

@@ -2,27 +2,6 @@ import getpass
 from enum import Enum, IntEnum, unique
 
 
-#
-# NOTE: acpi и agent используется для корректного завершения при использовании
-#       qemu/kvm. Для LXC (контейнеры) будет использоваться initctl или signal.
-#       paravirt для виртуальных машин запускаемых на XEN в соотвствующем режиме.
-#
-@unique
-class SignalShutdown(Enum):
-    ACPI = "acpi"
-    AGENT = "agent"
-    INITCTL = "initctl"
-    SIGNAL = "signal"
-    PARAVIRT = "paravirt"
-
-
-@unique
-class HashingAlgorithm(Enum):
-    MD5 = "md5"
-    SHA256 = "sha256"
-    SHA512 = "sha512"
-
-
 @unique
 class LoginMethod(Enum):
     SSH = "ssh"
@@ -32,12 +11,6 @@ class LoginMethod(Enum):
 class ExitCode(Enum):
     OK = 0
     FAIL = 1
-
-
-@unique
-class NetworkProtocolTCPIP(Enum):
-    TCP = "tcp"
-    UDP = "udp"
 
 
 @unique
@@ -62,25 +35,6 @@ class BytesOrder(Enum):
 class BitWidths(IntEnum):
     BITS32 = 32
     BITS64 = 64
-
-
-@unique
-class OperationSystem(Enum):
-    AIX = "aix"
-    ANDROID = "android"
-    DARWIN = "darwin"
-    DRAGONFLYBSD = "dragonflybsd"
-    FREEBSD = "freebsd"
-    ILLUMOS = "illumos"
-    IOS = "ios"
-    JS = "js"
-    LINUX = "linux"
-    NETBSD = "netbsd"
-    OPENBSD = "openbsd"
-    PLAN9 = "plan9"
-    SOLARIS = "solaris"
-    WASIP1 = "wasip1"
-    WINDOWS = "windows"
 
 
 CLI_MESSAGE_HELP = """
