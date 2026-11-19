@@ -20,7 +20,7 @@ This is handy to quickly validate a new Ansible playbook, or a role on a large n
 In a nutshell:
 
 ```shell
-echo "- distro: centos-7" > virt-lightning.yaml
+echo "- image: centos-7" > virt-lightning.yaml
 vl up
 vl ansible_inventory > inventory
 ansible all -m ping -i inventory
@@ -135,7 +135,7 @@ we use the shortest version.
 
 ## **vl images**
 
-List the distro images that can be used. Its output is compatible with `vl up`. You can initialize a new configuration with: `vl images > virt-lightning.yaml`.
+List the images that can be used. Its output is compatible with `vl up`. You can initialize a new configuration with: `vl images > virt-lightning.yaml`.
 
 ## **vl up**
 
@@ -230,7 +230,7 @@ private_hub=url1,url2
 
 A VM can be tuned at two different places with the following keys:
 
-- `distro`: the name of the base distro image to use, it's the only mandatory parameter.
+- `image`: the name of the base image to use, it's the only mandatory parameter.
 - `name`: the VM name
 - `memory`: the amount of memory to dedicate to the VM
 - `vcpus`: the number of vcpu to dedicate to the VM
@@ -251,26 +251,26 @@ A VM can be tuned at two different places with the following keys:
 
 ```yaml
 - name: esxi-vcenter
-  distro: esxi-6.7
+  image: esxi-6.7
   memory: 12000
   root_disk_size: 30
   vcpus: 2
   root_password: '!234AaAa56'
   groups: ['all_esxi']
 - name: esxi1
-  distro: esxi-6.7
+  image: esxi-6.7
   memory: 4096
   vcpus: 1
   root_password: '!234AaAa56'
   groups: ['all_esxi', 'esxi_lab']
 - name: esxi2
-  distro: esxi-6.7
+  image: esxi-6.7
   memory: 4096
   vcpus: 1
   root_password: '!234AaAa56'
   groups: ['all_esxi', 'esxi_lab']
 - name: centos-7
-  distro: centos-7
+  image: centos-7
   networks:
     - network: default
       ipv4: 192.168.122.50
@@ -282,7 +282,7 @@ A VM can be tuned at two different places with the following keys:
 
 ```yaml
 - name: controller
-  distro: fedora-35
+  image: fedora-35
   - bridge: my-ovs-bridge-name
     virtualport_type: openvswitch
 ```
@@ -291,7 +291,7 @@ A VM can be tuned at two different places with the following keys:
 
 ```yaml
 - name: vlvm-fedora-40
-  distro: fedora-40
+  image: fedora-40
   networks:
     - network: virt-lightning
       nic_model: virtio
@@ -302,7 +302,7 @@ A VM can be tuned at two different places with the following keys:
 ### Example: Addressing multiple interfaces
 ```yaml
 - name: example
-  distro: fedora-40
+  image: fedora-40
   networks:
     - network: default
       ipv4: 192.168.122.50
@@ -328,7 +328,7 @@ The variable `management_ipv4` holds the IP address and netmask.
       # "msg": "255.255.255.0"
 ```
 
-### You can also associate some parameters to the distro image itself
+### You can also associate some parameters to the image itself
 
 ```shell
 cat /var/lib/virt-lightning/pool/upstream/esxi-6.7.yaml

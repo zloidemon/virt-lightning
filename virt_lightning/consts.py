@@ -40,10 +40,10 @@ class BitWidths(IntEnum):
 CLI_MESSAGE_HELP = """
 Example:
 
- We export the list of the distro in the {conf} file.
+ We export the list of the images in the {conf} file.
    $ {cli} images > {conf}
 
- For each line of the {conf}, start a VM with the associated distro.
+ For each line of the {conf}, start a VM with the associated image.
    $ {cli} up
 
  Once the VM are up, we can generate an Ansible inventory file:
@@ -57,7 +57,7 @@ Commands:
     down                Delete all VMs created by app
     start               Start a new VM
     stop                Delete a VM
-    images              Dump list of supported distros
+    images              Dump list of supported images
     pull                Download image
     storage             Dump the VM image storage directory
     ansible             Ansible commands
@@ -121,6 +121,6 @@ EXEC_FILE_VIRSH = "virsh"
 EXEC_FILE_VIRT_VIEWER = "virt-viewer"
 QEMU_DIR = "/var/lib/libvirt/qemu/"
 # FIXME: Удалить после перевода выделения имён по шаблону из FQDN
-RE_DISTRO_HOSTNAME_PATTERN = r"[^a-zA-Z0-9-]+"
+RE_IMAGE_HOSTNAME_PATTERN = r"[^a-zA-Z0-9-]+"
 RE_FQDN_PATTERN = r"^[\.a-z0-9]+$"
 RE_USERNAME_PATTERN = "[a-z_][a-z0-9_-]{1,32}$"

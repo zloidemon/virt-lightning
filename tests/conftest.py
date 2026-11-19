@@ -42,7 +42,7 @@ def hv(scope="function"):
 
 @pytest.fixture
 def domain(hv, scope="function"):
-    yield hv.create_domain(name="a", distro="b")
+    yield hv.create_domain(name="a", image="b")
     clean_up()
 
 

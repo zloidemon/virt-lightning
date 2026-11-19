@@ -41,7 +41,7 @@ class CLIStart(ICLIcmd):
             dest="enable_console",
             default=True,
         )
-        self.parser.add_argument("distro", help="Name of the distro", type=str)
+        self.parser.add_argument("image", help="Name of the image", type=str)
         self.parser.add_argument(
             "--disk",
             action="extend",
@@ -63,12 +63,12 @@ class CLIStart(ICLIcmd):
     ):
         """Start a single VM."""
         host = {
-            k: kwargs[k] for k in ["name", "distro", "memory", "vcpus"] if kwargs.get(k)
+            k: kwargs[k] for k in ["name", "image", "memory", "vcpus"] if kwargs.get(k)
         }
         if kwargs.get("disk"):
             host.update({"disks": [{"size": x} for x in kwargs["disk"]]})
 
-        vmm.storage.ensure_image_exists(configuration, host["distro"])
+        vmm.storage.ensure_image_exists(configuration, host["image"])
         domain = LibvirtDomain._start_domain(vmm, host, context, configuration)
 
         if not domain:

@@ -110,7 +110,7 @@ class VMMLibvirt:
         # Sorted to get kvm before qemu, assume there is no other type
         return sorted(available)[0]
 
-    def create_domain(self, name=None, distro=None):
+    def create_domain(self, name=None, image=None):
         if not name:
             name = uuid.uuid4().hex[0:10]
         root = ElementTree.fromstring(DOMAIN_XML)
@@ -127,7 +127,7 @@ class VMMLibvirt:
 
         dom = self.conn.defineXML(ElementTree.tostring(root).decode())
         domain = LibvirtDomain(dom)
-        domain.distro = distro
+        domain.image = image
         return domain
 
     def configure_domain(self, domain, user_config):
@@ -135,7 +135,7 @@ class VMMLibvirt:
         #
         # NOTE: Перезапись конфигурации поставляемой к образу
         #
-        for k, v in self.storage.get_distro_configuration(domain.distro).items():
+        for k, v in self.storage.get_image_configuration(domain.image).items():
             if v:
                 config[k] = v
         for k, v in user_config.items():
@@ -176,11 +176,11 @@ class VMMLibvirt:
 
     def start(self, domain, metadata_format):
         cloud_init_iso, init_builder = None, None
-        if metadata_format.get("provider", "") == "nocloud" or domain.distro.startswith(
+        if metadata_format.get("provider", "") == "nocloud" or domain.image.startswith(
             "centos-6"
         ):
             init_builder = AuxiliaryCloudInitDisk
-        elif domain.distro.startswith("coreos"):
+        elif domain.image.startswith("coreos"):
             init_builder = AuxiliaryIgnitionDisk
         else:
             #

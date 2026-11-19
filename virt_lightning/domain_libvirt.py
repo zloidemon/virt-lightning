@@ -105,12 +105,12 @@ class LibvirtDomain:
             self.user_data["users"][0]["ssh_authorized_keys"] = [self.ssh_key]
 
     @property
-    def distro(self):
-        return self.get_metadata("distro")
+    def image(self):
+        return self.get_metadata("image")
 
-    @distro.setter
-    def distro(self, distro):
-        self.record_metadata("distro", distro)
+    @image.setter
+    def image(self, image):
+        self.record_metadata("image", image)
 
     @property
     def username(self):
@@ -439,12 +439,12 @@ class LibvirtDomain:
         # FIXME: Убрать replace() у названии образа. Надо хранить по иному для
         #        новой схемы хранения образов.
         #
-        distro = host["distro"].replace(":", "-")
+        image = host["image"].replace(":", "-")
         #
         # FIXME: Переделать выделение имен на использование FQDN
         #
         if "name" not in host:
-            host["name"] = re.sub(consts.RE_DISTRO_HOSTNAME_PATTERN, "", distro)
+            host["name"] = re.sub(consts.RE_IMAGE_HOSTNAME_PATTERN, "", image)
 
         domain = vmm.get_domain_by_name(host["name"])
         if not domain:
@@ -474,7 +474,7 @@ class LibvirtDomain:
             "meta_data_media_type": host.get("meta_data_media_type"),
             "default_bus_type": host.get("default_bus_type"),
         }
-        domain = vmm.create_domain(name=host["name"], distro=distro)
+        domain = vmm.create_domain(name=host["name"], image=image)
         vmm.configure_domain(domain, user_config)
         domain.context = context
         networks = host.get("networks", [{}])
@@ -505,7 +505,7 @@ class LibvirtDomain:
 
             volume = DiskSystem(None, vmm.storage, vmm.network).create(
                 name=f"{host['name']}-{i}",
-                backing_on=(distro if i == 0 else ""),
+                backing_on=(image if i == 0 else ""),
                 size=size,
             )
             domain.attach_disk(volume=volume)

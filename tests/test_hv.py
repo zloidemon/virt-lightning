@@ -16,13 +16,18 @@ def test_init_storage_pool(hv):
 
 
 def test_create_domain(hv):
-    domain = hv.create_domain(name="a", distro="b")
+    domain = hv.create_domain(name="a", image="b")
     assert domain
+
+
+def test_domain_image_property(hv):
+    domain = hv.create_domain(name="a", image="b")
+    assert domain.image == "b"
 
 
 def test_create_domain_has_default_video(hv):
     """Verify new domains have virtio video device by default."""
-    domain = hv.create_domain(name="video_test", distro="test")
+    domain = hv.create_domain(name="video_test", image="test")
     xml = domain.dom.XMLDesc(0)
     assert "<video>" in xml
     assert "type='virtio'" in xml
@@ -30,14 +35,14 @@ def test_create_domain_has_default_video(hv):
 
 def test_video_model_property_reads_from_xml(hv):
     """Verify video_model property reads current state from XML."""
-    domain = hv.create_domain(name="video_prop_test", distro="test")
+    domain = hv.create_domain(name="video_prop_test", image="test")
     # Should read virtio from the default video device
     assert domain.video_model == "virtio"
 
 
 def test_set_custom_video_model(hv):
     """Verify setting a custom video model updates the domain XML."""
-    domain = hv.create_domain(name="custom_video_test", distro="test")
+    domain = hv.create_domain(name="custom_video_test", image="test")
 
     # Change to qxl
     domain.video_model = "qxl"
@@ -54,14 +59,14 @@ def test_set_custom_video_model(hv):
     assert "type='cirrus'" in xml
 
 
-def test_distro_available(hv, tmpdir):
+def test_image_available(hv, tmpdir):
     hv.storage.storage_pool_obj = hv.storage.create_storage_pool("foo", tmpdir)
-    assert hv.storage.distro_available() == []
+    assert hv.storage.image_available() == []
     upstream_d = tmpdir / "upstream"
     upstream_d.mkdir()
-    distro_1 = upstream_d / "distro_1.qcow2"
-    distro_1.write(b"a")
-    assert hv.storage.distro_available() == ["distro_1"]
+    image_1 = upstream_d / "image_1.qcow2"
+    image_1.write(b"a")
+    assert hv.storage.image_available() == ["image_1"]
 
 
 def test_get_storage_dir(hv):

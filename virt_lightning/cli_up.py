@@ -38,7 +38,7 @@ class CLIup(ICLIcmd):
         loop = asyncio.get_event_loop()
 
         for hosts in virt_lightning_conf:
-            vmm.storage.ensure_image_exists(configuration, hosts["distro"])
+            vmm.storage.ensure_image_exists(configuration, hosts["image"])
 
         vmm.conn.domainEventRegisterAny(
             None,

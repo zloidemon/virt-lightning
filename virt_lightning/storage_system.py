@@ -101,27 +101,27 @@ class StorageSystem:
         if not self.storage_pool_obj.isActive():
             self.storage_pool_obj.create(0)
 
-    def distro_available(self):
+    def image_available(self):
         path = self.storage_dir / "upstream"
         return [path.stem for path in sorted(path.glob("*.qcow2"))]
 
-    def ensure_image_exists(self, configuration, distro):
-        if distro not in self.distro_available():
-            logger.debug("distro not available: %s, will be fetched", distro)
+    def ensure_image_exists(self, configuration, image):
+        if image not in self.image_available():
+            logger.debug("image not available: %s, will be fetched", image)
             try:
                 downloader = DownloaderNative(
                     configuration,
                     self.storage_dir,
                 )
-                downloader.pull(distro=distro)
+                downloader.pull(image=image)
             except ImageNotFoundUpstreamError:
-                raise ImageNotFoundLocallyError(distro) from None
+                raise ImageNotFoundLocallyError(image) from None
 
-    def get_distro_configuration(self, distro):
-        distro_configuration_file = pathlib.PosixPath(
-            f"{self.storage_dir}/upstream/{distro}.json"
+    def get_image_configuration(self, image):
+        image_configuration_file = pathlib.PosixPath(
+            f"{self.storage_dir}/upstream/{image}.json"
         )
-        if not distro_configuration_file.exists():
+        if not image_configuration_file.exists():
             return {}
 
-        return json.load(distro_configuration_file.open("r")) or {}
+        return json.load(image_configuration_file.open("r")) or {}

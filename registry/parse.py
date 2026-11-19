@@ -3,10 +3,10 @@ from pathlib import Path
 
 
 def gen_angie_map(configuration):
-    for name, distro in configuration["images"].items():
-        url = distro["url"]
-        filename = distro["file"]
-        for image in distro["base"]:
+    for name, image_config in configuration["images"].items():
+        url = image_config["url"]
+        filename = image_config["file"]
+        for image in image_config["base"]:
             _url = image.get("url", url)
             _file = image.get("file", filename)
 
