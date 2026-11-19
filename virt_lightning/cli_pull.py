@@ -34,7 +34,7 @@ class CLIPull:
         except ImageNotFoundUpstreamError:
             sys.stdout.write(
                 CLI_MESSAGE_NOTFOUND_IMAGE.format(
-                    base_url=consts.BASE_URL,
+                    base_url=consts.DEFAULT_BASE_REGISTRY_URL,
                     image=args.image,
                 )
             )

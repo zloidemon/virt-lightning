@@ -3,8 +3,15 @@ import sys
 
 import libvirt
 
+import virt_lightning.consts as consts
 from virt_lightning.domain_libvirt import LibvirtDomain
+from virt_lightning.exceptions import ImageNotFoundUpstreamError
 from virt_lightning.icli import ICLIcmd
+
+CLI_MESSAGE_NOTFOUND_IMAGE = """
+Image {image} cannot be downloaded. Visit {base_url}/images/ or
+private image hub to get an up to date list.
+"""
 
 CLI_MESSAGE_START_HELP = """
 **** System is online ****
@@ -68,7 +75,17 @@ class CLIStart(ICLIcmd):
         if kwargs.get("disk"):
             host.update({"disks": [{"size": x} for x in kwargs["disk"]]})
 
-        vmm.storage.ensure_image_exists(configuration, host["image"])
+        try:
+            vmm.storage.ensure_image_exists(configuration, host["image"])
+        except ImageNotFoundUpstreamError:
+            sys.stdout.write(
+                CLI_MESSAGE_NOTFOUND_IMAGE.format(
+                    base_url=consts.DEFAULT_BASE_REGISTRY_URL,
+                    image=host["image"],
+                )
+            )
+            exit(consts.ExitCode.FAIL.value)
+
         domain = LibvirtDomain._start_domain(vmm, host, context, configuration)
 
         if not domain:

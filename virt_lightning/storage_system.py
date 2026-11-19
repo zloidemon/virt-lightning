@@ -17,10 +17,7 @@ from virt_lightning.consts import (
     ExitCode,
 )
 from virt_lightning.downloader_native import DownloaderNative
-from virt_lightning.exceptions import (
-    ImageNotFoundLocallyError,
-    ImageNotFoundUpstreamError,
-)
+from virt_lightning.exceptions import ImageNotFoundUpstreamError
 
 STORAGE_POOL_XML = """
 <pool type='dir'>
@@ -106,16 +103,11 @@ class StorageSystem:
         return [path.stem for path in sorted(path.glob("*.qcow2"))]
 
     def ensure_image_exists(self, configuration, image):
-        if image not in self.image_available():
-            logger.debug("image not available: %s, will be fetched", image)
-            try:
-                downloader = DownloaderNative(
-                    configuration,
-                    self.storage_dir,
-                )
-                downloader.pull(image=image)
-            except ImageNotFoundUpstreamError:
-                raise ImageNotFoundLocallyError(image) from None
+        _image = image.replace(":", "-")
+        if _image not in self.image_available():
+            logger.info("Image not available locally, pulling: %s", image)
+            downloader = DownloaderNative(configuration, self.storage_dir)
+            downloader.pull(image=image)
 
     def get_image_configuration(self, image):
         image_configuration_file = pathlib.PosixPath(
@@ -124,4 +116,10 @@ class StorageSystem:
         if not image_configuration_file.exists():
             return {}
 
-        return json.load(image_configuration_file.open("r")) or {}
+        try:
+            return json.loads(image_configuration_file.read_text()) or {}
+        except (OSError, json.JSONDecodeError):
+            logger.warning(
+                "Ignoring invalid image configuration file: %s", image_configuration_file
+            )
+            return {}

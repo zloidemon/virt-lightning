@@ -69,13 +69,21 @@ class DownloaderNative(IDownloader):
                 fd.write(chunk)
                 self.__progress_callback(temp_file, fd.tell(), length)
         temp_file.rename(target_file)
+        metadata_file = target_file.with_suffix(".json")
+        temp_metadata_file = target_file.with_suffix(".json.temp")
+        metadata = None
         try:
             r = urllib.request.urlopen(f"{parent_url}/{image}.json")
         except urllib.error.HTTPError as e:
-            if e.code == 404:
-                pass
-        with target_file.with_suffix(".json").open("wb") as fd:
-            fd.write(r.read())
+            if e.code != 404:
+                raise
+            logger.info("No image configuration file for %s", image)
+        else:
+            metadata = r.read()
+        if metadata:
+            with temp_metadata_file.open("wb") as fd:
+                fd.write(metadata)
+            temp_metadata_file.rename(metadata_file)
         logger.info(f"Image {image} is ready!")
 
     def pull(self, image=None, **kwargs):
@@ -95,10 +103,12 @@ class DownloaderNative(IDownloader):
                     hashsum=hashsum,
                     **kwargs,
                 )
-                break
+                return
             except ImageNotFoundUpstreamError:
                 logger.info(
                     "Image: %s not found from url: %s",
                     image,
                     registry.entrypoint,
                 )
+
+        raise ImageNotFoundUpstreamError(image)

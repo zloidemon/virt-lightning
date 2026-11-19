@@ -1,12 +1,20 @@
 import asyncio
 import logging
+import sys
 from concurrent.futures import ThreadPoolExecutor
 
 import libvirt
 
+import virt_lightning.consts as consts
 from virt_lightning.consts import DEFAULT_LOGGER, DEFAULT_VL_CONFIGURATION_FILE
 from virt_lightning.domain_libvirt import LibvirtDomain
+from virt_lightning.exceptions import ImageNotFoundUpstreamError
 from virt_lightning.icli import ICLIcmd
+
+CLI_MESSAGE_NOTFOUND_IMAGE = """
+Image {image} cannot be downloaded. Visit {base_url}/images/ or
+private image hub to get an up to date list.
+"""
 
 logger = logging.getLogger(DEFAULT_LOGGER)
 
@@ -38,7 +46,16 @@ class CLIup(ICLIcmd):
         loop = asyncio.get_event_loop()
 
         for hosts in virt_lightning_conf:
-            vmm.storage.ensure_image_exists(configuration, hosts["image"])
+            try:
+                vmm.storage.ensure_image_exists(configuration, hosts["image"])
+            except ImageNotFoundUpstreamError:
+                sys.stdout.write(
+                    CLI_MESSAGE_NOTFOUND_IMAGE.format(
+                        base_url=consts.DEFAULT_BASE_REGISTRY_URL,
+                        image=hosts["image"],
+                    )
+                )
+                exit(consts.ExitCode.FAIL.value)
 
         vmm.conn.domainEventRegisterAny(
             None,

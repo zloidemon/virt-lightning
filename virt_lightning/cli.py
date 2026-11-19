@@ -25,6 +25,7 @@ from virt_lightning.cli_viewer import CLIViewer
 from virt_lightning.configuration_builder import ConfigurationBuilder
 from virt_lightning.configuration_legacy import LegacyConfiguration
 from virt_lightning.configuration_parser_legacy import ConfigurationParserLegacy
+import virt_lightning.consts as consts
 from virt_lightning.consts import (
     CLI_MESSAGE_HELP,
     CLI_MESSAGE_USAGE,
@@ -34,6 +35,8 @@ from virt_lightning.consts import (
     DEFAULT_VL_CONFIGURATION_FILE,
     ExitCode,
 )
+from virt_lightning.downloader_native import DownloaderNative
+from virt_lightning.exceptions import ImageNotFoundUpstreamError
 from virt_lightning.network_system import NetworkSystem
 from virt_lightning.storage_system import StorageSystem
 from virt_lightning.vmm_builder import VMMBuilder
@@ -144,11 +147,40 @@ def main():
         sys.stdout.write(f"{example}\n")
         exit(ExitCode.FAIL.value)
 
+    if args.debug:
+        logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.INFO)
+
     configuration_builder = ConfigurationBuilder.create()
     configuration_builder.set_default({})
     configuration_builder.set_source(args.config)
     configuration_builder.set_parser(ConfigurationParserLegacy)
     configuration = configuration_builder.build(LegacyConfiguration)
+
+    if args.action in ("start", "up"):
+        storage_dir = pathlib.PosixPath(consts.DEFAULT_STORAGE_DIR)
+        upstream = storage_dir / "upstream"
+        if args.action == "start":
+            images = [args.image]
+        else:
+            images = [host["image"] for host in args.virt_lightning_conf]
+        for image in images:
+            distro = image.replace(":", "-")
+            if (upstream / f"{distro}.qcow2").exists():
+                continue
+            logger.info("Image not available locally, pulling: %s", image)
+            try:
+                DownloaderNative(configuration, storage_dir).pull(image=image)
+            except ImageNotFoundUpstreamError:
+                sys.stdout.write(
+                    "\nImage {image} cannot be downloaded. Visit {base_url}/images/ or\n"
+                    "private image hub to get an up to date list.\n".format(
+                        base_url=consts.DEFAULT_BASE_REGISTRY_URL,
+                        image=image,
+                    )
+                )
+                exit(ExitCode.FAIL.value)
 
     vmm_builder = VMMBuilder(configuration)
 
@@ -157,11 +189,6 @@ def main():
     vmm_builder.set_vmm(VMMLibvirt)
 
     vmm = vmm_builder.connect()
-
-    if args.debug:
-        logger.setLevel(logging.DEBUG)
-    else:
-        logger.setLevel(logging.INFO)
 
     match args.action:
         case "ansible":
