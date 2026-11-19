@@ -1,3 +1,7 @@
+# Unreleased
+
+- rename the `distro` field to `image`
+
 # 2.5.0
 
 - use uv to release 2.5.0 (#358)

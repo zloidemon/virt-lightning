@@ -5,7 +5,7 @@ from virt_lightning.downloader_native import DownloaderNative
 from virt_lightning.exceptions import ImageNotFoundUpstreamError
 
 CLI_MESSAGE_NOTFOUND_IMAGE = """
-Distro {image} cannot be downloaded. Visit {base_url}/images/ or
+Image {image} cannot be downloaded. Visit {base_url}/images/ or
 private image hub to get an up to date list.
 """
 
@@ -17,7 +17,7 @@ class CLIPull:
         )
 
     def arguments(self):
-        self.parser.add_argument("distro", help="Name of the VM image", type=str)
+        self.parser.add_argument("image", help="Name of the VM image", type=str)
         return self
 
     def context(self, args):
@@ -34,8 +34,8 @@ class CLIPull:
         except ImageNotFoundUpstreamError:
             sys.stdout.write(
                 CLI_MESSAGE_NOTFOUND_IMAGE.format(
-                    base_url=consts.BASE_URL,
-                    image=args.distro,
+                    base_url=consts.DEFAULT_BASE_REGISTRY_URL,
+                    image=args.image,
                 )
             )
             exit(consts.ExitCode.FAIL.value)

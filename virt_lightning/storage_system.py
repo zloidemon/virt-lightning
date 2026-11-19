@@ -17,10 +17,7 @@ from virt_lightning.consts import (
     ExitCode,
 )
 from virt_lightning.downloader_native import DownloaderNative
-from virt_lightning.exceptions import (
-    ImageNotFoundLocallyError,
-    ImageNotFoundUpstreamError,
-)
+from virt_lightning.exceptions import ImageNotFoundUpstreamError
 
 STORAGE_POOL_XML = """
 <pool type='dir'>
@@ -101,27 +98,28 @@ class StorageSystem:
         if not self.storage_pool_obj.isActive():
             self.storage_pool_obj.create(0)
 
-    def distro_available(self):
+    def image_available(self):
         path = self.storage_dir / "upstream"
         return [path.stem for path in sorted(path.glob("*.qcow2"))]
 
-    def ensure_image_exists(self, configuration, distro):
-        if distro not in self.distro_available():
-            logger.debug("distro not available: %s, will be fetched", distro)
-            try:
-                downloader = DownloaderNative(
-                    configuration,
-                    self.storage_dir,
-                )
-                downloader.pull(distro=distro)
-            except ImageNotFoundUpstreamError:
-                raise ImageNotFoundLocallyError(distro) from None
+    def ensure_image_exists(self, configuration, image):
+        _image = image.replace(":", "-")
+        if _image not in self.image_available():
+            logger.info("Image not available locally, pulling: %s", image)
+            downloader = DownloaderNative(configuration, self.storage_dir)
+            downloader.pull(image=image)
 
-    def get_distro_configuration(self, distro):
-        distro_configuration_file = pathlib.PosixPath(
-            f"{self.storage_dir}/upstream/{distro}.json"
+    def get_image_configuration(self, image):
+        image_configuration_file = pathlib.PosixPath(
+            f"{self.storage_dir}/upstream/{image}.json"
         )
-        if not distro_configuration_file.exists():
+        if not image_configuration_file.exists():
             return {}
 
-        return json.load(distro_configuration_file.open("r")) or {}
+        try:
+            return json.loads(image_configuration_file.read_text()) or {}
+        except (OSError, json.JSONDecodeError):
+            logger.warning(
+                "Ignoring invalid image configuration file: %s", image_configuration_file
+            )
+            return {}

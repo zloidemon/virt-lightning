@@ -117,39 +117,3 @@ class IConfigurationRegistry(metaclass=ABCMeta):
 
     def __repr__(self):
         return f"ConfigurationRegistry({self.entrypoint})"
-
-
-#
-# Интерфейс конфигурации для проверок доступности
-#
-class IConfigurationHealthcheck(metaclass=ABCMeta):
-    @abstractproperty
-    def interval(self):
-        pass
-
-    @abstractproperty
-    def timeout(self):
-        pass
-
-    @abstractproperty
-    def start_period(self):
-        pass
-
-    @abstractproperty
-    def start_interval(self):
-        pass
-
-    @abstractproperty
-    def retries(self):
-        pass
-
-    def __repr__(self):
-        return (
-            "ConfigurationHealthcheck("
-            f"interval={self.interval},"
-            f"timeout={self.timeout},"
-            f"start_period={self.start_period},"
-            f"start_interval={self.start_interval},"
-            f"retries={self.retries}"
-            ")"
-        )

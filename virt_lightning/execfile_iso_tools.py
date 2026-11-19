@@ -1,30 +1,13 @@
-from virt_lightning.consts import (
-    EXEC_FILE_GENISOIMAGE,
-    EXEC_FILE_MKISOFS,
-)
-from virt_lightning.iexecfile import IExecFile
+"""
+Deprecated: use init_system.execfile_iso_tools instead.
+"""
+
+from virt_lightning.init_system_compat import import_init_system_module
+
+__all__ = ["ExecFileISOTool"]  # noqa: F822
 
 
-class ExecFileISOTool(IExecFile):
-    def __init__(self):
-        self.__name = None
-        self.__binaries = (EXEC_FILE_GENISOIMAGE, EXEC_FILE_MKISOFS)
-
-    @property
-    def name(self):
-        return self.__name
-
-    @property
-    def entrypoint(self):
-        for binary in self.__binaries:
-            self.__name = binary
-            if not self.which:
-                continue
-            else:
-                return self.which
-
-        error_msg = (
-            f"Failed to find in PATH: {','.join(self.__binaries)}"
-            "\nPlease install genisoimage tool"
-        )
-        raise Exception(error_msg)
+def __getattr__(name):
+    if name in __all__:
+        return getattr(import_init_system_module("execfile_iso_tools"), name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

@@ -35,9 +35,9 @@ class CLIps(ICLIcmd):
                 "ipv4": (domain.ipv4 and str(domain.ipv4.ip)) or "waiting",
                 "context": domain.context,
                 "username": domain.username,
-                "distro": domain.distro,
+                "image": domain.image,
             }
 
-        output_template = "+ {name:<13}   {username}@{ipv4:>5} [{distro}]"
+        output_template = "+ {name:<13}   {username}@{ipv4:>5} [{image}]"
         for _, v in sorted(results.items()):
             sys.stdout.write(output_template.format(**v))

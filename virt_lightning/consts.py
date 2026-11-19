@@ -2,27 +2,6 @@ import getpass
 from enum import Enum, IntEnum, unique
 
 
-#
-# NOTE: acpi и agent используется для корректного завершения при использовании
-#       qemu/kvm. Для LXC (контейнеры) будет использоваться initctl или signal.
-#       paravirt для виртуальных машин запускаемых на XEN в соотвствующем режиме.
-#
-@unique
-class SignalShutdown(Enum):
-    ACPI = "acpi"
-    AGENT = "agent"
-    INITCTL = "initctl"
-    SIGNAL = "signal"
-    PARAVIRT = "paravirt"
-
-
-@unique
-class HashingAlgorithm(Enum):
-    MD5 = "md5"
-    SHA256 = "sha256"
-    SHA512 = "sha512"
-
-
 @unique
 class LoginMethod(Enum):
     SSH = "ssh"
@@ -32,12 +11,6 @@ class LoginMethod(Enum):
 class ExitCode(Enum):
     OK = 0
     FAIL = 1
-
-
-@unique
-class NetworkProtocolTCPIP(Enum):
-    TCP = "tcp"
-    UDP = "udp"
 
 
 @unique
@@ -64,32 +37,13 @@ class BitWidths(IntEnum):
     BITS64 = 64
 
 
-@unique
-class OperationSystem(Enum):
-    AIX = "aix"
-    ANDROID = "android"
-    DARWIN = "darwin"
-    DRAGONFLYBSD = "dragonflybsd"
-    FREEBSD = "freebsd"
-    ILLUMOS = "illumos"
-    IOS = "ios"
-    JS = "js"
-    LINUX = "linux"
-    NETBSD = "netbsd"
-    OPENBSD = "openbsd"
-    PLAN9 = "plan9"
-    SOLARIS = "solaris"
-    WASIP1 = "wasip1"
-    WINDOWS = "windows"
-
-
 CLI_MESSAGE_HELP = """
 Example:
 
- We export the list of the distro in the {conf} file.
+ We export the list of the images in the {conf} file.
    $ {cli} images > {conf}
 
- For each line of the {conf}, start a VM with the associated distro.
+ For each line of the {conf}, start a VM with the associated image.
    $ {cli} up
 
  Once the VM are up, we can generate an Ansible inventory file:
@@ -103,7 +57,7 @@ Commands:
     down                Delete all VMs created by app
     start               Start a new VM
     stop                Delete a VM
-    images              Dump list of supported distros
+    images              Dump list of supported images
     pull                Download image
     storage             Dump the VM image storage directory
     ansible             Ansible commands
@@ -145,7 +99,7 @@ DEFAULT_DOMAIN_CONFIGURATION = {
     "username": getpass.getuser(),
     "vcpus": 1,
     "default_nic_model": "virtio",
-    "video_model": "virtio",
+    "video_model": "vga",
     "bootcmd": [],
     "runcmd": [],
     "meta_data_media_type": "cdrom",
@@ -167,6 +121,6 @@ EXEC_FILE_VIRSH = "virsh"
 EXEC_FILE_VIRT_VIEWER = "virt-viewer"
 QEMU_DIR = "/var/lib/libvirt/qemu/"
 # FIXME: Удалить после перевода выделения имён по шаблону из FQDN
-RE_DISTRO_HOSTNAME_PATTERN = r"[^a-zA-Z0-9-]+"
+RE_IMAGE_HOSTNAME_PATTERN = r"[^a-zA-Z0-9-]+"
 RE_FQDN_PATTERN = r"^[\.a-z0-9]+$"
 RE_USERNAME_PATTERN = "[a-z_][a-z0-9_-]{1,32}$"

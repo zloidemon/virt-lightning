@@ -27,12 +27,12 @@ class DownloaderNative(IDownloader):
 
     def __fetch_from_url(self, url=None, resource=None, hashsum=None, **kwargs):
         """Retrieve a VM image from a given url."""
-        distro = f"{resource}-{hashsum}"
+        image = f"{resource}-{hashsum}"
 
         target_file = pathlib.PosixPath(
-            "{storage_dir}/upstream/{distro}.qcow2".format(
+            "{storage_dir}/upstream/{image}.qcow2".format(
                 storage_dir=kwargs["storage_dir"],
-                distro=distro,
+                image=image,
             )
         )
         temp_file = target_file.with_suffix(".temp")
@@ -55,7 +55,7 @@ class DownloaderNative(IDownloader):
             r = urllib.request.urlopen(f"{parent_url}")
         except urllib.error.HTTPError as e:
             if e.code == 404:
-                raise ImageNotFoundUpstreamError(distro) from None
+                raise ImageNotFoundUpstreamError(image) from None
             raise
         last_modified = r.headers["Last-Modified"]
         logger.debug("Date: %s", last_modified)
@@ -69,24 +69,32 @@ class DownloaderNative(IDownloader):
                 fd.write(chunk)
                 self.__progress_callback(temp_file, fd.tell(), length)
         temp_file.rename(target_file)
+        metadata_file = target_file.with_suffix(".json")
+        temp_metadata_file = target_file.with_suffix(".json.temp")
+        metadata = None
         try:
-            r = urllib.request.urlopen(f"{parent_url}/{distro}.json")
+            r = urllib.request.urlopen(f"{parent_url}/{image}.json")
         except urllib.error.HTTPError as e:
-            if e.code == 404:
-                pass
-        with target_file.with_suffix(".json").open("wb") as fd:
-            fd.write(r.read())
-        logger.info(f"Image {distro} is ready!")
+            if e.code != 404:
+                raise
+            logger.info("No image configuration file for %s", image)
+        else:
+            metadata = r.read()
+        if metadata:
+            with temp_metadata_file.open("wb") as fd:
+                fd.write(metadata)
+            temp_metadata_file.rename(metadata_file)
+        logger.info(f"Image {image} is ready!")
 
-    def pull(self, distro=None, **kwargs):
+    def pull(self, image=None, **kwargs):
         """Retrieve a VM image from Internet."""
 
         for registry in self.configuration.registry_urls:
             try:
-                resource, hashsum = distro.split(":")
+                resource, hashsum = image.split(":")
 
                 if not resource or not hashsum:
-                    raise Exception("wrong distro argument")
+                    raise Exception("wrong image argument")
 
                 self.__fetch_from_url(
                     storage_dir=self.storage_dir,
@@ -95,10 +103,12 @@ class DownloaderNative(IDownloader):
                     hashsum=hashsum,
                     **kwargs,
                 )
-                break
+                return
             except ImageNotFoundUpstreamError:
                 logger.info(
                     "Image: %s not found from url: %s",
-                    kwargs["distro"],
+                    image,
                     registry.entrypoint,
                 )
+
+        raise ImageNotFoundUpstreamError(image)

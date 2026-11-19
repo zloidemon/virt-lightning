@@ -22,5 +22,5 @@ class CLIImages(ICLIcmd):
 
     @staticmethod
     def run(vmm):
-        for distro_name in vmm.storage.distro_available():
-            logger.info(f"- distro: {distro_name}")
+        for image_name in vmm.storage.image_available():
+            logger.info(f"- image: {image_name}")
